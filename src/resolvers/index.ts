@@ -1,13 +1,12 @@
 import { Query } from './Query'
-import { auth } from './Mutation/auth'
-import { post } from './Mutation/post'
+import { auth, activity } from './Mutation'
 import { AuthPayload } from './AuthPayload'
 
 export default {
   Query,
   Mutation: {
     ...auth,
-    ...post,
+    ...activity
   },
   AuthPayload,
 }

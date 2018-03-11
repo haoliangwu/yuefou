@@ -5,6 +5,30 @@
 # Model Types
 #
 
+type Activity implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location(where: LocationWhereInput): Location!
+  creator(where: UserWhereInput): User!
+  participants(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  tasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
+}
+
+type ActivityTask implements Node {
+  id: ID!
+  name: String!
+  status: ProcessStatus!
+  activity(where: ActivityWhereInput): Activity
+  assignee(where: UserWhereInput): User
+}
+
 type Post implements Node {
   id: ID!
   createdAt: DateTime!
@@ -21,12 +45,932 @@ type User implements Node {
   password: String!
   name: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
+  myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
+  attendedActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
 }
 
 
 #
 # Other Types
 #
+
+"""
+A connection to a list of items.
+"""
+type ActivityConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [ActivityEdge]!
+  aggregate: AggregateActivity!
+}
+
+input ActivityCreateInput {
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: LocationCreateOneInput!
+  creator: UserCreateOneWithoutMyActivitiesInput!
+  participants: UserCreateManyWithoutAttendedActivitiesInput
+  tasks: ActivityTaskCreateManyWithoutActivityInput
+}
+
+input ActivityCreateManyWithoutCreatorInput {
+  create: [ActivityCreateWithoutCreatorInput!]
+  connect: [ActivityWhereUniqueInput!]
+}
+
+input ActivityCreateManyWithoutParticipantsInput {
+  create: [ActivityCreateWithoutParticipantsInput!]
+  connect: [ActivityWhereUniqueInput!]
+}
+
+input ActivityCreateOneWithoutTasksInput {
+  create: ActivityCreateWithoutTasksInput
+  connect: ActivityWhereUniqueInput
+}
+
+input ActivityCreateWithoutCreatorInput {
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: LocationCreateOneInput!
+  participants: UserCreateManyWithoutAttendedActivitiesInput
+  tasks: ActivityTaskCreateManyWithoutActivityInput
+}
+
+input ActivityCreateWithoutParticipantsInput {
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: LocationCreateOneInput!
+  creator: UserCreateOneWithoutMyActivitiesInput!
+  tasks: ActivityTaskCreateManyWithoutActivityInput
+}
+
+input ActivityCreateWithoutTasksInput {
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: LocationCreateOneInput!
+  creator: UserCreateOneWithoutMyActivitiesInput!
+  participants: UserCreateManyWithoutAttendedActivitiesInput
+}
+
+"""
+An edge in a connection.
+"""
+type ActivityEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Activity!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum ActivityOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  title_ASC
+  title_DESC
+  desc_ASC
+  desc_DESC
+  type_ASC
+  type_DESC
+  status_ASC
+  status_DESC
+  startedAt_ASC
+  startedAt_DESC
+  endedAt_ASC
+  endedAt_DESC
+}
+
+type ActivityPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+}
+
+type ActivitySubscriptionPayload {
+  mutation: MutationType!
+  node: Activity
+  updatedFields: [String!]
+  previousValues: ActivityPreviousValues
+}
+
+input ActivitySubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ActivitySubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ActivitySubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: ActivityWhereInput
+}
+
+"""
+A connection to a list of items.
+"""
+type ActivityTaskConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [ActivityTaskEdge]!
+  aggregate: AggregateActivityTask!
+}
+
+input ActivityTaskCreateInput {
+  name: String!
+  status: ProcessStatus!
+  activity: ActivityCreateOneWithoutTasksInput
+  assignee: UserCreateOneWithoutMyTasksInput
+}
+
+input ActivityTaskCreateManyWithoutActivityInput {
+  create: [ActivityTaskCreateWithoutActivityInput!]
+  connect: [ActivityTaskWhereUniqueInput!]
+}
+
+input ActivityTaskCreateManyWithoutAssigneeInput {
+  create: [ActivityTaskCreateWithoutAssigneeInput!]
+  connect: [ActivityTaskWhereUniqueInput!]
+}
+
+input ActivityTaskCreateWithoutActivityInput {
+  name: String!
+  status: ProcessStatus!
+  assignee: UserCreateOneWithoutMyTasksInput
+}
+
+input ActivityTaskCreateWithoutAssigneeInput {
+  name: String!
+  status: ProcessStatus!
+  activity: ActivityCreateOneWithoutTasksInput
+}
+
+"""
+An edge in a connection.
+"""
+type ActivityTaskEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: ActivityTask!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum ActivityTaskOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  status_ASC
+  status_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type ActivityTaskPreviousValues {
+  id: ID!
+  name: String!
+  status: ProcessStatus!
+}
+
+type ActivityTaskSubscriptionPayload {
+  mutation: MutationType!
+  node: ActivityTask
+  updatedFields: [String!]
+  previousValues: ActivityTaskPreviousValues
+}
+
+input ActivityTaskSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ActivityTaskSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ActivityTaskSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: ActivityTaskWhereInput
+}
+
+input ActivityTaskUpdateInput {
+  name: String
+  status: ProcessStatus
+  activity: ActivityUpdateOneWithoutTasksInput
+  assignee: UserUpdateOneWithoutMyTasksInput
+}
+
+input ActivityTaskUpdateManyWithoutActivityInput {
+  create: [ActivityTaskCreateWithoutActivityInput!]
+  connect: [ActivityTaskWhereUniqueInput!]
+  disconnect: [ActivityTaskWhereUniqueInput!]
+  delete: [ActivityTaskWhereUniqueInput!]
+  update: [ActivityTaskUpdateWithWhereUniqueWithoutActivityInput!]
+  upsert: [ActivityTaskUpsertWithWhereUniqueWithoutActivityInput!]
+}
+
+input ActivityTaskUpdateManyWithoutAssigneeInput {
+  create: [ActivityTaskCreateWithoutAssigneeInput!]
+  connect: [ActivityTaskWhereUniqueInput!]
+  disconnect: [ActivityTaskWhereUniqueInput!]
+  delete: [ActivityTaskWhereUniqueInput!]
+  update: [ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput!]
+  upsert: [ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput!]
+}
+
+input ActivityTaskUpdateWithoutActivityDataInput {
+  name: String
+  status: ProcessStatus
+  assignee: UserUpdateOneWithoutMyTasksInput
+}
+
+input ActivityTaskUpdateWithoutAssigneeDataInput {
+  name: String
+  status: ProcessStatus
+  activity: ActivityUpdateOneWithoutTasksInput
+}
+
+input ActivityTaskUpdateWithWhereUniqueWithoutActivityInput {
+  where: ActivityTaskWhereUniqueInput!
+  data: ActivityTaskUpdateWithoutActivityDataInput!
+}
+
+input ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput!
+  data: ActivityTaskUpdateWithoutAssigneeDataInput!
+}
+
+input ActivityTaskUpsertWithWhereUniqueWithoutActivityInput {
+  where: ActivityTaskWhereUniqueInput!
+  update: ActivityTaskUpdateWithoutActivityDataInput!
+  create: ActivityTaskCreateWithoutActivityInput!
+}
+
+input ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput!
+  update: ActivityTaskUpdateWithoutAssigneeDataInput!
+  create: ActivityTaskCreateWithoutAssigneeInput!
+}
+
+input ActivityTaskWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ActivityTaskWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ActivityTaskWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
+  status: ProcessStatus
+  """
+  All values that are not equal to given value.
+  """
+  status_not: ProcessStatus
+  """
+  All values that are contained in given list.
+  """
+  status_in: [ProcessStatus!]
+  """
+  All values that are not contained in given list.
+  """
+  status_not_in: [ProcessStatus!]
+  activity: ActivityWhereInput
+  assignee: UserWhereInput
+}
+
+input ActivityTaskWhereUniqueInput {
+  id: ID
+}
+
+enum ActivityType {
+  HOST
+  TASK
+  POTLUCK
+}
+
+input ActivityUpdateInput {
+  title: String
+  desc: String
+  type: ActivityType
+  status: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: LocationUpdateOneInput
+  creator: UserUpdateOneWithoutMyActivitiesInput
+  participants: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+input ActivityUpdateManyWithoutCreatorInput {
+  create: [ActivityCreateWithoutCreatorInput!]
+  connect: [ActivityWhereUniqueInput!]
+  disconnect: [ActivityWhereUniqueInput!]
+  delete: [ActivityWhereUniqueInput!]
+  update: [ActivityUpdateWithWhereUniqueWithoutCreatorInput!]
+  upsert: [ActivityUpsertWithWhereUniqueWithoutCreatorInput!]
+}
+
+input ActivityUpdateManyWithoutParticipantsInput {
+  create: [ActivityCreateWithoutParticipantsInput!]
+  connect: [ActivityWhereUniqueInput!]
+  disconnect: [ActivityWhereUniqueInput!]
+  delete: [ActivityWhereUniqueInput!]
+  update: [ActivityUpdateWithWhereUniqueWithoutParticipantsInput!]
+  upsert: [ActivityUpsertWithWhereUniqueWithoutParticipantsInput!]
+}
+
+input ActivityUpdateOneWithoutTasksInput {
+  create: ActivityCreateWithoutTasksInput
+  connect: ActivityWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: ActivityUpdateWithoutTasksDataInput
+  upsert: ActivityUpsertWithoutTasksInput
+}
+
+input ActivityUpdateWithoutCreatorDataInput {
+  title: String
+  desc: String
+  type: ActivityType
+  status: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: LocationUpdateOneInput
+  participants: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+input ActivityUpdateWithoutParticipantsDataInput {
+  title: String
+  desc: String
+  type: ActivityType
+  status: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: LocationUpdateOneInput
+  creator: UserUpdateOneWithoutMyActivitiesInput
+  tasks: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+input ActivityUpdateWithoutTasksDataInput {
+  title: String
+  desc: String
+  type: ActivityType
+  status: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: LocationUpdateOneInput
+  creator: UserUpdateOneWithoutMyActivitiesInput
+  participants: UserUpdateManyWithoutAttendedActivitiesInput
+}
+
+input ActivityUpdateWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput!
+  data: ActivityUpdateWithoutCreatorDataInput!
+}
+
+input ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput!
+  data: ActivityUpdateWithoutParticipantsDataInput!
+}
+
+input ActivityUpsertWithoutTasksInput {
+  update: ActivityUpdateWithoutTasksDataInput!
+  create: ActivityCreateWithoutTasksInput!
+}
+
+input ActivityUpsertWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput!
+  update: ActivityUpdateWithoutCreatorDataInput!
+  create: ActivityCreateWithoutCreatorInput!
+}
+
+input ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput!
+  update: ActivityUpdateWithoutParticipantsDataInput!
+  create: ActivityCreateWithoutParticipantsInput!
+}
+
+input ActivityWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [ActivityWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [ActivityWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  title: String
+  """
+  All values that are not equal to given value.
+  """
+  title_not: String
+  """
+  All values that are contained in given list.
+  """
+  title_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  title_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  title_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  title_lte: String
+  """
+  All values greater than the given value.
+  """
+  title_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  title_gte: String
+  """
+  All values containing the given string.
+  """
+  title_contains: String
+  """
+  All values not containing the given string.
+  """
+  title_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  title_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  title_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  title_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  title_not_ends_with: String
+  desc: String
+  """
+  All values that are not equal to given value.
+  """
+  desc_not: String
+  """
+  All values that are contained in given list.
+  """
+  desc_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  desc_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  desc_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  desc_lte: String
+  """
+  All values greater than the given value.
+  """
+  desc_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  desc_gte: String
+  """
+  All values containing the given string.
+  """
+  desc_contains: String
+  """
+  All values not containing the given string.
+  """
+  desc_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  desc_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  desc_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  desc_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  desc_not_ends_with: String
+  type: ActivityType
+  """
+  All values that are not equal to given value.
+  """
+  type_not: ActivityType
+  """
+  All values that are contained in given list.
+  """
+  type_in: [ActivityType!]
+  """
+  All values that are not contained in given list.
+  """
+  type_not_in: [ActivityType!]
+  status: ProcessStatus
+  """
+  All values that are not equal to given value.
+  """
+  status_not: ProcessStatus
+  """
+  All values that are contained in given list.
+  """
+  status_in: [ProcessStatus!]
+  """
+  All values that are not contained in given list.
+  """
+  status_not_in: [ProcessStatus!]
+  startedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  startedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  startedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  startedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  startedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  startedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  startedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  startedAt_gte: DateTime
+  endedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  endedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  endedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  endedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  endedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  endedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  endedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  endedAt_gte: DateTime
+  location: LocationWhereInput
+  creator: UserWhereInput
+  participants_every: UserWhereInput
+  participants_some: UserWhereInput
+  participants_none: UserWhereInput
+  tasks_every: ActivityTaskWhereInput
+  tasks_some: ActivityTaskWhereInput
+  tasks_none: ActivityTaskWhereInput
+}
+
+input ActivityWhereUniqueInput {
+  id: ID
+}
+
+type AggregateActivity {
+  count: Int!
+}
+
+type AggregateActivityTask {
+  count: Int!
+}
+
+type AggregateCoordinate {
+  count: Int!
+}
+
+type AggregateLocation {
+  count: Int!
+}
 
 type AggregatePost {
   count: Int!
@@ -43,7 +987,376 @@ type BatchPayload {
   count: Long!
 }
 
+type Coordinate {
+  lat: Float!
+  lng: Float!
+}
+
+"""
+A connection to a list of items.
+"""
+type CoordinateConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [CoordinateEdge]!
+  aggregate: AggregateCoordinate!
+}
+
+input CoordinateCreateInput {
+  lat: Float!
+  lng: Float!
+}
+
+input CoordinateCreateOneInput {
+  create: CoordinateCreateInput
+}
+
+"""
+An edge in a connection.
+"""
+type CoordinateEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Coordinate!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum CoordinateOrderByInput {
+  lat_ASC
+  lat_DESC
+  lng_ASC
+  lng_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type CoordinatePreviousValues {
+  lat: Float!
+  lng: Float!
+}
+
+type CoordinateSubscriptionPayload {
+  mutation: MutationType!
+  node: Coordinate
+  updatedFields: [String!]
+  previousValues: CoordinatePreviousValues
+}
+
+input CoordinateSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [CoordinateSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [CoordinateSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: CoordinateWhereInput
+}
+
+input CoordinateUpdateDataInput {
+  lat: Float
+  lng: Float
+}
+
+input CoordinateUpdateInput {
+  lat: Float
+  lng: Float
+}
+
+input CoordinateUpdateOneInput {
+  create: CoordinateCreateInput
+  disconnect: Boolean
+  delete: Boolean
+  update: CoordinateUpdateDataInput
+  upsert: CoordinateUpsertNestedInput
+}
+
+input CoordinateUpsertNestedInput {
+  update: CoordinateUpdateDataInput!
+  create: CoordinateCreateInput!
+}
+
+input CoordinateWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [CoordinateWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [CoordinateWhereInput!]
+  lat: Float
+  """
+  All values that are not equal to given value.
+  """
+  lat_not: Float
+  """
+  All values that are contained in given list.
+  """
+  lat_in: [Float!]
+  """
+  All values that are not contained in given list.
+  """
+  lat_not_in: [Float!]
+  """
+  All values less than the given value.
+  """
+  lat_lt: Float
+  """
+  All values less than or equal the given value.
+  """
+  lat_lte: Float
+  """
+  All values greater than the given value.
+  """
+  lat_gt: Float
+  """
+  All values greater than or equal the given value.
+  """
+  lat_gte: Float
+  lng: Float
+  """
+  All values that are not equal to given value.
+  """
+  lng_not: Float
+  """
+  All values that are contained in given list.
+  """
+  lng_in: [Float!]
+  """
+  All values that are not contained in given list.
+  """
+  lng_not_in: [Float!]
+  """
+  All values less than the given value.
+  """
+  lng_lt: Float
+  """
+  All values less than or equal the given value.
+  """
+  lng_lte: Float
+  """
+  All values greater than the given value.
+  """
+  lng_gt: Float
+  """
+  All values greater than or equal the given value.
+  """
+  lng_gte: Float
+}
+
 scalar DateTime
+
+type Location {
+  name: String
+  coordinate(where: CoordinateWhereInput): Coordinate
+}
+
+"""
+A connection to a list of items.
+"""
+type LocationConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [LocationEdge]!
+  aggregate: AggregateLocation!
+}
+
+input LocationCreateInput {
+  name: String
+  coordinate: CoordinateCreateOneInput
+}
+
+input LocationCreateOneInput {
+  create: LocationCreateInput
+}
+
+"""
+An edge in a connection.
+"""
+type LocationEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Location!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum LocationOrderByInput {
+  name_ASC
+  name_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type LocationPreviousValues {
+  name: String
+}
+
+type LocationSubscriptionPayload {
+  mutation: MutationType!
+  node: Location
+  updatedFields: [String!]
+  previousValues: LocationPreviousValues
+}
+
+input LocationSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [LocationSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [LocationSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: LocationWhereInput
+}
+
+input LocationUpdateDataInput {
+  name: String
+  coordinate: CoordinateUpdateOneInput
+}
+
+input LocationUpdateInput {
+  name: String
+  coordinate: CoordinateUpdateOneInput
+}
+
+input LocationUpdateOneInput {
+  create: LocationCreateInput
+  disconnect: Boolean
+  delete: Boolean
+  update: LocationUpdateDataInput
+  upsert: LocationUpsertNestedInput
+}
+
+input LocationUpsertNestedInput {
+  update: LocationUpdateDataInput!
+  create: LocationCreateInput!
+}
+
+input LocationWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [LocationWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [LocationWhereInput!]
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
+  coordinate: CoordinateWhereInput
+}
 
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
@@ -52,18 +1365,36 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
+  createLocation(data: LocationCreateInput!): Location!
+  createCoordinate(data: CoordinateCreateInput!): Coordinate!
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
+  createActivity(data: ActivityCreateInput!): Activity!
+  createActivityTask(data: ActivityTaskCreateInput!): ActivityTask!
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateActivity(data: ActivityUpdateInput!, where: ActivityWhereUniqueInput!): Activity
+  updateActivityTask(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereUniqueInput!): ActivityTask
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
+  deleteActivity(where: ActivityWhereUniqueInput!): Activity
+  deleteActivityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertActivity(where: ActivityWhereUniqueInput!, create: ActivityCreateInput!, update: ActivityUpdateInput!): Activity!
+  upsertActivityTask(where: ActivityTaskWhereUniqueInput!, create: ActivityTaskCreateInput!, update: ActivityTaskUpdateInput!): ActivityTask!
+  updateManyLocations(data: LocationUpdateInput!, where: LocationWhereInput!): BatchPayload!
+  updateManyCoordinates(data: CoordinateUpdateInput!, where: CoordinateWhereInput!): BatchPayload!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
+  updateManyActivities(data: ActivityUpdateInput!, where: ActivityWhereInput!): BatchPayload!
+  updateManyActivityTasks(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereInput!): BatchPayload!
+  deleteManyLocations(where: LocationWhereInput!): BatchPayload!
+  deleteManyCoordinates(where: CoordinateWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
+  deleteManyActivities(where: ActivityWhereInput!): BatchPayload!
+  deleteManyActivityTasks(where: ActivityTaskWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -481,13 +1812,30 @@ input PostWhereUniqueInput {
   id: ID
 }
 
+enum ProcessStatus {
+  INIT
+  PENDING
+  DONE
+  STOP
+}
+
 type Query {
+  locations(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Location]!
+  coordinates(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Coordinate]!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity]!
+  activityTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask]!
   post(where: PostWhereUniqueInput!): Post
   user(where: UserWhereUniqueInput!): User
+  activity(where: ActivityWhereUniqueInput!): Activity
+  activityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
+  locationsConnection(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LocationConnection!
+  coordinatesConnection(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CoordinateConnection!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  activitiesConnection(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityConnection!
+  activityTasksConnection(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityTaskConnection!
   """
   Fetches an object given its ID
   """
@@ -498,8 +1846,12 @@ type Query {
 }
 
 type Subscription {
+  location(where: LocationSubscriptionWhereInput): LocationSubscriptionPayload
+  coordinate(where: CoordinateSubscriptionWhereInput): CoordinateSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  activity(where: ActivitySubscriptionWhereInput): ActivitySubscriptionPayload
+  activityTask(where: ActivityTaskSubscriptionWhereInput): ActivityTaskSubscriptionPayload
 }
 
 """
@@ -522,6 +1874,24 @@ input UserCreateInput {
   password: String!
   name: String!
   posts: PostCreateManyWithoutAuthorInput
+  myActivities: ActivityCreateManyWithoutCreatorInput
+  myTasks: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities: ActivityCreateManyWithoutParticipantsInput
+}
+
+input UserCreateManyWithoutAttendedActivitiesInput {
+  create: [UserCreateWithoutAttendedActivitiesInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
+input UserCreateOneWithoutMyActivitiesInput {
+  create: UserCreateWithoutMyActivitiesInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutMyTasksInput {
+  create: UserCreateWithoutMyTasksInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutPostsInput {
@@ -529,10 +1899,40 @@ input UserCreateOneWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateWithoutAttendedActivitiesInput {
+  email: String!
+  password: String!
+  name: String!
+  posts: PostCreateManyWithoutAuthorInput
+  myActivities: ActivityCreateManyWithoutCreatorInput
+  myTasks: ActivityTaskCreateManyWithoutAssigneeInput
+}
+
+input UserCreateWithoutMyActivitiesInput {
+  email: String!
+  password: String!
+  name: String!
+  posts: PostCreateManyWithoutAuthorInput
+  myTasks: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities: ActivityCreateManyWithoutParticipantsInput
+}
+
+input UserCreateWithoutMyTasksInput {
+  email: String!
+  password: String!
+  name: String!
+  posts: PostCreateManyWithoutAuthorInput
+  myActivities: ActivityCreateManyWithoutCreatorInput
+  attendedActivities: ActivityCreateManyWithoutParticipantsInput
+}
+
 input UserCreateWithoutPostsInput {
   email: String!
   password: String!
   name: String!
+  myActivities: ActivityCreateManyWithoutCreatorInput
+  myTasks: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
 """
@@ -611,6 +2011,36 @@ input UserUpdateInput {
   password: String
   name: String
   posts: PostUpdateManyWithoutAuthorInput
+  myActivities: ActivityUpdateManyWithoutCreatorInput
+  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
+}
+
+input UserUpdateManyWithoutAttendedActivitiesInput {
+  create: [UserCreateWithoutAttendedActivitiesInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  delete: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput!]
+  upsert: [UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput!]
+}
+
+input UserUpdateOneWithoutMyActivitiesInput {
+  create: UserCreateWithoutMyActivitiesInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutMyActivitiesDataInput
+  upsert: UserUpsertWithoutMyActivitiesInput
+}
+
+input UserUpdateOneWithoutMyTasksInput {
+  create: UserCreateWithoutMyTasksInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutMyTasksDataInput
+  upsert: UserUpsertWithoutMyTasksInput
 }
 
 input UserUpdateOneWithoutPostsInput {
@@ -622,15 +2052,66 @@ input UserUpdateOneWithoutPostsInput {
   upsert: UserUpsertWithoutPostsInput
 }
 
+input UserUpdateWithoutAttendedActivitiesDataInput {
+  email: String
+  password: String
+  name: String
+  posts: PostUpdateManyWithoutAuthorInput
+  myActivities: ActivityUpdateManyWithoutCreatorInput
+  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
+}
+
+input UserUpdateWithoutMyActivitiesDataInput {
+  email: String
+  password: String
+  name: String
+  posts: PostUpdateManyWithoutAuthorInput
+  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
+}
+
+input UserUpdateWithoutMyTasksDataInput {
+  email: String
+  password: String
+  name: String
+  posts: PostUpdateManyWithoutAuthorInput
+  myActivities: ActivityUpdateManyWithoutCreatorInput
+  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
+}
+
 input UserUpdateWithoutPostsDataInput {
   email: String
   password: String
   name: String
+  myActivities: ActivityUpdateManyWithoutCreatorInput
+  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
+}
+
+input UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutAttendedActivitiesDataInput!
+}
+
+input UserUpsertWithoutMyActivitiesInput {
+  update: UserUpdateWithoutMyActivitiesDataInput!
+  create: UserCreateWithoutMyActivitiesInput!
+}
+
+input UserUpsertWithoutMyTasksInput {
+  update: UserUpdateWithoutMyTasksDataInput!
+  create: UserCreateWithoutMyTasksInput!
 }
 
 input UserUpsertWithoutPostsInput {
   update: UserUpdateWithoutPostsDataInput!
   create: UserCreateWithoutPostsInput!
+}
+
+input UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutAttendedActivitiesDataInput!
+  create: UserCreateWithoutAttendedActivitiesInput!
 }
 
 input UserWhereInput {
@@ -857,6 +2338,15 @@ input UserWhereInput {
   posts_every: PostWhereInput
   posts_some: PostWhereInput
   posts_none: PostWhereInput
+  myActivities_every: ActivityWhereInput
+  myActivities_some: ActivityWhereInput
+  myActivities_none: ActivityWhereInput
+  myTasks_every: ActivityTaskWhereInput
+  myTasks_some: ActivityTaskWhereInput
+  myTasks_none: ActivityTaskWhereInput
+  attendedActivities_every: ActivityWhereInput
+  attendedActivities_some: ActivityWhereInput
+  attendedActivities_none: ActivityWhereInput
 }
 
 input UserWhereUniqueInput {

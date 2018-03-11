@@ -1,0 +1,18 @@
+# import Activity from './activity.graphql'
+
+type Location {
+  name: String
+  coordinate: Coordinate
+}
+
+type Coordinate {
+  lat: Float!
+  lng: Float!
+}
+
+enum ProcessStatus {
+  INIT
+  PENDING
+  DONE
+  STOP
+}

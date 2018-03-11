@@ -1,0 +1,32 @@
+# import Location, ProcessStatus from './common.graphql'
+# import User from './user.graphql'
+
+enum ActivityType {
+  HOST
+  TASK
+  POTLUCK
+}
+
+type Activity {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus!
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: Location!
+  creator: User! @relation(name: "MyActivities")
+  participants: [User!]! @relation(name: "AttendedActivities" onDelete: SET_NULL)
+  tasks: [ActivityTask!]! @relation(name: "BelongActivity" onDelete: CASCADE)
+}
+
+type ActivityTask {
+  id: ID! @unique
+  name: String!
+  status: ProcessStatus!
+  activity: Activity @relation(name: "BelongActivity")
+  assignee: User @relation(name: "ActivityTaskAssignee")
+}

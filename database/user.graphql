@@ -1,3 +1,5 @@
+# import Activity, ActivityTask from './activity.graphql'
+
 type Post {
   id: ID! @unique
   createdAt: DateTime!
@@ -14,4 +16,8 @@ type User {
   password: String!
   name: String!
   posts: [Post!]!
+  myActivities: [Activity!]! @relation(name: "MyActivities" onDelete: CASCADE)
+  myTasks: [ActivityTask!]! @relation(name: "ActivityTaskAssignee")
+  attendedActivities: [Activity!]! @relation(name: "AttendedActivities")
 }
+
