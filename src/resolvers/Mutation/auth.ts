@@ -3,6 +3,9 @@ import * as jwt from 'jsonwebtoken'
 import { Context } from '../../utils'
 
 export const auth = {
+  /*
+   用户注册 
+   */
   async signup(parent, args, ctx: Context, info) {
     const password = await bcrypt.hash(args.password, 10)
     const user = await ctx.db.mutation.createUser({
@@ -15,6 +18,9 @@ export const auth = {
     }
   },
 
+  /*
+   用户登录
+   */
   async login(parent, { email, password }, ctx: Context, info) {
     const user = await ctx.db.query.user({ where: { email } })
     if (!user) {

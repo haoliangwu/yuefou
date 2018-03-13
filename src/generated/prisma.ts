@@ -9,10 +9,10 @@ type Activity implements Node {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location(where: LocationWhereInput): Location!
+  location: String!
   creator(where: UserWhereInput): User!
   participants(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   tasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
@@ -66,10 +66,10 @@ input ActivityCreateInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
@@ -94,10 +94,10 @@ input ActivityCreateWithoutCreatorInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
 }
@@ -106,10 +106,10 @@ input ActivityCreateWithoutParticipantsInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   tasks: ActivityTaskCreateManyWithoutActivityInput
 }
@@ -118,10 +118,10 @@ input ActivityCreateWithoutTasksInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
 }
@@ -159,6 +159,8 @@ enum ActivityOrderByInput {
   startedAt_DESC
   endedAt_ASC
   endedAt_DESC
+  location_ASC
+  location_DESC
 }
 
 type ActivityPreviousValues {
@@ -168,9 +170,10 @@ type ActivityPreviousValues {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
+  location: String!
 }
 
 type ActivitySubscriptionPayload {
@@ -528,7 +531,7 @@ input ActivityUpdateInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
@@ -568,7 +571,7 @@ input ActivityUpdateWithoutCreatorDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
 }
@@ -580,7 +583,7 @@ input ActivityUpdateWithoutParticipantsDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
 }
@@ -592,7 +595,7 @@ input ActivityUpdateWithoutTasksDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
 }
@@ -934,7 +937,59 @@ input ActivityWhereInput {
   All values greater than or equal the given value.
   """
   endedAt_gte: DateTime
-  location: LocationWhereInput
+  location: String
+  """
+  All values that are not equal to given value.
+  """
+  location_not: String
+  """
+  All values that are contained in given list.
+  """
+  location_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  location_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  location_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  location_lte: String
+  """
+  All values greater than the given value.
+  """
+  location_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  location_gte: String
+  """
+  All values containing the given string.
+  """
+  location_contains: String
+  """
+  All values not containing the given string.
+  """
+  location_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  location_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  location_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  location_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  location_not_ends_with: String
   creator: UserWhereInput
   participants_every: UserWhereInput
   participants_some: UserWhereInput
@@ -956,14 +1011,6 @@ type AggregateActivityTask {
   count: Int!
 }
 
-type AggregateCoordinate {
-  count: Int!
-}
-
-type AggregateLocation {
-  count: Int!
-}
-
 type AggregatePost {
   count: Int!
 }
@@ -979,376 +1026,7 @@ type BatchPayload {
   count: Long!
 }
 
-type Coordinate {
-  lat: Float!
-  lng: Float!
-}
-
-"""
-A connection to a list of items.
-"""
-type CoordinateConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [CoordinateEdge]!
-  aggregate: AggregateCoordinate!
-}
-
-input CoordinateCreateInput {
-  lat: Float!
-  lng: Float!
-}
-
-input CoordinateCreateOneInput {
-  create: CoordinateCreateInput
-}
-
-"""
-An edge in a connection.
-"""
-type CoordinateEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Coordinate!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum CoordinateOrderByInput {
-  lat_ASC
-  lat_DESC
-  lng_ASC
-  lng_DESC
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type CoordinatePreviousValues {
-  lat: Float!
-  lng: Float!
-}
-
-type CoordinateSubscriptionPayload {
-  mutation: MutationType!
-  node: Coordinate
-  updatedFields: [String!]
-  previousValues: CoordinatePreviousValues
-}
-
-input CoordinateSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [CoordinateSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [CoordinateSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: CoordinateWhereInput
-}
-
-input CoordinateUpdateDataInput {
-  lat: Float
-  lng: Float
-}
-
-input CoordinateUpdateInput {
-  lat: Float
-  lng: Float
-}
-
-input CoordinateUpdateOneInput {
-  create: CoordinateCreateInput
-  disconnect: Boolean
-  delete: Boolean
-  update: CoordinateUpdateDataInput
-  upsert: CoordinateUpsertNestedInput
-}
-
-input CoordinateUpsertNestedInput {
-  update: CoordinateUpdateDataInput!
-  create: CoordinateCreateInput!
-}
-
-input CoordinateWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [CoordinateWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [CoordinateWhereInput!]
-  lat: Float
-  """
-  All values that are not equal to given value.
-  """
-  lat_not: Float
-  """
-  All values that are contained in given list.
-  """
-  lat_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  lat_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  lat_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  lat_lte: Float
-  """
-  All values greater than the given value.
-  """
-  lat_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  lat_gte: Float
-  lng: Float
-  """
-  All values that are not equal to given value.
-  """
-  lng_not: Float
-  """
-  All values that are contained in given list.
-  """
-  lng_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  lng_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  lng_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  lng_lte: Float
-  """
-  All values greater than the given value.
-  """
-  lng_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  lng_gte: Float
-}
-
 scalar DateTime
-
-type Location {
-  name: String
-  coordinate(where: CoordinateWhereInput): Coordinate
-}
-
-"""
-A connection to a list of items.
-"""
-type LocationConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [LocationEdge]!
-  aggregate: AggregateLocation!
-}
-
-input LocationCreateInput {
-  name: String
-  coordinate: CoordinateCreateOneInput
-}
-
-input LocationCreateOneInput {
-  create: LocationCreateInput
-}
-
-"""
-An edge in a connection.
-"""
-type LocationEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Location!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum LocationOrderByInput {
-  name_ASC
-  name_DESC
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type LocationPreviousValues {
-  name: String
-}
-
-type LocationSubscriptionPayload {
-  mutation: MutationType!
-  node: Location
-  updatedFields: [String!]
-  previousValues: LocationPreviousValues
-}
-
-input LocationSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [LocationSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [LocationSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: LocationWhereInput
-}
-
-input LocationUpdateDataInput {
-  name: String
-  coordinate: CoordinateUpdateOneInput
-}
-
-input LocationUpdateInput {
-  name: String
-  coordinate: CoordinateUpdateOneInput
-}
-
-input LocationUpdateOneInput {
-  create: LocationCreateInput
-  disconnect: Boolean
-  delete: Boolean
-  update: LocationUpdateDataInput
-  upsert: LocationUpsertNestedInput
-}
-
-input LocationUpsertNestedInput {
-  update: LocationUpdateDataInput!
-  create: LocationCreateInput!
-}
-
-input LocationWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [LocationWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [LocationWhereInput!]
-  name: String
-  """
-  All values that are not equal to given value.
-  """
-  name_not: String
-  """
-  All values that are contained in given list.
-  """
-  name_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  name_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  name_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  name_lte: String
-  """
-  All values greater than the given value.
-  """
-  name_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  name_gte: String
-  """
-  All values containing the given string.
-  """
-  name_contains: String
-  """
-  All values not containing the given string.
-  """
-  name_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  name_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  name_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  name_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  name_not_ends_with: String
-  coordinate: CoordinateWhereInput
-}
 
 """
 The 'Long' scalar type represents non-fractional signed whole numeric values.
@@ -2279,8 +1957,6 @@ input UserWhereUniqueInput {
 }
 
 type Mutation {
-  createLocation(data: LocationCreateInput!): Location!
-  createCoordinate(data: CoordinateCreateInput!): Coordinate!
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
   createActivity(data: ActivityCreateInput!): Activity!
@@ -2297,14 +1973,10 @@ type Mutation {
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertActivity(where: ActivityWhereUniqueInput!, create: ActivityCreateInput!, update: ActivityUpdateInput!): Activity!
   upsertActivityTask(where: ActivityTaskWhereUniqueInput!, create: ActivityTaskCreateInput!, update: ActivityTaskUpdateInput!): ActivityTask!
-  updateManyLocations(data: LocationUpdateInput!, where: LocationWhereInput!): BatchPayload!
-  updateManyCoordinates(data: CoordinateUpdateInput!, where: CoordinateWhereInput!): BatchPayload!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyActivities(data: ActivityUpdateInput!, where: ActivityWhereInput!): BatchPayload!
   updateManyActivityTasks(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereInput!): BatchPayload!
-  deleteManyLocations(where: LocationWhereInput!): BatchPayload!
-  deleteManyCoordinates(where: CoordinateWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyActivities(where: ActivityWhereInput!): BatchPayload!
@@ -2312,8 +1984,6 @@ type Mutation {
 }
 
 type Query {
-  locations(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Location]!
-  coordinates(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Coordinate]!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity]!
@@ -2322,8 +1992,6 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   activity(where: ActivityWhereUniqueInput!): Activity
   activityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  locationsConnection(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LocationConnection!
-  coordinatesConnection(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CoordinateConnection!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   activitiesConnection(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityConnection!
@@ -2338,8 +2006,6 @@ type Query {
 }
 
 type Subscription {
-  location(where: LocationSubscriptionWhereInput): LocationSubscriptionPayload
-  coordinate(where: CoordinateSubscriptionWhereInput): CoordinateSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   activity(where: ActivitySubscriptionWhereInput): ActivitySubscriptionPayload
@@ -2347,28 +2013,16 @@ type Subscription {
 }
 `
 
-export type ActivityType = 
-  'HOST' |
-  'TASK' |
-  'POTLUCK'
-
 export type ProcessStatus = 
   'INIT' |
   'PENDING' |
   'DONE' |
   'STOP'
 
-export type CoordinateOrderByInput = 
-  'lat_ASC' |
-  'lat_DESC' |
-  'lng_ASC' |
-  'lng_DESC' |
-  'id_ASC' |
-  'id_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
+export type ActivityType = 
+  'HOST' |
+  'TASK' |
+  'POTLUCK'
 
 export type PostOrderByInput = 
   'id_ASC' |
@@ -2402,7 +2056,9 @@ export type ActivityOrderByInput =
   'startedAt_ASC' |
   'startedAt_DESC' |
   'endedAt_ASC' |
-  'endedAt_DESC'
+  'endedAt_DESC' |
+  'location_ASC' |
+  'location_DESC'
 
 export type UserOrderByInput = 
   'id_ASC' |
@@ -2413,16 +2069,6 @@ export type UserOrderByInput =
   'password_DESC' |
   'name_ASC' |
   'name_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
-export type LocationOrderByInput = 
-  'name_ASC' |
-  'name_DESC' |
-  'id_ASC' |
-  'id_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -2445,14 +2091,108 @@ export type MutationType =
   'UPDATED' |
   'DELETED'
 
-export interface UserCreateOneWithoutMyTasksInput {
-  create?: UserCreateWithoutMyTasksInput
-  connect?: UserWhereUniqueInput
+export interface UserCreateInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
 }
 
-export interface LocationWhereInput {
-  AND?: LocationWhereInput[] | LocationWhereInput
-  OR?: LocationWhereInput[] | LocationWhereInput
+export interface PostWhereInput {
+  AND?: PostWhereInput[] | PostWhereInput
+  OR?: PostWhereInput[] | PostWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  createdAt?: DateTime
+  createdAt_not?: DateTime
+  createdAt_in?: DateTime[] | DateTime
+  createdAt_not_in?: DateTime[] | DateTime
+  createdAt_lt?: DateTime
+  createdAt_lte?: DateTime
+  createdAt_gt?: DateTime
+  createdAt_gte?: DateTime
+  updatedAt?: DateTime
+  updatedAt_not?: DateTime
+  updatedAt_in?: DateTime[] | DateTime
+  updatedAt_not_in?: DateTime[] | DateTime
+  updatedAt_lt?: DateTime
+  updatedAt_lte?: DateTime
+  updatedAt_gt?: DateTime
+  updatedAt_gte?: DateTime
+  isPublished?: Boolean
+  isPublished_not?: Boolean
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
+  text?: String
+  text_not?: String
+  text_in?: String[] | String
+  text_not_in?: String[] | String
+  text_lt?: String
+  text_lte?: String
+  text_gt?: String
+  text_gte?: String
+  text_contains?: String
+  text_not_contains?: String
+  text_starts_with?: String
+  text_not_starts_with?: String
+  text_ends_with?: String
+  text_not_ends_with?: String
+  author?: UserWhereInput
+}
+
+export interface UserUpdateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutPostsDataInput
+  upsert?: UserUpsertWithoutPostsInput
+}
+
+export interface ActivityTaskWhereInput {
+  AND?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
+  OR?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
   name?: String
   name_not?: String
   name_in?: String[] | String
@@ -2467,46 +2207,223 @@ export interface LocationWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
-  coordinate?: CoordinateWhereInput
+  status?: ProcessStatus
+  status_not?: ProcessStatus
+  status_in?: ProcessStatus[] | ProcessStatus
+  status_not_in?: ProcessStatus[] | ProcessStatus
+  activity?: ActivityWhereInput
+  assignee?: UserWhereInput
 }
 
-export interface ActivityCreateWithoutCreatorInput {
+export interface ActivityCreateOneWithoutTasksInput {
+  create?: ActivityCreateWithoutTasksInput
+  connect?: ActivityWhereUniqueInput
+}
+
+export interface ActivityTaskUpdateManyWithoutActivityInput {
+  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  update?: ActivityTaskUpdateWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpdateWithWhereUniqueWithoutActivityInput
+  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpsertWithWhereUniqueWithoutActivityInput
+}
+
+export interface ActivityCreateWithoutTasksInput {
   title: String
   desc?: String
   type: ActivityType
-  status: ProcessStatus
+  status?: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationCreateOneInput
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
+  participants?: UserCreateManyWithoutAttendedActivitiesInput
+}
+
+export interface UserUpdateWithoutPostsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface UserCreateOneWithoutMyActivitiesInput {
+  create?: UserCreateWithoutMyActivitiesInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface ActivityTaskSubscriptionWhereInput {
+  AND?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
+  OR?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: ActivityTaskWhereInput
+}
+
+export interface UserCreateWithoutMyActivitiesInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface ActivitySubscriptionWhereInput {
+  AND?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
+  OR?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: ActivityWhereInput
+}
+
+export interface ActivityCreateManyWithoutParticipantsInput {
+  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
+  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+}
+
+export interface PostSubscriptionWhereInput {
+  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: PostWhereInput
+}
+
+export interface ActivityCreateWithoutParticipantsInput {
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
+  tasks?: ActivityTaskCreateManyWithoutActivityInput
+}
+
+export interface PostWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface ActivityTaskCreateManyWithoutActivityInput {
+  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+}
+
+export interface ActivityWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface ActivityTaskCreateWithoutActivityInput {
+  name: String
+  status: ProcessStatus
+  assignee?: UserCreateOneWithoutMyTasksInput
+}
+
+export interface ActivityUpdateInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  creator?: UserUpdateOneWithoutMyActivitiesInput
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+export interface UserCreateOneWithoutMyTasksInput {
+  create?: UserCreateWithoutMyTasksInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput
+  create: UserCreateWithoutPostsInput
+}
+
+export interface UserCreateWithoutMyTasksInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutAttendedActivitiesDataInput
+  create: UserCreateWithoutAttendedActivitiesInput
+}
+
+export interface ActivityTaskUpdateWithoutActivityDataInput {
+  name?: String
+  status?: ProcessStatus
+  assignee?: UserUpdateOneWithoutMyTasksInput
+}
+
+export interface ActivityUpsertWithoutTasksInput {
+  update: ActivityUpdateWithoutTasksDataInput
+  create: ActivityCreateWithoutTasksInput
+}
+
+export interface ActivityCreateInput {
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
   participants?: UserCreateManyWithoutAttendedActivitiesInput
   tasks?: ActivityTaskCreateManyWithoutActivityInput
 }
 
-export interface UserUpdateOneWithoutMyActivitiesInput {
-  create?: UserCreateWithoutMyActivitiesInput
+export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput
+  update: ActivityUpdateWithoutParticipantsDataInput
+  create: ActivityCreateWithoutParticipantsInput
+}
+
+export interface ActivityTaskCreateInput {
+  name: String
+  status: ProcessStatus
+  activity?: ActivityCreateOneWithoutTasksInput
+  assignee?: UserCreateOneWithoutMyTasksInput
+}
+
+export interface UserUpsertWithoutMyTasksInput {
+  update: UserUpdateWithoutMyTasksDataInput
+  create: UserCreateWithoutMyTasksInput
+}
+
+export interface PostUpdateInput {
+  isPublished?: Boolean
+  title?: String
+  text?: String
+  author?: UserUpdateOneWithoutPostsInput
+}
+
+export interface UserUpdateOneWithoutMyTasksInput {
+  create?: UserCreateWithoutMyTasksInput
   connect?: UserWhereUniqueInput
   disconnect?: Boolean
   delete?: Boolean
-  update?: UserUpdateWithoutMyActivitiesDataInput
-  upsert?: UserUpsertWithoutMyActivitiesInput
-}
-
-export interface LocationCreateOneInput {
-  create?: LocationCreateInput
-}
-
-export interface UserUpdateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutPostsDataInput
-  upsert?: UserUpsertWithoutPostsInput
-}
-
-export interface UserCreateManyWithoutAttendedActivitiesInput {
-  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  update?: UserUpdateWithoutMyTasksDataInput
+  upsert?: UserUpsertWithoutMyTasksInput
 }
 
 export interface ActivityWhereInput {
@@ -2594,7 +2511,20 @@ export interface ActivityWhereInput {
   endedAt_lte?: DateTime
   endedAt_gt?: DateTime
   endedAt_gte?: DateTime
-  location?: LocationWhereInput
+  location?: String
+  location_not?: String
+  location_in?: String[] | String
+  location_not_in?: String[] | String
+  location_lt?: String
+  location_lte?: String
+  location_gt?: String
+  location_gte?: String
+  location_contains?: String
+  location_not_contains?: String
+  location_starts_with?: String
+  location_not_starts_with?: String
+  location_ends_with?: String
+  location_not_ends_with?: String
   creator?: UserWhereInput
   participants_every?: UserWhereInput
   participants_some?: UserWhereInput
@@ -2604,271 +2534,9 @@ export interface ActivityWhereInput {
   tasks_none?: ActivityTaskWhereInput
 }
 
-export interface UserCreateWithoutAttendedActivitiesInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-}
-
-export interface PostWhereInput {
-  AND?: PostWhereInput[] | PostWhereInput
-  OR?: PostWhereInput[] | PostWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  createdAt?: DateTime
-  createdAt_not?: DateTime
-  createdAt_in?: DateTime[] | DateTime
-  createdAt_not_in?: DateTime[] | DateTime
-  createdAt_lt?: DateTime
-  createdAt_lte?: DateTime
-  createdAt_gt?: DateTime
-  createdAt_gte?: DateTime
-  updatedAt?: DateTime
-  updatedAt_not?: DateTime
-  updatedAt_in?: DateTime[] | DateTime
-  updatedAt_not_in?: DateTime[] | DateTime
-  updatedAt_lt?: DateTime
-  updatedAt_lte?: DateTime
-  updatedAt_gt?: DateTime
-  updatedAt_gte?: DateTime
-  isPublished?: Boolean
-  isPublished_not?: Boolean
-  title?: String
-  title_not?: String
-  title_in?: String[] | String
-  title_not_in?: String[] | String
-  title_lt?: String
-  title_lte?: String
-  title_gt?: String
-  title_gte?: String
-  title_contains?: String
-  title_not_contains?: String
-  title_starts_with?: String
-  title_not_starts_with?: String
-  title_ends_with?: String
-  title_not_ends_with?: String
-  text?: String
-  text_not?: String
-  text_in?: String[] | String
-  text_not_in?: String[] | String
-  text_lt?: String
-  text_lte?: String
-  text_gt?: String
-  text_gte?: String
-  text_contains?: String
-  text_not_contains?: String
-  text_starts_with?: String
-  text_not_starts_with?: String
-  text_ends_with?: String
-  text_not_ends_with?: String
-  author?: UserWhereInput
-}
-
-export interface PostCreateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-}
-
-export interface ActivitySubscriptionWhereInput {
-  AND?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
-  OR?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: ActivityWhereInput
-}
-
-export interface PostCreateWithoutAuthorInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-}
-
-export interface CoordinateSubscriptionWhereInput {
-  AND?: CoordinateSubscriptionWhereInput[] | CoordinateSubscriptionWhereInput
-  OR?: CoordinateSubscriptionWhereInput[] | CoordinateSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: CoordinateWhereInput
-}
-
-export interface ActivityTaskCreateManyWithoutAssigneeInput {
-  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-}
-
-export interface LocationSubscriptionWhereInput {
-  AND?: LocationSubscriptionWhereInput[] | LocationSubscriptionWhereInput
-  OR?: LocationSubscriptionWhereInput[] | LocationSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: LocationWhereInput
-}
-
-export interface ActivityTaskCreateWithoutAssigneeInput {
-  name: String
-  status: ProcessStatus
-  activity?: ActivityCreateOneWithoutTasksInput
-}
-
-export interface LocationUpdateInput {
-  name?: String
-  coordinate?: CoordinateUpdateOneInput
-}
-
-export interface ActivityCreateOneWithoutTasksInput {
-  create?: ActivityCreateWithoutTasksInput
-  connect?: ActivityWhereUniqueInput
-}
-
-export interface UserWhereUniqueInput {
-  id?: ID_Input
-  email?: String
-}
-
-export interface ActivityCreateWithoutTasksInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: LocationCreateOneInput
-  creator: UserCreateOneWithoutMyActivitiesInput
-  participants?: UserCreateManyWithoutAttendedActivitiesInput
-}
-
-export interface ActivityTaskWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface UserCreateOneWithoutMyActivitiesInput {
-  create?: UserCreateWithoutMyActivitiesInput
+export interface UserCreateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
   connect?: UserWhereUniqueInput
-}
-
-export interface ActivityUpdateInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: LocationUpdateOneInput
-  creator?: UserUpdateOneWithoutMyActivitiesInput
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
-  tasks?: ActivityTaskUpdateManyWithoutActivityInput
-}
-
-export interface UserCreateWithoutMyActivitiesInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
-export interface UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput
-  create: UserCreateWithoutPostsInput
-}
-
-export interface ActivityCreateManyWithoutParticipantsInput {
-  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
-  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-}
-
-export interface UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutAttendedActivitiesDataInput
-  create: UserCreateWithoutAttendedActivitiesInput
-}
-
-export interface ActivityCreateWithoutParticipantsInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: LocationCreateOneInput
-  creator: UserCreateOneWithoutMyActivitiesInput
-  tasks?: ActivityTaskCreateManyWithoutActivityInput
-}
-
-export interface ActivityUpsertWithoutTasksInput {
-  update: ActivityUpdateWithoutTasksDataInput
-  create: ActivityCreateWithoutTasksInput
-}
-
-export interface ActivityTaskCreateManyWithoutActivityInput {
-  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-}
-
-export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
-  where: ActivityWhereUniqueInput
-  update: ActivityUpdateWithoutParticipantsDataInput
-  create: ActivityCreateWithoutParticipantsInput
-}
-
-export interface ActivityTaskCreateWithoutActivityInput {
-  name: String
-  status: ProcessStatus
-  assignee?: UserCreateOneWithoutMyTasksInput
-}
-
-export interface UserUpsertWithoutMyTasksInput {
-  update: UserUpdateWithoutMyTasksDataInput
-  create: UserCreateWithoutMyTasksInput
-}
-
-export interface ActivityUpdateManyWithoutParticipantsInput {
-  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
-  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  update?: ActivityUpdateWithWhereUniqueWithoutParticipantsInput[] | ActivityUpdateWithWhereUniqueWithoutParticipantsInput
-  upsert?: ActivityUpsertWithWhereUniqueWithoutParticipantsInput[] | ActivityUpsertWithWhereUniqueWithoutParticipantsInput
-}
-
-export interface UserUpdateOneWithoutMyTasksInput {
-  create?: UserCreateWithoutMyTasksInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutMyTasksDataInput
-  upsert?: UserUpsertWithoutMyTasksInput
-}
-
-export interface UserCreateWithoutMyTasksInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
 }
 
 export interface ActivityTaskUpdateWithWhereUniqueWithoutActivityInput {
@@ -2876,101 +2544,9 @@ export interface ActivityTaskUpdateWithWhereUniqueWithoutActivityInput {
   data: ActivityTaskUpdateWithoutActivityDataInput
 }
 
-export interface UserCreateInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
-export interface ActivityUpdateWithoutParticipantsDataInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: LocationUpdateOneInput
-  creator?: UserUpdateOneWithoutMyActivitiesInput
-  tasks?: ActivityTaskUpdateManyWithoutActivityInput
-}
-
-export interface ActivityCreateInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: LocationCreateOneInput
-  creator: UserCreateOneWithoutMyActivitiesInput
-  participants?: UserCreateManyWithoutAttendedActivitiesInput
-  tasks?: ActivityTaskCreateManyWithoutActivityInput
-}
-
-export interface LocationCreateInput {
-  name?: String
-  coordinate?: CoordinateCreateOneInput
-}
-
-export interface ActivityTaskCreateInput {
-  name: String
-  status: ProcessStatus
-  activity?: ActivityCreateOneWithoutTasksInput
-  assignee?: UserCreateOneWithoutMyTasksInput
-}
-
-export interface CoordinateCreateInput {
-  lat: Float
-  lng: Float
-}
-
-export interface PostUpdateInput {
-  isPublished?: Boolean
-  title?: String
-  text?: String
-  author?: UserUpdateOneWithoutPostsInput
-}
-
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface UserUpdateWithoutMyActivitiesDataInput {
-  email?: String
-  password?: String
-  name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
 export interface ActivityCreateManyWithoutCreatorInput {
   create?: ActivityCreateWithoutCreatorInput[] | ActivityCreateWithoutCreatorInput
   connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-}
-
-export interface UserUpdateWithoutPostsDataInput {
-  email?: String
-  password?: String
-  name?: String
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface ActivityTaskSubscriptionWhereInput {
-  AND?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
-  OR?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: ActivityTaskWhereInput
 }
 
 export interface ActivityUpdateManyWithoutCreatorInput {
@@ -2980,6 +2556,47 @@ export interface ActivityUpdateManyWithoutCreatorInput {
   delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
   update?: ActivityUpdateWithWhereUniqueWithoutCreatorInput[] | ActivityUpdateWithWhereUniqueWithoutCreatorInput
   upsert?: ActivityUpsertWithWhereUniqueWithoutCreatorInput[] | ActivityUpsertWithWhereUniqueWithoutCreatorInput
+}
+
+export interface UserCreateManyWithoutAttendedActivitiesInput {
+  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+}
+
+export interface ActivityUpdateWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput
+  data: ActivityUpdateWithoutCreatorDataInput
+}
+
+export interface PostCreateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+}
+
+export interface ActivityUpdateWithoutCreatorDataInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+export interface ActivityTaskCreateManyWithoutAssigneeInput {
+  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+}
+
+export interface UserUpdateManyWithoutAttendedActivitiesInput {
+  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  update?: UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput
+  upsert?: UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput
 }
 
 export interface UserSubscriptionWhereInput {
@@ -2992,184 +2609,14 @@ export interface UserSubscriptionWhereInput {
   node?: UserWhereInput
 }
 
-export interface ActivityUpdateWithWhereUniqueWithoutCreatorInput {
-  where: ActivityWhereUniqueInput
-  data: ActivityUpdateWithoutCreatorDataInput
-}
-
-export interface CoordinateWhereInput {
-  AND?: CoordinateWhereInput[] | CoordinateWhereInput
-  OR?: CoordinateWhereInput[] | CoordinateWhereInput
-  lat?: Float
-  lat_not?: Float
-  lat_in?: Float[] | Float
-  lat_not_in?: Float[] | Float
-  lat_lt?: Float
-  lat_lte?: Float
-  lat_gt?: Float
-  lat_gte?: Float
-  lng?: Float
-  lng_not?: Float
-  lng_in?: Float[] | Float
-  lng_not_in?: Float[] | Float
-  lng_lt?: Float
-  lng_lte?: Float
-  lng_gt?: Float
-  lng_gte?: Float
-}
-
-export interface ActivityUpdateWithoutCreatorDataInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: LocationUpdateOneInput
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
-  tasks?: ActivityTaskUpdateManyWithoutActivityInput
-}
-
-export interface PostWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface LocationUpdateOneInput {
-  create?: LocationCreateInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: LocationUpdateDataInput
-  upsert?: LocationUpsertNestedInput
-}
-
-export interface ActivityTaskUpdateInput {
-  name?: String
-  status?: ProcessStatus
-  activity?: ActivityUpdateOneWithoutTasksInput
-  assignee?: UserUpdateOneWithoutMyTasksInput
-}
-
-export interface LocationUpdateDataInput {
-  name?: String
-  coordinate?: CoordinateUpdateOneInput
-}
-
-export interface ActivityUpsertWithWhereUniqueWithoutCreatorInput {
-  where: ActivityWhereUniqueInput
-  update: ActivityUpdateWithoutCreatorDataInput
-  create: ActivityCreateWithoutCreatorInput
-}
-
-export interface CoordinateUpdateOneInput {
-  create?: CoordinateCreateInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: CoordinateUpdateDataInput
-  upsert?: CoordinateUpsertNestedInput
-}
-
-export interface UserUpsertWithoutMyActivitiesInput {
-  update: UserUpdateWithoutMyActivitiesDataInput
-  create: UserCreateWithoutMyActivitiesInput
-}
-
-export interface CoordinateUpdateDataInput {
-  lat?: Float
-  lng?: Float
-}
-
-export interface UserUpdateWithoutMyTasksDataInput {
-  email?: String
-  password?: String
-  name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface CoordinateUpsertNestedInput {
-  update: CoordinateUpdateDataInput
-  create: CoordinateCreateInput
-}
-
-export interface ActivityTaskUpdateManyWithoutActivityInput {
-  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  update?: ActivityTaskUpdateWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpdateWithWhereUniqueWithoutActivityInput
-  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpsertWithWhereUniqueWithoutActivityInput
-}
-
-export interface LocationUpsertNestedInput {
-  update: LocationUpdateDataInput
-  create: LocationCreateInput
-}
-
-export interface CoordinateCreateOneInput {
-  create?: CoordinateCreateInput
-}
-
-export interface UserUpdateManyWithoutAttendedActivitiesInput {
-  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  update?: UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput
-  upsert?: UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput
-}
-
-export interface UserCreateWithoutPostsInput {
-  email: String
-  password: String
-  name: String
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
 export interface UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput {
   where: UserWhereUniqueInput
   data: UserUpdateWithoutAttendedActivitiesDataInput
 }
 
-export interface ActivityTaskWhereInput {
-  AND?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
-  OR?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
+export interface UserWhereUniqueInput {
   id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  name?: String
-  name_not?: String
-  name_in?: String[] | String
-  name_not_in?: String[] | String
-  name_lt?: String
-  name_lte?: String
-  name_gt?: String
-  name_gte?: String
-  name_contains?: String
-  name_not_contains?: String
-  name_starts_with?: String
-  name_not_starts_with?: String
-  name_ends_with?: String
-  name_not_ends_with?: String
-  status?: ProcessStatus
-  status_not?: ProcessStatus
-  status_in?: ProcessStatus[] | ProcessStatus
-  status_not_in?: ProcessStatus[] | ProcessStatus
-  activity?: ActivityWhereInput
-  assignee?: UserWhereInput
+  email?: String
 }
 
 export interface UserUpdateWithoutAttendedActivitiesDataInput {
@@ -3181,9 +2628,14 @@ export interface UserUpdateWithoutAttendedActivitiesDataInput {
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
 }
 
-export interface CoordinateUpdateInput {
-  lat?: Float
-  lng?: Float
+export interface UserUpdateInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
 }
 
 export interface PostUpdateManyWithoutAuthorInput {
@@ -3195,14 +2647,10 @@ export interface PostUpdateManyWithoutAuthorInput {
   upsert?: PostUpsertWithWhereUniqueWithoutAuthorInput[] | PostUpsertWithWhereUniqueWithoutAuthorInput
 }
 
-export interface UserUpdateInput {
-  email?: String
-  password?: String
-  name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+export interface ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput
+  update: ActivityTaskUpdateWithoutAssigneeDataInput
+  create: ActivityTaskCreateWithoutAssigneeInput
 }
 
 export interface PostUpdateWithWhereUniqueWithoutAuthorInput {
@@ -3222,15 +2670,49 @@ export interface PostUpdateWithoutAuthorDataInput {
   text?: String
 }
 
-export interface ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
-  where: ActivityWhereUniqueInput
-  data: ActivityUpdateWithoutParticipantsDataInput
+export interface PostCreateInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+  author: UserCreateOneWithoutPostsInput
 }
 
 export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
   where: PostWhereUniqueInput
   update: PostUpdateWithoutAuthorDataInput
   create: PostCreateWithoutAuthorInput
+}
+
+export interface ActivityCreateWithoutCreatorInput {
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  participants?: UserCreateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskCreateManyWithoutActivityInput
+}
+
+export interface ActivityTaskUpdateManyWithoutAssigneeInput {
+  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  update?: ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput
+  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput
+}
+
+export interface PostCreateWithoutAuthorInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+}
+
+export interface ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput
+  data: ActivityTaskUpdateWithoutAssigneeDataInput
 }
 
 export interface UserWhereInput {
@@ -3306,29 +2788,14 @@ export interface UserWhereInput {
   attendedActivities_none?: ActivityWhereInput
 }
 
-export interface ActivityTaskUpdateManyWithoutAssigneeInput {
-  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  update?: ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput
-  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput
-}
-
-export interface ActivityWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface ActivityUpdateWithoutTasksDataInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
+export interface ActivityTaskUpdateWithoutAssigneeDataInput {
+  name?: String
   status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: LocationUpdateOneInput
-  creator?: UserUpdateOneWithoutMyActivitiesInput
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+  activity?: ActivityUpdateOneWithoutTasksInput
+}
+
+export interface ActivityTaskWhereUniqueInput {
+  id?: ID_Input
 }
 
 export interface ActivityUpdateOneWithoutTasksInput {
@@ -3340,44 +2807,111 @@ export interface ActivityUpdateOneWithoutTasksInput {
   upsert?: ActivityUpsertWithoutTasksInput
 }
 
-export interface ActivityTaskUpdateWithoutAssigneeDataInput {
+export interface UserUpsertWithoutMyActivitiesInput {
+  update: UserUpdateWithoutMyActivitiesDataInput
+  create: UserCreateWithoutMyActivitiesInput
+}
+
+export interface ActivityUpdateWithoutTasksDataInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  creator?: UserUpdateOneWithoutMyActivitiesInput
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+}
+
+export interface UserCreateWithoutPostsInput {
+  email: String
+  password: String
+  name: String
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface UserUpdateOneWithoutMyActivitiesInput {
+  create?: UserCreateWithoutMyActivitiesInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutMyActivitiesDataInput
+  upsert?: UserUpsertWithoutMyActivitiesInput
+}
+
+export interface ActivityTaskCreateWithoutAssigneeInput {
+  name: String
+  status: ProcessStatus
+  activity?: ActivityCreateOneWithoutTasksInput
+}
+
+export interface ActivityUpdateWithoutParticipantsDataInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  creator?: UserUpdateOneWithoutMyActivitiesInput
+  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+export interface ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput
+  data: ActivityUpdateWithoutParticipantsDataInput
+}
+
+export interface ActivityUpdateManyWithoutParticipantsInput {
+  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
+  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  update?: ActivityUpdateWithWhereUniqueWithoutParticipantsInput[] | ActivityUpdateWithWhereUniqueWithoutParticipantsInput
+  upsert?: ActivityUpsertWithWhereUniqueWithoutParticipantsInput[] | ActivityUpsertWithWhereUniqueWithoutParticipantsInput
+}
+
+export interface UserUpdateWithoutMyActivitiesDataInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface ActivityTaskUpdateInput {
   name?: String
   status?: ProcessStatus
   activity?: ActivityUpdateOneWithoutTasksInput
-}
-
-export interface ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput {
-  where: ActivityTaskWhereUniqueInput
-  data: ActivityTaskUpdateWithoutAssigneeDataInput
-}
-
-export interface ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput {
-  where: ActivityTaskWhereUniqueInput
-  update: ActivityTaskUpdateWithoutAssigneeDataInput
-  create: ActivityTaskCreateWithoutAssigneeInput
-}
-
-export interface PostSubscriptionWhereInput {
-  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: PostWhereInput
-}
-
-export interface PostCreateInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-  author: UserCreateOneWithoutPostsInput
-}
-
-export interface ActivityTaskUpdateWithoutActivityDataInput {
-  name?: String
-  status?: ProcessStatus
   assignee?: UserUpdateOneWithoutMyTasksInput
+}
+
+export interface UserCreateWithoutAttendedActivitiesInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+}
+
+export interface UserUpdateWithoutMyTasksDataInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface ActivityUpsertWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput
+  update: ActivityUpdateWithoutCreatorDataInput
+  create: ActivityCreateWithoutCreatorInput
 }
 
 /*
@@ -3394,44 +2928,53 @@ export interface ActivityTaskPreviousValues {
   status: ProcessStatus
 }
 
-/*
- * Information about pagination in a connection.
-
- */
-export interface PageInfo {
-  hasNextPage: Boolean
-  hasPreviousPage: Boolean
-  startCursor?: String
-  endCursor?: String
-}
-
-export interface UserPreviousValues {
-  id: ID_Output
-  email: String
-  password: String
-  name: String
-}
-
-/*
- * A connection to a list of items.
-
- */
-export interface LocationConnection {
-  pageInfo: PageInfo
-  edges: LocationEdge[]
-  aggregate: AggregateLocation
-}
-
-export interface BatchPayload {
-  count: Long
-}
-
 export interface ActivityTask extends Node {
   id: ID_Output
   name: String
   status: ProcessStatus
   activity?: Activity
   assignee?: User
+}
+
+export interface Post extends Node {
+  id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
+  isPublished: Boolean
+  title: String
+  text: String
+  author: User
+}
+
+export interface BatchPayload {
+  count: Long
+}
+
+export interface AggregateActivityTask {
+  count: Int
+}
+
+export interface ActivityTaskSubscriptionPayload {
+  mutation: MutationType
+  node?: ActivityTask
+  updatedFields?: String[]
+  previousValues?: ActivityTaskPreviousValues
+}
+
+export interface Activity extends Node {
+  id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: User
+  participants?: User[]
+  tasks?: ActivityTask[]
 }
 
 /*
@@ -3443,27 +2986,18 @@ export interface ActivityTaskEdge {
   cursor: String
 }
 
-export interface ActivityTaskSubscriptionPayload {
-  mutation: MutationType
-  node?: ActivityTask
-  updatedFields?: String[]
-  previousValues?: ActivityTaskPreviousValues
+/*
+ * A connection to a list of items.
+
+ */
+export interface ActivityTaskConnection {
+  pageInfo: PageInfo
+  edges: ActivityTaskEdge[]
+  aggregate: AggregateActivityTask
 }
 
 export interface AggregateActivity {
   count: Int
-}
-
-export interface ActivityPreviousValues {
-  id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  title: String
-  desc?: String
-  type: ActivityType
-  status: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
 }
 
 /*
@@ -3474,121 +3008,6 @@ export interface ActivityConnection {
   pageInfo: PageInfo
   edges: ActivityEdge[]
   aggregate: AggregateActivity
-}
-
-export interface ActivitySubscriptionPayload {
-  mutation: MutationType
-  node?: Activity
-  updatedFields?: String[]
-  previousValues?: ActivityPreviousValues
-}
-
-/*
- * An edge in a connection.
-
- */
-export interface UserEdge {
-  node: User
-  cursor: String
-}
-
-export interface Coordinate {
-  lat: Float
-  lng: Float
-}
-
-export interface AggregatePost {
-  count: Int
-}
-
-export interface Activity extends Node {
-  id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  title: String
-  desc?: String
-  type: ActivityType
-  status: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: Location
-  creator: User
-  participants?: User[]
-  tasks?: ActivityTask[]
-}
-
-/*
- * A connection to a list of items.
-
- */
-export interface PostConnection {
-  pageInfo: PageInfo
-  edges: PostEdge[]
-  aggregate: AggregatePost
-}
-
-export interface LocationSubscriptionPayload {
-  mutation: MutationType
-  node?: Location
-  updatedFields?: String[]
-  previousValues?: LocationPreviousValues
-}
-
-/*
- * An edge in a connection.
-
- */
-export interface CoordinateEdge {
-  node: Coordinate
-  cursor: String
-}
-
-export interface LocationPreviousValues {
-  name?: String
-}
-
-export interface AggregateLocation {
-  count: Int
-}
-
-export interface Location {
-  name?: String
-  coordinate?: Coordinate
-}
-
-export interface AggregateActivityTask {
-  count: Int
-}
-
-export interface CoordinateSubscriptionPayload {
-  mutation: MutationType
-  node?: Coordinate
-  updatedFields?: String[]
-  previousValues?: CoordinatePreviousValues
-}
-
-/*
- * An edge in a connection.
-
- */
-export interface ActivityEdge {
-  node: Activity
-  cursor: String
-}
-
-export interface CoordinatePreviousValues {
-  lat: Float
-  lng: Float
-}
-
-/*
- * A connection to a list of items.
-
- */
-export interface UserConnection {
-  pageInfo: PageInfo
-  edges: UserEdge[]
-  aggregate: AggregateUser
 }
 
 export interface User extends Node {
@@ -3602,17 +3021,64 @@ export interface User extends Node {
   attendedActivities?: Activity[]
 }
 
-export interface AggregateCoordinate {
+/*
+ * An edge in a connection.
+
+ */
+export interface UserEdge {
+  node: User
+  cursor: String
+}
+
+export interface ActivityPreviousValues {
+  id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+}
+
+export interface AggregatePost {
   count: Int
+}
+
+export interface PostSubscriptionPayload {
+  mutation: MutationType
+  node?: Post
+  updatedFields?: String[]
+  previousValues?: PostPreviousValues
+}
+
+/*
+ * Information about pagination in a connection.
+
+ */
+export interface PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor?: String
+  endCursor?: String
 }
 
 /*
  * An edge in a connection.
 
  */
-export interface LocationEdge {
-  node: Location
+export interface ActivityEdge {
+  node: Activity
   cursor: String
+}
+
+export interface UserPreviousValues {
+  id: ID_Output
+  email: String
+  password: String
+  name: String
 }
 
 export interface UserSubscriptionPayload {
@@ -3622,14 +3088,11 @@ export interface UserSubscriptionPayload {
   previousValues?: UserPreviousValues
 }
 
-export interface Post extends Node {
-  id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  isPublished: Boolean
-  title: String
-  text: String
-  author: User
+export interface ActivitySubscriptionPayload {
+  mutation: MutationType
+  node?: Activity
+  updatedFields?: String[]
+  previousValues?: ActivityPreviousValues
 }
 
 export interface PostPreviousValues {
@@ -3641,31 +3104,18 @@ export interface PostPreviousValues {
   text: String
 }
 
-export interface PostSubscriptionPayload {
-  mutation: MutationType
-  node?: Post
-  updatedFields?: String[]
-  previousValues?: PostPreviousValues
+export interface AggregateUser {
+  count: Int
 }
 
 /*
  * A connection to a list of items.
 
  */
-export interface ActivityTaskConnection {
+export interface PostConnection {
   pageInfo: PageInfo
-  edges: ActivityTaskEdge[]
-  aggregate: AggregateActivityTask
-}
-
-/*
- * A connection to a list of items.
-
- */
-export interface CoordinateConnection {
-  pageInfo: PageInfo
-  edges: CoordinateEdge[]
-  aggregate: AggregateCoordinate
+  edges: PostEdge[]
+  aggregate: AggregatePost
 }
 
 /*
@@ -3677,27 +3127,15 @@ export interface PostEdge {
   cursor: String
 }
 
-export interface AggregateUser {
-  count: Int
+/*
+ * A connection to a list of items.
+
+ */
+export interface UserConnection {
+  pageInfo: PageInfo
+  edges: UserEdge[]
+  aggregate: AggregateUser
 }
-
-export type DateTime = string
-
-/*
-The `Boolean` scalar type represents `true` or `false`.
-*/
-export type Boolean = boolean
-
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string
-
-/*
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-*/
-export type ID_Input = string | number
-export type ID_Output = string
 
 /*
 The 'Long' scalar type represents non-fractional signed whole numeric values.
@@ -3706,14 +3144,27 @@ Long can represent values between -(2^63) and 2^63 - 1.
 export type Long = string
 
 /*
-The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). 
-*/
-export type Float = number
-
-/*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number
+
+/*
+The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
+*/
+export type ID_Input = string | number
+export type ID_Output = string
+
+/*
+The `Boolean` scalar type represents `true` or `false`.
+*/
+export type Boolean = boolean
+
+export type DateTime = string
+
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string
 
 export interface Schema {
   query: Query
@@ -3722,8 +3173,6 @@ export interface Schema {
 }
 
 export type Query = {
-  locations: (args: { where?: LocationWhereInput, orderBy?: LocationOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Location[]>
-  coordinates: (args: { where?: CoordinateWhereInput, orderBy?: CoordinateOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Coordinate[]>
   posts: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Post[]>
   users: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<User[]>
   activities: (args: { where?: ActivityWhereInput, orderBy?: ActivityOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Activity[]>
@@ -3732,8 +3181,6 @@ export type Query = {
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   activity: (args: { where: ActivityWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Activity | null>
   activityTask: (args: { where: ActivityTaskWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask | null>
-  locationsConnection: (args: { where?: LocationWhereInput, orderBy?: LocationOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<LocationConnection>
-  coordinatesConnection: (args: { where?: CoordinateWhereInput, orderBy?: CoordinateOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<CoordinateConnection>
   postsConnection: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<PostConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
   activitiesConnection: (args: { where?: ActivityWhereInput, orderBy?: ActivityOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ActivityConnection>
@@ -3742,8 +3189,6 @@ export type Query = {
 }
 
 export type Mutation = {
-  createLocation: (args: { data: LocationCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Location>
-  createCoordinate: (args: { data: CoordinateCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Coordinate>
   createPost: (args: { data: PostCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   createUser: (args: { data: UserCreateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
   createActivity: (args: { data: ActivityCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Activity>
@@ -3760,14 +3205,10 @@ export type Mutation = {
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
   upsertActivity: (args: { where: ActivityWhereUniqueInput, create: ActivityCreateInput, update: ActivityUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Activity>
   upsertActivityTask: (args: { where: ActivityTaskWhereUniqueInput, create: ActivityTaskCreateInput, update: ActivityTaskUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask>
-  updateManyLocations: (args: { data: LocationUpdateInput, where: LocationWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  updateManyCoordinates: (args: { data: CoordinateUpdateInput, where: CoordinateWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyPosts: (args: { data: PostUpdateInput, where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyActivities: (args: { data: ActivityUpdateInput, where: ActivityWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyActivityTasks: (args: { data: ActivityTaskUpdateInput, where: ActivityTaskWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  deleteManyLocations: (args: { where: LocationWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  deleteManyCoordinates: (args: { where: CoordinateWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyPosts: (args: { where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyUsers: (args: { where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyActivities: (args: { where: ActivityWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
@@ -3775,8 +3216,6 @@ export type Mutation = {
 }
 
 export type Subscription = {
-  location: (args: { where?: LocationSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<LocationSubscriptionPayload>>
-  coordinate: (args: { where?: CoordinateSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<CoordinateSubscriptionPayload>>
   post: (args: { where?: PostSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<PostSubscriptionPayload>>
   user: (args: { where?: UserSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<UserSubscriptionPayload>>
   activity: (args: { where?: ActivitySubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<ActivitySubscriptionPayload>>
@@ -3790,8 +3229,6 @@ export class Prisma extends BasePrisma {
   }
 
   exists = {
-    Location: (where: LocationWhereInput): Promise<boolean> => super.existsDelegate('query', 'locations', { where }, {}, '{ id }'),
-    Coordinate: (where: CoordinateWhereInput): Promise<boolean> => super.existsDelegate('query', 'coordinates', { where }, {}, '{ id }'),
     Post: (where: PostWhereInput): Promise<boolean> => super.existsDelegate('query', 'posts', { where }, {}, '{ id }'),
     User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }'),
     Activity: (where: ActivityWhereInput): Promise<boolean> => super.existsDelegate('query', 'activities', { where }, {}, '{ id }'),
@@ -3799,8 +3236,6 @@ export class Prisma extends BasePrisma {
   }
 
   query: Query = {
-    locations: (args, info): Promise<Location[]> => super.delegate('query', 'locations', args, {}, info),
-    coordinates: (args, info): Promise<Coordinate[]> => super.delegate('query', 'coordinates', args, {}, info),
     posts: (args, info): Promise<Post[]> => super.delegate('query', 'posts', args, {}, info),
     users: (args, info): Promise<User[]> => super.delegate('query', 'users', args, {}, info),
     activities: (args, info): Promise<Activity[]> => super.delegate('query', 'activities', args, {}, info),
@@ -3809,8 +3244,6 @@ export class Prisma extends BasePrisma {
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
     activity: (args, info): Promise<Activity | null> => super.delegate('query', 'activity', args, {}, info),
     activityTask: (args, info): Promise<ActivityTask | null> => super.delegate('query', 'activityTask', args, {}, info),
-    locationsConnection: (args, info): Promise<LocationConnection> => super.delegate('query', 'locationsConnection', args, {}, info),
-    coordinatesConnection: (args, info): Promise<CoordinateConnection> => super.delegate('query', 'coordinatesConnection', args, {}, info),
     postsConnection: (args, info): Promise<PostConnection> => super.delegate('query', 'postsConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
     activitiesConnection: (args, info): Promise<ActivityConnection> => super.delegate('query', 'activitiesConnection', args, {}, info),
@@ -3819,8 +3252,6 @@ export class Prisma extends BasePrisma {
   }
 
   mutation: Mutation = {
-    createLocation: (args, info): Promise<Location> => super.delegate('mutation', 'createLocation', args, {}, info),
-    createCoordinate: (args, info): Promise<Coordinate> => super.delegate('mutation', 'createCoordinate', args, {}, info),
     createPost: (args, info): Promise<Post> => super.delegate('mutation', 'createPost', args, {}, info),
     createUser: (args, info): Promise<User> => super.delegate('mutation', 'createUser', args, {}, info),
     createActivity: (args, info): Promise<Activity> => super.delegate('mutation', 'createActivity', args, {}, info),
@@ -3837,14 +3268,10 @@ export class Prisma extends BasePrisma {
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
     upsertActivity: (args, info): Promise<Activity> => super.delegate('mutation', 'upsertActivity', args, {}, info),
     upsertActivityTask: (args, info): Promise<ActivityTask> => super.delegate('mutation', 'upsertActivityTask', args, {}, info),
-    updateManyLocations: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyLocations', args, {}, info),
-    updateManyCoordinates: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyCoordinates', args, {}, info),
     updateManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyPosts', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
     updateManyActivities: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyActivities', args, {}, info),
     updateManyActivityTasks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyActivityTasks', args, {}, info),
-    deleteManyLocations: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyLocations', args, {}, info),
-    deleteManyCoordinates: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyCoordinates', args, {}, info),
     deleteManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyPosts', args, {}, info),
     deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info),
     deleteManyActivities: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyActivities', args, {}, info),
@@ -3852,8 +3279,6 @@ export class Prisma extends BasePrisma {
   }
 
   subscription: Subscription = {
-    location: (args, infoOrQuery): Promise<AsyncIterator<LocationSubscriptionPayload>> => super.delegateSubscription('location', args, {}, infoOrQuery),
-    coordinate: (args, infoOrQuery): Promise<AsyncIterator<CoordinateSubscriptionPayload>> => super.delegateSubscription('coordinate', args, {}, infoOrQuery),
     post: (args, infoOrQuery): Promise<AsyncIterator<PostSubscriptionPayload>> => super.delegateSubscription('post', args, {}, infoOrQuery),
     user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery),
     activity: (args, infoOrQuery): Promise<AsyncIterator<ActivitySubscriptionPayload>> => super.delegateSubscription('activity', args, {}, infoOrQuery),

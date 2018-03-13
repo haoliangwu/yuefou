@@ -1,28 +1,27 @@
 import { getUserId, Context } from '../../utils';
-import { ActivityCreateInput } from '../../generated/prisma';
+import { ActivityCreateInput, Activity } from '../../generated/prisma';
 
 export const activity = {
-  async createActivity(parent, args, ctx: Context, info) {
+  /*
+   创建一个活动 
+   */
+  createActivity(parent, args, ctx: Context, info) {
     const userId = getUserId(ctx)
 
-    const { title, startDate, endDate, location } = args
+    const { title, location, type } = args
 
     const now = new Date()
 
     const data: ActivityCreateInput = {
       title,
-      type: "HOST",
+      type,
       status: "INIT",
       creator: {
         connect: { id: userId },
       },
-      startedAt: startDate || now.toISOString(),
-      endedAt: endDate || now.toISOString(),
-      location: {
-        create: {
-          name: location
-        }
-      }
+      startedAt: now.toISOString(),
+      endedAt: now.toISOString(),
+      location: location
     }
 
     return ctx.db.mutation.createActivity(
@@ -30,4 +29,37 @@ export const activity = {
       info
     )
   },
+
+  /* 
+   参与一个活动
+   */
+  async attendActivity(parent, { id }, ctx: Context, info) {
+    const userId = getUserId(ctx)
+
+    const activity = await ctx.db.query.activities({
+      where: {
+        id,
+        creator: {
+          id: userId
+        }
+      },
+    }, info)
+
+    if (activity[0].creator.id === userId) {
+      return activity[0]
+    } else {
+      return ctx.db.mutation.updateActivity({
+        where: {
+          id
+        },
+        data: {
+          participants: {
+            connect: {
+              id: userId
+            }
+          }
+        }
+      }, info)
+    }
+  }
 }

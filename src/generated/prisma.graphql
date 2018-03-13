@@ -12,10 +12,10 @@ type Activity implements Node {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location(where: LocationWhereInput): Location!
+  location: String!
   creator(where: UserWhereInput): User!
   participants(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   tasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
@@ -74,10 +74,10 @@ input ActivityCreateInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
@@ -102,10 +102,10 @@ input ActivityCreateWithoutCreatorInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
 }
@@ -114,10 +114,10 @@ input ActivityCreateWithoutParticipantsInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   tasks: ActivityTaskCreateManyWithoutActivityInput
 }
@@ -126,10 +126,10 @@ input ActivityCreateWithoutTasksInput {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
-  location: LocationCreateOneInput!
+  location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
 }
@@ -167,6 +167,8 @@ enum ActivityOrderByInput {
   startedAt_DESC
   endedAt_ASC
   endedAt_DESC
+  location_ASC
+  location_DESC
 }
 
 type ActivityPreviousValues {
@@ -176,9 +178,10 @@ type ActivityPreviousValues {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus!
+  status: ProcessStatus
   startedAt: DateTime!
   endedAt: DateTime!
+  location: String!
 }
 
 type ActivitySubscriptionPayload {
@@ -536,7 +539,7 @@ input ActivityUpdateInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
@@ -576,7 +579,7 @@ input ActivityUpdateWithoutCreatorDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
 }
@@ -588,7 +591,7 @@ input ActivityUpdateWithoutParticipantsDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
 }
@@ -600,7 +603,7 @@ input ActivityUpdateWithoutTasksDataInput {
   status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
-  location: LocationUpdateOneInput
+  location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
 }
@@ -942,7 +945,59 @@ input ActivityWhereInput {
   All values greater than or equal the given value.
   """
   endedAt_gte: DateTime
-  location: LocationWhereInput
+  location: String
+  """
+  All values that are not equal to given value.
+  """
+  location_not: String
+  """
+  All values that are contained in given list.
+  """
+  location_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  location_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  location_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  location_lte: String
+  """
+  All values greater than the given value.
+  """
+  location_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  location_gte: String
+  """
+  All values containing the given string.
+  """
+  location_contains: String
+  """
+  All values not containing the given string.
+  """
+  location_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  location_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  location_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  location_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  location_not_ends_with: String
   creator: UserWhereInput
   participants_every: UserWhereInput
   participants_some: UserWhereInput
@@ -964,14 +1019,6 @@ type AggregateActivityTask {
   count: Int!
 }
 
-type AggregateCoordinate {
-  count: Int!
-}
-
-type AggregateLocation {
-  count: Int!
-}
-
 type AggregatePost {
   count: Int!
 }
@@ -987,376 +1034,7 @@ type BatchPayload {
   count: Long!
 }
 
-type Coordinate {
-  lat: Float!
-  lng: Float!
-}
-
-"""
-A connection to a list of items.
-"""
-type CoordinateConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [CoordinateEdge]!
-  aggregate: AggregateCoordinate!
-}
-
-input CoordinateCreateInput {
-  lat: Float!
-  lng: Float!
-}
-
-input CoordinateCreateOneInput {
-  create: CoordinateCreateInput
-}
-
-"""
-An edge in a connection.
-"""
-type CoordinateEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Coordinate!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum CoordinateOrderByInput {
-  lat_ASC
-  lat_DESC
-  lng_ASC
-  lng_DESC
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type CoordinatePreviousValues {
-  lat: Float!
-  lng: Float!
-}
-
-type CoordinateSubscriptionPayload {
-  mutation: MutationType!
-  node: Coordinate
-  updatedFields: [String!]
-  previousValues: CoordinatePreviousValues
-}
-
-input CoordinateSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [CoordinateSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [CoordinateSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: CoordinateWhereInput
-}
-
-input CoordinateUpdateDataInput {
-  lat: Float
-  lng: Float
-}
-
-input CoordinateUpdateInput {
-  lat: Float
-  lng: Float
-}
-
-input CoordinateUpdateOneInput {
-  create: CoordinateCreateInput
-  disconnect: Boolean
-  delete: Boolean
-  update: CoordinateUpdateDataInput
-  upsert: CoordinateUpsertNestedInput
-}
-
-input CoordinateUpsertNestedInput {
-  update: CoordinateUpdateDataInput!
-  create: CoordinateCreateInput!
-}
-
-input CoordinateWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [CoordinateWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [CoordinateWhereInput!]
-  lat: Float
-  """
-  All values that are not equal to given value.
-  """
-  lat_not: Float
-  """
-  All values that are contained in given list.
-  """
-  lat_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  lat_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  lat_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  lat_lte: Float
-  """
-  All values greater than the given value.
-  """
-  lat_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  lat_gte: Float
-  lng: Float
-  """
-  All values that are not equal to given value.
-  """
-  lng_not: Float
-  """
-  All values that are contained in given list.
-  """
-  lng_in: [Float!]
-  """
-  All values that are not contained in given list.
-  """
-  lng_not_in: [Float!]
-  """
-  All values less than the given value.
-  """
-  lng_lt: Float
-  """
-  All values less than or equal the given value.
-  """
-  lng_lte: Float
-  """
-  All values greater than the given value.
-  """
-  lng_gt: Float
-  """
-  All values greater than or equal the given value.
-  """
-  lng_gte: Float
-}
-
 scalar DateTime
-
-type Location {
-  name: String
-  coordinate(where: CoordinateWhereInput): Coordinate
-}
-
-"""
-A connection to a list of items.
-"""
-type LocationConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [LocationEdge]!
-  aggregate: AggregateLocation!
-}
-
-input LocationCreateInput {
-  name: String
-  coordinate: CoordinateCreateOneInput
-}
-
-input LocationCreateOneInput {
-  create: LocationCreateInput
-}
-
-"""
-An edge in a connection.
-"""
-type LocationEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Location!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum LocationOrderByInput {
-  name_ASC
-  name_DESC
-  id_ASC
-  id_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
-}
-
-type LocationPreviousValues {
-  name: String
-}
-
-type LocationSubscriptionPayload {
-  mutation: MutationType!
-  node: Location
-  updatedFields: [String!]
-  previousValues: LocationPreviousValues
-}
-
-input LocationSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [LocationSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [LocationSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: LocationWhereInput
-}
-
-input LocationUpdateDataInput {
-  name: String
-  coordinate: CoordinateUpdateOneInput
-}
-
-input LocationUpdateInput {
-  name: String
-  coordinate: CoordinateUpdateOneInput
-}
-
-input LocationUpdateOneInput {
-  create: LocationCreateInput
-  disconnect: Boolean
-  delete: Boolean
-  update: LocationUpdateDataInput
-  upsert: LocationUpsertNestedInput
-}
-
-input LocationUpsertNestedInput {
-  update: LocationUpdateDataInput!
-  create: LocationCreateInput!
-}
-
-input LocationWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [LocationWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [LocationWhereInput!]
-  name: String
-  """
-  All values that are not equal to given value.
-  """
-  name_not: String
-  """
-  All values that are contained in given list.
-  """
-  name_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  name_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  name_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  name_lte: String
-  """
-  All values greater than the given value.
-  """
-  name_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  name_gte: String
-  """
-  All values containing the given string.
-  """
-  name_contains: String
-  """
-  All values not containing the given string.
-  """
-  name_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  name_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  name_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  name_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  name_not_ends_with: String
-  coordinate: CoordinateWhereInput
-}
 
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
@@ -1365,8 +1043,6 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createLocation(data: LocationCreateInput!): Location!
-  createCoordinate(data: CoordinateCreateInput!): Coordinate!
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
   createActivity(data: ActivityCreateInput!): Activity!
@@ -1383,14 +1059,10 @@ type Mutation {
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertActivity(where: ActivityWhereUniqueInput!, create: ActivityCreateInput!, update: ActivityUpdateInput!): Activity!
   upsertActivityTask(where: ActivityTaskWhereUniqueInput!, create: ActivityTaskCreateInput!, update: ActivityTaskUpdateInput!): ActivityTask!
-  updateManyLocations(data: LocationUpdateInput!, where: LocationWhereInput!): BatchPayload!
-  updateManyCoordinates(data: CoordinateUpdateInput!, where: CoordinateWhereInput!): BatchPayload!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyActivities(data: ActivityUpdateInput!, where: ActivityWhereInput!): BatchPayload!
   updateManyActivityTasks(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereInput!): BatchPayload!
-  deleteManyLocations(where: LocationWhereInput!): BatchPayload!
-  deleteManyCoordinates(where: CoordinateWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyActivities(where: ActivityWhereInput!): BatchPayload!
@@ -1820,8 +1492,6 @@ enum ProcessStatus {
 }
 
 type Query {
-  locations(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Location]!
-  coordinates(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Coordinate]!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity]!
@@ -1830,8 +1500,6 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   activity(where: ActivityWhereUniqueInput!): Activity
   activityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  locationsConnection(where: LocationWhereInput, orderBy: LocationOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LocationConnection!
-  coordinatesConnection(where: CoordinateWhereInput, orderBy: CoordinateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CoordinateConnection!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   activitiesConnection(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityConnection!
@@ -1846,8 +1514,6 @@ type Query {
 }
 
 type Subscription {
-  location(where: LocationSubscriptionWhereInput): LocationSubscriptionPayload
-  coordinate(where: CoordinateSubscriptionWhereInput): CoordinateSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   activity(where: ActivitySubscriptionWhereInput): ActivitySubscriptionPayload

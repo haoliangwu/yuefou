@@ -1,8 +1,8 @@
-# import Post, Activity from "./generated/prisma.graphql"
+# import Post, Activity, ActivityType, ActivityCreateInput from "./generated/prisma.graphql"
 
 type Query {
   me: User
-  myActivities: [Activity!]!
+  activities: [Activity!]!
 }
 
 type Mutation {
@@ -10,7 +10,8 @@ type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   # activity
-  createActivity(title: String!, startDate: DateTime, endDate: DateTime, location: String): Activity
+  createActivity(title: String!, type: ActivityType, location: String): Activity
+  attendActivity(id: String!): Activity
 }
 
 type AuthPayload {
@@ -19,8 +20,11 @@ type AuthPayload {
 }
 
 type User {
-  id: ID!
-  email: String!
+  id: ID! 
+  email: String! 
   name: String!
   posts: [Post!]!
+  myActivities: [Activity!]!
+  myTasks: [ActivityTask!]!
+  attendedActivities: [Activity!]!
 }
