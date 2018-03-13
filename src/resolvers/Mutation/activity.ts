@@ -1,5 +1,6 @@
 import { getUserId, Context } from '../../utils';
-import { ActivityCreateInput, Activity } from '../../generated/prisma';
+import { ActivityCreateInput, Activity, ActivityWhereUniqueInput, ActivityUpdateInput } from '../../generated/prisma';
+import * as ERROR from '../../constants/error';
 
 export const activity = {
   /*
@@ -15,7 +16,7 @@ export const activity = {
     const data: ActivityCreateInput = {
       title,
       type,
-      status: "INIT",
+      status: 'INIT',
       creator: {
         connect: { id: userId },
       },
@@ -24,10 +25,7 @@ export const activity = {
       location: location
     }
 
-    return ctx.db.mutation.createActivity(
-      { data },
-      info
-    )
+    return ctx.db.mutation.createActivity({ data }, info)
   },
 
   /* 
@@ -36,30 +34,74 @@ export const activity = {
   async attendActivity(parent, { id }, ctx: Context, info) {
     const userId = getUserId(ctx)
 
-    const activity = await ctx.db.query.activities({
-      where: {
+    const isCreator = await ctx.db.exists.Activity({
+      id,
+      creator: {
+        id: userId
+      }
+    })
+
+    if (isCreator) {
+      return new Error(ERROR.NO_INVITE_SELF)
+    } else {
+      const isParticipant = await ctx.db.exists.Activity({
         id,
-        creator: {
+        participants_some: {
           id: userId
         }
-      },
-    }, info)
+      })
 
-    if (activity[0].creator.id === userId) {
-      return activity[0]
-    } else {
-      return ctx.db.mutation.updateActivity({
-        where: {
+
+      if (isParticipant) {
+        return new Error(ERROR.NO_DUPLICATE_ATTEND)
+      } else {
+
+        const where: ActivityWhereUniqueInput = {
           id
-        },
-        data: {
+        }
+
+        const data: ActivityUpdateInput = {
           participants: {
             connect: {
               id: userId
             }
           }
         }
-      }, info)
+
+        return ctx.db.mutation.updateActivity({ where, data }, info)
+      }
+    }
+  },
+
+  /* 
+   退出一个活动
+   */
+  async quitActivity(parent, { id }, ctx: Context, info) {
+    const userId = getUserId(ctx)
+
+    const isExitedActivity = await ctx.db.exists.Activity({
+      id,
+      participants_some: {
+        id: userId
+      }
+    })
+
+    const where: ActivityWhereUniqueInput = {
+      id
+    }
+
+    const data: ActivityUpdateInput = {
+      participants: {
+        disconnect: {
+          id: userId
+        }
+      }
+    }
+
+    if (isExitedActivity) {
+      return ctx.db.mutation.updateActivity({ where, data }, info)
+    } else {
+      return new Error(ERROR.IS_NOT_PARTICIPANT)
     }
   }
 }

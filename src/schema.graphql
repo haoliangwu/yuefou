@@ -10,8 +10,9 @@ type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   # activity
-  createActivity(title: String!, type: ActivityType, location: String): Activity
-  attendActivity(id: String!): Activity
+  createActivity(title: String!, type: ActivityType, location: String): Activity!
+  attendActivity(id: String!): Activity!
+  quitActivity(id: String!): Activity!
 }
 
 type AuthPayload {

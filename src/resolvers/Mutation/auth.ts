@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import { Context } from '../../utils'
+import { NO_EXISTED_USER, INVALID_PASSWORD } from '../../constants/error';
 
 export const auth = {
   /*
@@ -24,12 +25,12 @@ export const auth = {
   async login(parent, { email, password }, ctx: Context, info) {
     const user = await ctx.db.query.user({ where: { email } })
     if (!user) {
-      throw new Error(`No such user found for email: ${email}`)
+      throw new Error(NO_EXISTED_USER)
     }
 
     const valid = await bcrypt.compare(password, user.password)
     if (!valid) {
-      throw new Error('Invalid password')
+      throw new Error(INVALID_PASSWORD)
     }
 
     return {
