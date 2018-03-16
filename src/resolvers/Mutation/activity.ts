@@ -9,20 +9,21 @@ export const activity = {
   createActivity(parent, args, ctx: Context, info) {
     const userId = getUserId(ctx)
 
-    const { title, location, type } = args
+    const { activity: { title, location, type, desc, startedAt, endedAt } } = args
 
     const now = new Date()
 
     const data: ActivityCreateInput = {
       title,
-      type,
+      desc,
       status: 'INIT',
       creator: {
         connect: { id: userId },
       },
-      startedAt: now.toISOString(),
-      endedAt: now.toISOString(),
-      location: location
+      type: type || 'HOST',
+      startedAt: startedAt || now.toISOString(),
+      endedAt: endedAt || now.toISOString(),
+      location: location || 'somewhere'
     }
 
     return ctx.db.mutation.createActivity({ data }, info)

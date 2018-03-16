@@ -6,7 +6,7 @@ export const Query = {
    */
   me(parent, args, ctx: Context, info) {
     const id = getUserId(ctx)
-    
+
     return ctx.db.query.user({ where: { id } }, info)
   },
 
@@ -31,6 +31,19 @@ export const Query = {
           }
         ]
       },
+    }, info)
+  },
+
+  /* 
+   根据 id 获取活动详情
+   */
+  async activity(parent, args, ctx: Context, info) {
+    const { id } = args
+
+    return await ctx.db.query.activity({
+      where: {
+        id
+      }
     }, info)
   }
 }

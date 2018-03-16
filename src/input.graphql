@@ -1,0 +1,8 @@
+input CreateActivityInput {
+  title: String!
+  type: ActivityType
+  location: String
+  desc: String
+  startedAt: String
+  endedAt: String
+}
