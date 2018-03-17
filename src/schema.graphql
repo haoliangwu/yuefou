@@ -1,5 +1,5 @@
 # import Post, Activity, ActivityType, ActivityTask from "./generated/prisma.graphql"
-# import CreateActivityInput from "./input.graphql"
+# import * from "./input.graphql"
 
 # this is needed for upload to work
 scalar Upload
@@ -21,7 +21,9 @@ type Mutation {
   attendActivity(id: ID!): Activity!
   quitActivity(id: ID!): Activity!
   # task
-  # createTask(task: CreateTaskInput): ActivityTask!
+  createTask(id: ID!, task: CreateTaskInput): ActivityTask!
+  updateTask(id: ID!, task: UpdateTaskInput): ActivityTask!
+  deleteTask(id: ID!, taskId: ID!): ActivityTask
   # upload
   singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
@@ -40,6 +42,7 @@ type User {
   myActivities: [Activity!]!
   myTasks: [ActivityTask!]!
   attendedActivities: [Activity!]!
+  avatar: String
 }
 
 type File {

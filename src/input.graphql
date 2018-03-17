@@ -18,3 +18,12 @@ input UpdateActivityInput {
   endedAt: String
   status: ProcessStatus
 }
+
+input CreateTaskInput {
+  name: String!
+}
+
+input UpdateTaskInput {
+  id: ID!
+  name: String
+}

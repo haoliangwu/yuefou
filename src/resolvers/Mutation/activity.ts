@@ -1,8 +1,37 @@
+import * as R from 'ramda';
+
 import { getUserId, Context } from '../../utils';
 import { ActivityCreateInput, Activity, ActivityWhereUniqueInput, ActivityUpdateInput } from '../../generated/prisma';
 import * as ERROR from '../../constants/error';
 
-import * as R from 'ramda';
+/* 
+一个活动是否存在
+*/
+export async function whenActivityExistedById(id, ctx: Context) {
+  const isExitedActivity = await ctx.db.exists.Activity({ id })
+
+  if (!isExitedActivity) {
+    return Promise.reject(ERROR.NO_EXISTED_ACTIVITY)
+  }
+}
+
+/* 
+当前用户是活动的创建者
+*/
+export async function whenCurrentUserIsActivityCreator(id, ctx: Context) {
+  const userId = getUserId(ctx)
+
+  const isCreator = await ctx.db.exists.Activity({
+    id,
+    creator: {
+      id: userId
+    }
+  })
+
+  if (!isCreator) {
+    return Promise.reject(ERROR.ONLY_BY_CREATOR)
+  }
+}
 
 /*
 创建一个活动 
@@ -34,65 +63,29 @@ function createActivity(parent, { activity }, ctx: Context, info) {
 更新一个活动
 */
 async function updateActivity(parent, { activity }, ctx: Context, info) {
-  const userId = getUserId(ctx)
-
   const { id, ...updateProps } = activity
 
-  const originActivity = await ctx.db.query.activity({
+  await whenActivityExistedById(id, ctx)
+  await whenCurrentUserIsActivityCreator(id, ctx)
+
+  const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
+
+  return ctx.db.mutation.updateActivity({
+    data,
     where: { id }
-  })
-
-  if (originActivity) {
-    const isCreator = await ctx.db.exists.Activity({
-      id,
-      creator: {
-        id: userId
-      }
-    })
-
-    if (isCreator) {
-      const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
-
-      return ctx.db.mutation.updateActivity({
-        data,
-        where: { id }
-      }, info)
-    } else {
-      throw new Error(ERROR.ONLY_BY_CREATOR)
-    }
-  } else {
-    throw new Error(ERROR.NO_EXISTED_ACTIVITY)
-  }
+  }, info)
 }
 
 /* 
 删除一个活动
 */
 async function deleteActivity(parent, { id }, ctx: Context, info) {
-  const userId = getUserId(ctx)
+  await whenActivityExistedById(id, ctx)
+  await whenCurrentUserIsActivityCreator(id, ctx)
 
-  const activity = await ctx.db.query.activity({
+  return await ctx.db.mutation.deleteActivity({
     where: { id }
-  })
-
-  if (activity) {
-    const isCreator = await ctx.db.exists.Activity({
-      id,
-      creator: {
-        id: userId
-      }
-    })
-
-    if (isCreator) {
-      return await ctx.db.mutation.deleteActivity({
-        where: { id }
-      }, info)
-    } else {
-      throw new Error(ERROR.ONLY_BY_CREATOR)
-    }
-  } else {
-    throw new Error(ERROR.NO_EXISTED_ACTIVITY)
-  }
+  }, info)
 }
 
 /* 

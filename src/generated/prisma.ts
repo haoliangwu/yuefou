@@ -45,6 +45,7 @@ type User implements Node {
   myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
   attendedActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
+  avatar: String
 }
 
 """
@@ -1475,6 +1476,7 @@ input UserCreateInput {
   email: String!
   password: String!
   name: String!
+  avatar: String
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -1505,6 +1507,7 @@ input UserCreateWithoutAttendedActivitiesInput {
   email: String!
   password: String!
   name: String!
+  avatar: String
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -1514,6 +1517,7 @@ input UserCreateWithoutMyActivitiesInput {
   email: String!
   password: String!
   name: String!
+  avatar: String
   posts: PostCreateManyWithoutAuthorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
@@ -1523,6 +1527,7 @@ input UserCreateWithoutMyTasksInput {
   email: String!
   password: String!
   name: String!
+  avatar: String
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
@@ -1532,6 +1537,7 @@ input UserCreateWithoutPostsInput {
   email: String!
   password: String!
   name: String!
+  avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
@@ -1560,6 +1566,8 @@ enum UserOrderByInput {
   password_DESC
   name_ASC
   name_DESC
+  avatar_ASC
+  avatar_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -1571,6 +1579,7 @@ type UserPreviousValues {
   email: String!
   password: String!
   name: String!
+  avatar: String
 }
 
 type UserSubscriptionPayload {
@@ -1612,6 +1621,7 @@ input UserUpdateInput {
   email: String
   password: String
   name: String
+  avatar: String
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -1658,6 +1668,7 @@ input UserUpdateWithoutAttendedActivitiesDataInput {
   email: String
   password: String
   name: String
+  avatar: String
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -1667,6 +1678,7 @@ input UserUpdateWithoutMyActivitiesDataInput {
   email: String
   password: String
   name: String
+  avatar: String
   posts: PostUpdateManyWithoutAuthorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
@@ -1676,6 +1688,7 @@ input UserUpdateWithoutMyTasksDataInput {
   email: String
   password: String
   name: String
+  avatar: String
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
@@ -1685,6 +1698,7 @@ input UserUpdateWithoutPostsDataInput {
   email: String
   password: String
   name: String
+  avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
@@ -1937,6 +1951,59 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   name_not_ends_with: String
+  avatar: String
+  """
+  All values that are not equal to given value.
+  """
+  avatar_not: String
+  """
+  All values that are contained in given list.
+  """
+  avatar_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  avatar_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  avatar_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  avatar_lte: String
+  """
+  All values greater than the given value.
+  """
+  avatar_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  avatar_gte: String
+  """
+  All values containing the given string.
+  """
+  avatar_contains: String
+  """
+  All values not containing the given string.
+  """
+  avatar_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  avatar_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  avatar_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  avatar_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  avatar_not_ends_with: String
   posts_every: PostWhereInput
   posts_some: PostWhereInput
   posts_none: PostWhereInput
@@ -2069,6 +2136,8 @@ export type UserOrderByInput =
   'password_DESC' |
   'name_ASC' |
   'name_DESC' |
+  'avatar_ASC' |
+  'avatar_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
   'createdAt_ASC' |
@@ -2095,6 +2164,7 @@ export interface UserCreateInput {
   email: String
   password: String
   name: String
+  avatar?: String
   posts?: PostCreateManyWithoutAuthorInput
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2245,6 +2315,7 @@ export interface UserUpdateWithoutPostsDataInput {
   email?: String
   password?: String
   name?: String
+  avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
   attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
@@ -2269,6 +2340,7 @@ export interface UserCreateWithoutMyActivitiesInput {
   email: String
   password: String
   name: String
+  avatar?: String
   posts?: PostCreateManyWithoutAuthorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
   attendedActivities?: ActivityCreateManyWithoutParticipantsInput
@@ -2357,6 +2429,7 @@ export interface UserCreateWithoutMyTasksInput {
   email: String
   password: String
   name: String
+  avatar?: String
   posts?: PostCreateManyWithoutAuthorInput
   myActivities?: ActivityCreateManyWithoutCreatorInput
   attendedActivities?: ActivityCreateManyWithoutParticipantsInput
@@ -2623,6 +2696,7 @@ export interface UserUpdateWithoutAttendedActivitiesDataInput {
   email?: String
   password?: String
   name?: String
+  avatar?: String
   posts?: PostUpdateManyWithoutAuthorInput
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2632,6 +2706,7 @@ export interface UserUpdateInput {
   email?: String
   password?: String
   name?: String
+  avatar?: String
   posts?: PostUpdateManyWithoutAuthorInput
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2774,6 +2849,20 @@ export interface UserWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
+  avatar?: String
+  avatar_not?: String
+  avatar_in?: String[] | String
+  avatar_not_in?: String[] | String
+  avatar_lt?: String
+  avatar_lte?: String
+  avatar_gt?: String
+  avatar_gte?: String
+  avatar_contains?: String
+  avatar_not_contains?: String
+  avatar_starts_with?: String
+  avatar_not_starts_with?: String
+  avatar_ends_with?: String
+  avatar_not_ends_with?: String
   posts_every?: PostWhereInput
   posts_some?: PostWhereInput
   posts_none?: PostWhereInput
@@ -2828,6 +2917,7 @@ export interface UserCreateWithoutPostsInput {
   email: String
   password: String
   name: String
+  avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
   attendedActivities?: ActivityCreateManyWithoutParticipantsInput
@@ -2878,6 +2968,7 @@ export interface UserUpdateWithoutMyActivitiesDataInput {
   email?: String
   password?: String
   name?: String
+  avatar?: String
   posts?: PostUpdateManyWithoutAuthorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
   attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
@@ -2894,6 +2985,7 @@ export interface UserCreateWithoutAttendedActivitiesInput {
   email: String
   password: String
   name: String
+  avatar?: String
   posts?: PostCreateManyWithoutAuthorInput
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2903,6 +2995,7 @@ export interface UserUpdateWithoutMyTasksDataInput {
   email?: String
   password?: String
   name?: String
+  avatar?: String
   posts?: PostUpdateManyWithoutAuthorInput
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
@@ -3019,6 +3112,7 @@ export interface User extends Node {
   myActivities?: Activity[]
   myTasks?: ActivityTask[]
   attendedActivities?: Activity[]
+  avatar?: String
 }
 
 /*
@@ -3079,6 +3173,7 @@ export interface UserPreviousValues {
   email: String
   password: String
   name: String
+  avatar?: String
 }
 
 export interface UserSubscriptionPayload {

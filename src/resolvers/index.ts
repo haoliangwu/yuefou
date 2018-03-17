@@ -1,5 +1,5 @@
 import { Query } from './Query'
-import { auth, activity, upload } from './Mutation'
+import { auth, activity, upload, task } from './Mutation'
 import { AuthPayload } from './AuthPayload'
 
 export default {
@@ -7,7 +7,8 @@ export default {
   Mutation: {
     ...auth,
     ...activity,
-    ...upload
+    ...upload,
+    ...task
   },
   AuthPayload,
 }
