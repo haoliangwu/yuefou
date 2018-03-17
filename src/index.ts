@@ -1,7 +1,9 @@
-import { GraphQLServer } from 'graphql-yoga'
+import { GraphQLServer, Options } from 'graphql-yoga'
+
 import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
 
+// base server
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
   resolvers,
@@ -15,4 +17,11 @@ const server = new GraphQLServer({
   }),
 })
 
-server.start(() => console.log(`Server is running on http://localhost:4000`))
+const options: Options = {
+  uploads: {
+    maxFileSize: 4096,
+    maxFiles: 1
+  }
+}
+
+server.start(options, () => console.log(`Server is running on http://localhost:4000`))

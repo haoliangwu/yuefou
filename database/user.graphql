@@ -19,5 +19,6 @@ type User {
   myActivities: [Activity!]! @relation(name: "MyActivities" onDelete: CASCADE)
   myTasks: [ActivityTask!]! @relation(name: "ActivityTaskAssignee")
   attendedActivities: [Activity!]! @relation(name: "AttendedActivities")
+  avatar: String
 }
 

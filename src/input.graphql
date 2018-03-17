@@ -1,3 +1,5 @@
+# import ProcessStatus from "./generated/prisma.graphql"
+
 input CreateActivityInput {
   title: String!
   type: ActivityType
@@ -5,4 +7,14 @@ input CreateActivityInput {
   desc: String
   startedAt: String
   endedAt: String
+}
+
+input UpdateActivityInput {
+  id: ID!
+  title: String
+  location: String
+  desc: String
+  startedAt: String
+  endedAt: String
+  status: ProcessStatus
 }
