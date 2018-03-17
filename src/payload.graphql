@@ -1,0 +1,9 @@
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type ActivityTaskPayload {
+  activity: Activity!
+  task: ActivityTask!
+}

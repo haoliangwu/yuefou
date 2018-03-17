@@ -1,6 +1,6 @@
 import { Query } from './Query'
 import { auth, activity, upload, task } from './Mutation'
-// import { AuthPayload } from './AuthPayload'
+import { AuthPayload, ActivityTaskPayload } from './Payload';
 
 export default {
   Query,
@@ -10,5 +10,6 @@ export default {
     ...upload,
     ...task
   },
-  // AuthPayload,
+  AuthPayload,
+  ActivityTaskPayload
 }
