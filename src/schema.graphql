@@ -25,7 +25,8 @@ type Mutation {
   # task
   createTask(id: ID!, task: CreateTaskInput): ActivityTaskPayload!
   updateTask(id: ID!, task: UpdateTaskInput): ActivityTaskPayload!
-  deleteTask(id: ID!, taskId: ID!): ActivityTaskPayload
+  deleteTask(id: ID!, taskId: ID!): ActivityTaskPayload!
+  assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTaskPayload!
   # upload
   singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!

@@ -43,15 +43,18 @@ async function createTask(parent, { id, task }, ctx: Context, info) {
   await whenActivityExistedById(id, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
+  const userId = getUserId(ctx)
+
   const { name } = task
 
   const data: ActivityTaskCreateInput = {
     name,
     status: 'INIT',
+    assignee: {
+      connect: { id: userId }
+    },
     activity: {
-      connect: {
-        id
-      }
+      connect: { id }
     }
   }
 
@@ -106,8 +109,37 @@ async function deleteTask(parent, { id, taskId }, ctx: Context, info) {
   }
 }
 
+/* 
+指定任务委托人
+*/
+async function assignTask(parent, { id, taskId, assigneeId }, ctx: Context, info) {
+  await whenTaskExistedById(taskId, ctx)
+  await isCurrentUserIsCreatorOrParticipant(id, ctx)
+
+  if (!assigneeId) {
+    assigneeId = getUserId(ctx)
+  }
+
+  const data: ActivityTaskUpdateInput = {
+    assignee: {
+      connect: { id: assigneeId }
+    }
+  }
+
+  const task = await ctx.db.mutation.updateActivityTask({
+    data,
+    where: { id: taskId }
+  })
+
+  return {
+    task,
+    activity: { id }
+  }
+}
+
 export const task = {
   createTask,
   updateTask,
-  deleteTask
+  deleteTask,
+  assignTask
 }
