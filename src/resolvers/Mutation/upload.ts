@@ -36,7 +36,7 @@ export const upload = {
 
     const { id, path } = await storeUpload({ stream, filename }, userId)
 
-    return recordFile({ id, filename, mimetype, encoding, path })
+    return { id, filename, mimetype, encoding, path }
   },
 
   /* 

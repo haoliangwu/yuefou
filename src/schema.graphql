@@ -7,7 +7,9 @@
 scalar Upload
 
 type Query {
+  # user
   me: User
+  # activity
   activities: [Activity!]!
   activity(id: String): Activity
 }
@@ -16,6 +18,9 @@ type Mutation {
   # auth
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
+  # user
+  updateUser(user: UpdateUserInput): User!
+  uploadAvatar(file: Upload): User!
   # activity
   createActivity(activity: CreateActivityInput): Activity!
   updateActivity(activity: UpdateActivityInput): Activity!
