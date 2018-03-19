@@ -13,10 +13,10 @@ export async function isUserExisted(id, ctx: Context) {
   }
 }
 
-async function updateUser(parent, args, ctx: Context, info) {
+async function updateUser(parent, { user }, ctx: Context, info) {
   const userId = getUserId(ctx)
 
-  const data = R.filter(R.complement(R.isNil), args) as UserUpdateInput
+  const data = R.filter(R.complement(R.isNil), user) as UserUpdateInput
 
   return ctx.db.mutation.updateUser({
     data,

@@ -1,5 +1,5 @@
 import { Query } from './Query'
-import { auth, activity, upload, task } from './Mutation'
+import { auth, activity, upload, task, user } from './Mutation'
 import { AuthPayload, ActivityTaskPayload } from './Payload';
 
 export default {
@@ -8,7 +8,8 @@ export default {
     ...auth,
     ...activity,
     ...upload,
-    ...task
+    ...task,
+    ...user
   },
   AuthPayload,
   ActivityTaskPayload

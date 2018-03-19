@@ -1,5 +1,5 @@
 import { createWriteStream } from 'fs'
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import * as mkdirp from 'mkdirp'
 import * as uuid from 'node-uuid';
 
@@ -7,15 +7,15 @@ import { Context, getUserId } from '../../utils'
 
 const storeUpload = async ({ stream, filename }, namespace = '.'): Promise<any> => {
   const id = uuid.v4()
-  const folder = resolve(process.env.UPLOAD_DIR, namespace)
-  const path = `${folder}/${id}-${filename}`
+  const fileName = `${id}-${filename}`
+  const fullPath = resolve(process.env.UPLOAD_DIR, namespace)
 
-  mkdirp.sync(folder)
+  mkdirp.sync(fullPath)
 
   return new Promise((resolve, reject) =>
     stream
-      .pipe(createWriteStream(path))
-      .on('finish', () => resolve({ id, path }))
+      .pipe(createWriteStream(join(fullPath, fileName)))
+      .on('finish', () => resolve({ id, path: fileName }))
       .on('error', reject),
   )
 }

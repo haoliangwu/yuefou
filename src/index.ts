@@ -19,7 +19,7 @@ const server = new GraphQLServer({
 
 const options: Options = {
   uploads: {
-    maxFileSize: 4096,
+    maxFileSize: 2097152,
     maxFiles: 1
   }
 }
