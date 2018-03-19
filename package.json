@@ -6,9 +6,9 @@
     "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
     "playground": "graphql playground",
     "build": "rimraf dist && tsc",
+    "sync": "./sync.sh",
     "prod:start": "dotenv -- pm2 start dist/index.js --name yuefou-server",
-    "prod:restart": "pm2 restart yuefou-server",
-    "sync": "./sync.sh"
+    "prod:restart": "pm2 restart yuefou-server"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
