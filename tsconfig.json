@@ -1,4 +1,8 @@
 {
+  "exclude": [
+    "dist",
+    "webapp"
+  ],
   "compilerOptions": {
     "target": "es5",
     "moduleResolution": "node",
