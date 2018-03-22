@@ -58,14 +58,9 @@ async function createTask(parent, { id, task }, ctx: Context, info) {
     }
   }
 
-  task = await ctx.db.mutation.createActivityTask({
+  return await ctx.db.mutation.createActivityTask({
     data
-  })
-
-  return {
-    task,
-    activity: { id }
-  }
+  }, info)
 }
 
 /* 
@@ -79,17 +74,12 @@ async function updateTask(parent, { id, task }, ctx: Context, info) {
 
   const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
 
-  task = await ctx.db.mutation.updateActivityTask({
+  return await ctx.db.mutation.updateActivityTask({
     data,
     where: {
       id: taskId
     }
-  })
-
-  return {
-    task,
-    activity: { id }
-  }
+  }, info)
 }
 
 /* 
@@ -99,14 +89,9 @@ async function deleteTask(parent, { id, taskId }, ctx: Context, info) {
   await whenTaskExistedById(taskId, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
-  const task = await ctx.db.mutation.deleteActivityTask({
+  return await ctx.db.mutation.deleteActivityTask({
     where: { id: taskId }
-  })
-
-  return {
-    task,
-    activity: { id }
-  }
+  }, info)
 }
 
 /* 
@@ -126,15 +111,10 @@ async function assignTask(parent, { id, taskId, assigneeId }, ctx: Context, info
     }
   }
 
-  const task = await ctx.db.mutation.updateActivityTask({
+  return await ctx.db.mutation.updateActivityTask({
     data,
     where: { id: taskId }
-  })
-
-  return {
-    task,
-    activity: { id }
-  }
+  }, info)
 }
 
 export const task = {

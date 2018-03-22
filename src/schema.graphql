@@ -28,10 +28,10 @@ type Mutation {
   attendActivity(id: ID!): Activity!
   quitActivity(id: ID!): Activity!
   # task
-  createTask(id: ID!, task: CreateTaskInput): ActivityTaskPayload!
-  updateTask(id: ID!, task: UpdateTaskInput): ActivityTaskPayload!
-  deleteTask(id: ID!, taskId: ID!): ActivityTaskPayload!
-  assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTaskPayload!
+  createTask(id: ID!, task: CreateTaskInput): ActivityTask!
+  updateTask(id: ID!, task: UpdateTaskInput): ActivityTask!
+  deleteTask(id: ID!, taskId: ID!): ActivityTask!
+  assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
   # upload
   singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
