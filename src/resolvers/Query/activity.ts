@@ -1,13 +1,4 @@
-import { getUserId, Context } from '../utils'
-
-/* 
-获取当前用户的详情
-*/
-function me(parent, args, ctx: Context, info) {
-  const id = getUserId(ctx)
-
-  return ctx.db.query.user({ where: { id } }, info)
-}
+import { getUserId, Context } from '../../utils'
 
 /* 
 获取当前用户可见的所有活动
@@ -47,8 +38,7 @@ async function activity(parent, args, ctx: Context, info) {
 }
 
 
-export const Query = {
-  me,
+export const activityQuery = {
   activities,
   activity
 }

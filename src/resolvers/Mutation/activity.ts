@@ -165,7 +165,7 @@ async function quitActivity(parent, { id }, ctx: Context, info) {
   }
 }
 
-export const activity = {
+export const activityMutation = {
   createActivity,
   deleteActivity,
   updateActivity,

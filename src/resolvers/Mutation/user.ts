@@ -3,7 +3,7 @@ import * as ERROR from '../../constants/error';
 import { UserUpdateInput } from "../../generated/prisma";
 import * as R from 'ramda'
 
-import { upload } from '../Mutation/upload';
+import { uploadMutation } from '../Mutation/upload';
 
 export async function isUserExisted(id, ctx: Context) {
   const isExisted = await ctx.db.exists.User({ id })
@@ -39,7 +39,7 @@ async function uploadAvatar(parent, { file }, ctx: Context, info) {
   }, info)
 }
 
-export const user = {
+export const userMutation = {
   updateUser,
   uploadAvatar
 }

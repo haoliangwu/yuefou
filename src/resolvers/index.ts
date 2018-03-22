@@ -1,15 +1,19 @@
-import { Query } from './Query'
-import { auth, activity, upload, task, user } from './Mutation'
+import { userQuery, activityQuery, taskQuery } from './Query'
+import { authMutation, activityMutation, uploadMutation, taskMutation, userMutation } from './Mutation'
 import { AuthPayload } from './Payload';
 
 export default {
-  Query,
+  Query: {
+    ...activityQuery,
+    ...taskQuery,
+    ...userQuery
+  },
   Mutation: {
-    ...auth,
-    ...activity,
-    ...upload,
-    ...task,
-    ...user
+    ...authMutation,
+    ...activityMutation,
+    ...uploadMutation,
+    ...taskMutation,
+    ...userMutation
   },
   AuthPayload
   

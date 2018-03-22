@@ -1,6 +1,6 @@
 import { getUserId, Context } from '../../utils'
 
-export const post = {
+export const postMutation = {
   async createDraft(parent, { title, text }, ctx: Context, info) {
     const userId = getUserId(ctx)
     return ctx.db.mutation.createPost(

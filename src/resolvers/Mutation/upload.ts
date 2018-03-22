@@ -25,7 +25,7 @@ const recordFile = async ({ id, filename, mimetype, encoding, path }) => {
 }
 
 
-export const upload = {
+export const uploadMutation = {
   /*
    单个文件上传 
    */
@@ -44,7 +44,7 @@ export const upload = {
    */
   async multipleUpload(parent, { files }, ctx: Context, info) {
     return Promise.all(files.map(file => {
-      return upload.singleUpload(parent, { file }, ctx, info)
+      return uploadMutation.singleUpload(parent, { file }, ctx, info)
     }))
   }
 }

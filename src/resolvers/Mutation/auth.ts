@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken'
 import { Context } from '../../utils'
 import { NO_EXISTED_USER, INVALID_PASSWORD } from '../../constants/error';
 
-export const auth = {
+export const authMutation = {
   /*
    用户注册 
    */

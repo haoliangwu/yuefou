@@ -8,10 +8,13 @@ scalar Upload
 
 type Query {
   # user
-  me: User
+  me: User!
   # activity
   activities: [Activity!]!
-  activity(id: String): Activity
+  activity(id: ID!): Activity
+  # task
+  tasks: [ActivityTask!]!
+  task(id: ID!): Activity
 }
 
 type Mutation {
@@ -19,17 +22,17 @@ type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   # user
-  updateUser(user: UpdateUserInput): User!
-  uploadAvatar(file: Upload): User!
+  updateUser(user: UpdateUserInput!): User!
+  uploadAvatar(file: Upload!): User!
   # activity
-  createActivity(activity: CreateActivityInput): Activity!
-  updateActivity(activity: UpdateActivityInput): Activity!
-  deleteActivity(id: ID!): Activity
+  createActivity(activity: CreateActivityInput!): Activity!
+  updateActivity(activity: UpdateActivityInput!): Activity!
+  deleteActivity(id: ID!): Activity!
   attendActivity(id: ID!): Activity!
   quitActivity(id: ID!): Activity!
   # task
-  createTask(id: ID!, task: CreateTaskInput): ActivityTask!
-  updateTask(id: ID!, task: UpdateTaskInput): ActivityTask!
+  createTask(id: ID!, task: CreateTaskInput!): ActivityTask!
+  updateTask(id: ID!, task: UpdateTaskInput!): ActivityTask!
   deleteTask(id: ID!, taskId: ID!): ActivityTask!
   assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
   # upload
