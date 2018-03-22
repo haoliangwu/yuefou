@@ -27,7 +27,7 @@ async function updateUser(parent, { user }, ctx: Context, info) {
 async function uploadAvatar(parent, { file }, ctx: Context, info) {
   const userId = getUserId(ctx)
 
-  const { path } = await upload.singleUpload(parent, { file }, ctx, info)
+  const { path } = await uploadMutation.singleUpload(parent, { file }, ctx, info)
 
   const data: UserUpdateInput = {
     avatar: path
