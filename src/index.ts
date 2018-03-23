@@ -1,14 +1,16 @@
-import { GraphQLServer, Options } from 'graphql-yoga'
+import { GraphQLServer, Options, PubSub } from 'graphql-yoga'
 
 import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
 
+const pubsub = new PubSub()
 // base server
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
   resolvers,
   context: req => ({
     ...req,
+    pubsub,
     db: new Prisma({
       endpoint: process.env.PRISMA_ENDPOINT, // the endpoint of the Prisma DB service (value is set in .env)
       secret: process.env.PRISMA_SECRET, // taken from database/prisma.yml (value is set in .env)
@@ -21,7 +23,8 @@ const options: Options = {
   uploads: {
     maxFileSize: 2097152,
     maxFiles: 1
-  }
+  },
+  // subscriptions: "/subscription"
 }
 
 server.start(options, () => console.log(`Server is running on http://localhost:4000`))

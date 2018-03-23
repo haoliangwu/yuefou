@@ -1,4 +1,4 @@
-# import Post, Activity, ActivityType, ActivityTask, ProcessStatus from "./generated/prisma.graphql"
+# import Post, Activity, ActivityType, ActivityTask, ProcessStatus, ActivityTaskSubscriptionPayload from "./generated/prisma.graphql"
 # import * from "./input.graphql"
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
@@ -39,4 +39,9 @@ type Mutation {
   # upload
   singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!
+}
+
+type Subscription {
+  # task
+  updateTask: ActivityTaskSubscriptionPayload
 }

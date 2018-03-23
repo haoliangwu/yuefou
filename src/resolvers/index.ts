@@ -1,8 +1,10 @@
 import { userQuery, activityQuery, taskQuery } from './Query'
 import { authMutation, activityMutation, uploadMutation, taskMutation, userMutation } from './Mutation'
 import { AuthPayload } from './Payload';
+import { taskSubscription } from './Subscription/task';
 
 export default {
+  // root type
   Query: {
     ...activityQuery,
     ...taskQuery,
@@ -15,6 +17,9 @@ export default {
     ...taskMutation,
     ...userMutation
   },
+  Subscription: {
+    ...taskSubscription
+  },
+  // app type
   AuthPayload
-  
 }

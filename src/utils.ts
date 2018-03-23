@@ -1,8 +1,10 @@
 import * as jwt from 'jsonwebtoken'
 import { Prisma } from './generated/prisma'
+import { PubSub } from 'graphql-yoga';
 
 export interface Context {
   db: Prisma
+  pubsub: PubSub
   request: any
 }
 
