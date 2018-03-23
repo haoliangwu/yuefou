@@ -140,5 +140,6 @@ export const taskMutation = {
   createTask,
   updateTask,
   deleteTask,
-  assignTask
+  assignTask,
+  updateTaskStatus
 }
