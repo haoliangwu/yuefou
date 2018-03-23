@@ -2,7 +2,7 @@ import * as R from 'ramda';
 
 import { Context, getUserId } from "../../utils";
 import * as ERROR from '../../constants/error';
-import { ActivityTaskCreateInput, ActivityTaskUpdateInput, ActivityUpdateInput } from '../../generated/prisma';
+import { ActivityTaskCreateInput, ActivityTaskUpdateInput, ActivityUpdateInput, ProcessStatus } from '../../generated/prisma';
 import { whenActivityExistedById } from '.';
 
 /*
@@ -73,6 +73,25 @@ async function updateTask(parent, { id, task }, ctx: Context, info) {
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
   const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
+
+  return ctx.db.mutation.updateActivityTask({
+    data,
+    where: {
+      id: taskId
+    }
+  }, info)
+}
+
+/* 
+更新一个任务
+*/
+async function updateTaskStatus(parent, { id, taskId, status = 'INIT' as ProcessStatus }, ctx: Context, info) {
+  await whenTaskExistedById(taskId, ctx)
+  await isCurrentUserIsCreatorOrParticipant(id, ctx)
+
+  const data: ActivityUpdateInput = {
+    status
+  }
 
   return ctx.db.mutation.updateActivityTask({
     data,

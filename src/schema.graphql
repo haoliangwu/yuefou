@@ -1,4 +1,4 @@
-# import Post, Activity, ActivityType, ActivityTask from "./generated/prisma.graphql"
+# import Post, Activity, ActivityType, ActivityTask, ProcessStatus from "./generated/prisma.graphql"
 # import * from "./input.graphql"
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
@@ -33,6 +33,7 @@ type Mutation {
   # task
   createTask(id: ID!, task: CreateTaskInput!): ActivityTask!
   updateTask(id: ID!, task: UpdateTaskInput!): ActivityTask!
+  updateTaskStatus(id: ID!, taskId: ID!, status: ProcessStatus!): ActivityTask!
   deleteTask(id: ID!, taskId: ID!): ActivityTask!
   assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
   # upload
