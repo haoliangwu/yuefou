@@ -43,5 +43,5 @@ type Mutation {
 
 type Subscription {
   # task
-  updateTask: ActivityTaskSubscriptionPayload
+  updatedTask: ActivityTaskSubscriptionPayload
 }

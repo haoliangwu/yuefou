@@ -1,6 +1,6 @@
 import { Context } from "../../utils";
 
-const updateTask = {
+const updatedTask = {
   subscribe: (parent, args, ctx: Context, info) => {
     return ctx.db.subscription.activityTask(
       {
@@ -15,5 +15,5 @@ const updateTask = {
 }
 
 export const taskSubscription = {
-  updateTask
+  updatedTask
 }
