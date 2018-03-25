@@ -25,8 +25,12 @@ type Activity {
 
 type ActivityTask {
   id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
   activity: Activity @relation(name: "BelongActivity")
   assignee: User @relation(name: "ActivityTaskAssignee")
 }
