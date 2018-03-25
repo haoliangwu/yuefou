@@ -1,4 +1,4 @@
-# import Post, Activity, ActivityType, ActivityTask, ProcessStatus, ActivityTaskSubscriptionPayload from "./generated/prisma.graphql"
+# import * from "./generated/prisma.graphql"
 # import * from "./input.graphql"
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
@@ -11,9 +11,11 @@ type Query {
   me: User!
   # activity
   activities: [Activity!]!
+  activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection!
   activity(id: ID!): Activity
   # task
   tasks: [ActivityTask!]!
+  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection
   task(id: ID!): Activity
 }
 

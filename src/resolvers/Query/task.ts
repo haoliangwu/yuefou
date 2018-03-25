@@ -7,6 +7,22 @@ function tasks(parent, args, ctx: Context, info) {
   const id = getUserId(ctx)
 
   return ctx.db.query.activityTasks({
+    orderBy: "updatedAt_DESC",
+    where: {
+      assignee: { id }
+    },
+  }, info)
+}
+
+/* 
+获取当前用户可见的所有活动（分页）
+*/
+function tasksConnection(parent, { pagination = {} }, ctx: Context, info) {
+  const id = getUserId(ctx)
+
+  return ctx.db.query.activityTasksConnection({
+    ...pagination,
+    orderBy: "updatedAt_DESC",
     where: {
       assignee: { id }
     },
@@ -29,5 +45,6 @@ function task(parent, args, ctx: Context, info) {
 
 export const taskQuery = {
   tasks,
+  tasksConnection,
   task
 }

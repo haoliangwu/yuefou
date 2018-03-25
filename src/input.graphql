@@ -1,5 +1,17 @@
 # import ProcessStatus from "./generated/prisma.graphql"
 
+input ForwardPaginationInput {
+  first: Int!
+  after: ID
+  skip: Int
+}
+
+input BackwardPaginationInput {
+  last: Int!
+  before: ID
+  skip: Int
+}
+
 input UpdateUserInput {
   name: String!
 }
