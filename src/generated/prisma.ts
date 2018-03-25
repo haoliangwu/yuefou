@@ -20,8 +20,12 @@ type Activity implements Node {
 
 type ActivityTask implements Node {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
   activity(where: ActivityWhereInput): Activity
   assignee(where: UserWhereInput): User
 }
@@ -229,7 +233,9 @@ type ActivityTaskConnection {
 
 input ActivityTaskCreateInput {
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
   assignee: UserCreateOneWithoutMyTasksInput
 }
@@ -246,13 +252,17 @@ input ActivityTaskCreateManyWithoutAssigneeInput {
 
 input ActivityTaskCreateWithoutActivityInput {
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
   assignee: UserCreateOneWithoutMyTasksInput
 }
 
 input ActivityTaskCreateWithoutAssigneeInput {
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
 }
 
@@ -273,20 +283,28 @@ type ActivityTaskEdge {
 enum ActivityTaskOrderByInput {
   id_ASC
   id_DESC
-  name_ASC
-  name_DESC
-  status_ASC
-  status_DESC
-  updatedAt_ASC
-  updatedAt_DESC
   createdAt_ASC
   createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  name_ASC
+  name_DESC
+  desc_ASC
+  desc_DESC
+  status_ASC
+  status_DESC
+  endedAt_ASC
+  endedAt_DESC
 }
 
 type ActivityTaskPreviousValues {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   name: String!
+  desc: String
   status: ProcessStatus!
+  endedAt: DateTime
 }
 
 type ActivityTaskSubscriptionPayload {
@@ -326,7 +344,9 @@ input ActivityTaskSubscriptionWhereInput {
 
 input ActivityTaskUpdateInput {
   name: String
+  desc: String
   status: ProcessStatus
+  endedAt: DateTime
   activity: ActivityUpdateOneWithoutTasksInput
   assignee: UserUpdateOneWithoutMyTasksInput
 }
@@ -351,13 +371,17 @@ input ActivityTaskUpdateManyWithoutAssigneeInput {
 
 input ActivityTaskUpdateWithoutActivityDataInput {
   name: String
+  desc: String
   status: ProcessStatus
+  endedAt: DateTime
   assignee: UserUpdateOneWithoutMyTasksInput
 }
 
 input ActivityTaskUpdateWithoutAssigneeDataInput {
   name: String
+  desc: String
   status: ProcessStatus
+  endedAt: DateTime
   activity: ActivityUpdateOneWithoutTasksInput
 }
 
@@ -445,6 +469,64 @@ input ActivityTaskWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
   name: String
   """
   All values that are not equal to given value.
@@ -498,6 +580,59 @@ input ActivityTaskWhereInput {
   All values not ending with the given string.
   """
   name_not_ends_with: String
+  desc: String
+  """
+  All values that are not equal to given value.
+  """
+  desc_not: String
+  """
+  All values that are contained in given list.
+  """
+  desc_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  desc_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  desc_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  desc_lte: String
+  """
+  All values greater than the given value.
+  """
+  desc_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  desc_gte: String
+  """
+  All values containing the given string.
+  """
+  desc_contains: String
+  """
+  All values not containing the given string.
+  """
+  desc_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  desc_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  desc_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  desc_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  desc_not_ends_with: String
   status: ProcessStatus
   """
   All values that are not equal to given value.
@@ -511,6 +646,35 @@ input ActivityTaskWhereInput {
   All values that are not contained in given list.
   """
   status_not_in: [ProcessStatus!]
+  endedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  endedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  endedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  endedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  endedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  endedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  endedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  endedAt_gte: DateTime
   activity: ActivityWhereInput
   assignee: UserWhereInput
 }
@@ -2146,14 +2310,18 @@ export type UserOrderByInput =
 export type ActivityTaskOrderByInput = 
   'id_ASC' |
   'id_DESC' |
-  'name_ASC' |
-  'name_DESC' |
-  'status_ASC' |
-  'status_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
+  'name_ASC' |
+  'name_DESC' |
+  'desc_ASC' |
+  'desc_DESC' |
+  'status_ASC' |
+  'status_DESC' |
+  'endedAt_ASC' |
+  'endedAt_DESC'
 
 export type MutationType = 
   'CREATED' |
@@ -2263,6 +2431,22 @@ export interface ActivityTaskWhereInput {
   id_not_starts_with?: ID_Input
   id_ends_with?: ID_Input
   id_not_ends_with?: ID_Input
+  createdAt?: DateTime
+  createdAt_not?: DateTime
+  createdAt_in?: DateTime[] | DateTime
+  createdAt_not_in?: DateTime[] | DateTime
+  createdAt_lt?: DateTime
+  createdAt_lte?: DateTime
+  createdAt_gt?: DateTime
+  createdAt_gte?: DateTime
+  updatedAt?: DateTime
+  updatedAt_not?: DateTime
+  updatedAt_in?: DateTime[] | DateTime
+  updatedAt_not_in?: DateTime[] | DateTime
+  updatedAt_lt?: DateTime
+  updatedAt_lte?: DateTime
+  updatedAt_gt?: DateTime
+  updatedAt_gte?: DateTime
   name?: String
   name_not?: String
   name_in?: String[] | String
@@ -2277,10 +2461,32 @@ export interface ActivityTaskWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
+  desc?: String
+  desc_not?: String
+  desc_in?: String[] | String
+  desc_not_in?: String[] | String
+  desc_lt?: String
+  desc_lte?: String
+  desc_gt?: String
+  desc_gte?: String
+  desc_contains?: String
+  desc_not_contains?: String
+  desc_starts_with?: String
+  desc_not_starts_with?: String
+  desc_ends_with?: String
+  desc_not_ends_with?: String
   status?: ProcessStatus
   status_not?: ProcessStatus
   status_in?: ProcessStatus[] | ProcessStatus
   status_not_in?: ProcessStatus[] | ProcessStatus
+  endedAt?: DateTime
+  endedAt_not?: DateTime
+  endedAt_in?: DateTime[] | DateTime
+  endedAt_not_in?: DateTime[] | DateTime
+  endedAt_lt?: DateTime
+  endedAt_lte?: DateTime
+  endedAt_gt?: DateTime
+  endedAt_gte?: DateTime
   activity?: ActivityWhereInput
   assignee?: UserWhereInput
 }
@@ -2398,7 +2604,9 @@ export interface ActivityWhereUniqueInput {
 
 export interface ActivityTaskCreateWithoutActivityInput {
   name: String
+  desc?: String
   status: ProcessStatus
+  endedAt?: DateTime
   assignee?: UserCreateOneWithoutMyTasksInput
 }
 
@@ -2443,7 +2651,9 @@ export interface UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
 
 export interface ActivityTaskUpdateWithoutActivityDataInput {
   name?: String
+  desc?: String
   status?: ProcessStatus
+  endedAt?: DateTime
   assignee?: UserUpdateOneWithoutMyTasksInput
 }
 
@@ -2473,7 +2683,9 @@ export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
 
 export interface ActivityTaskCreateInput {
   name: String
+  desc?: String
   status: ProcessStatus
+  endedAt?: DateTime
   activity?: ActivityCreateOneWithoutTasksInput
   assignee?: UserCreateOneWithoutMyTasksInput
 }
@@ -2879,7 +3091,9 @@ export interface UserWhereInput {
 
 export interface ActivityTaskUpdateWithoutAssigneeDataInput {
   name?: String
+  desc?: String
   status?: ProcessStatus
+  endedAt?: DateTime
   activity?: ActivityUpdateOneWithoutTasksInput
 }
 
@@ -2934,7 +3148,9 @@ export interface UserUpdateOneWithoutMyActivitiesInput {
 
 export interface ActivityTaskCreateWithoutAssigneeInput {
   name: String
+  desc?: String
   status: ProcessStatus
+  endedAt?: DateTime
   activity?: ActivityCreateOneWithoutTasksInput
 }
 
@@ -2976,7 +3192,9 @@ export interface UserUpdateWithoutMyActivitiesDataInput {
 
 export interface ActivityTaskUpdateInput {
   name?: String
+  desc?: String
   status?: ProcessStatus
+  endedAt?: DateTime
   activity?: ActivityUpdateOneWithoutTasksInput
   assignee?: UserUpdateOneWithoutMyTasksInput
 }
@@ -3017,14 +3235,22 @@ export interface Node {
 
 export interface ActivityTaskPreviousValues {
   id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
   name: String
+  desc?: String
   status: ProcessStatus
+  endedAt?: DateTime
 }
 
 export interface ActivityTask extends Node {
   id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
   name: String
+  desc?: String
   status: ProcessStatus
+  endedAt?: DateTime
   activity?: Activity
   assignee?: User
 }
