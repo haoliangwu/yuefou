@@ -16,7 +16,7 @@ type Query {
   # task
   tasks: [ActivityTask!]!
   tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection
-  task(id: ID!): Activity
+  task(id: ID!): ActivityTask
 }
 
 type Mutation {
