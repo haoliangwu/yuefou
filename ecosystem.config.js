@@ -32,15 +32,15 @@ module.exports = {
       host : '58.87.91.173',
       ref  : 'origin/master',
       repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/home/ubuntu/lyon/yuefou',
+      path : '/home/ubuntu/yuefou',
       'post-deploy' : 'yarn install && yarn prod:start'
     },
-    dev : {
+    staging : {
       user : 'ubuntu',
       host : '58.87.91.173',
       ref  : 'origin/staging',
       repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/home/ubuntu/lyon/yuefou',
+      path : '/home/ubuntu/yuefou',
       'post-deploy' : 'yarn install && yarn prod:start'
     }
   }
