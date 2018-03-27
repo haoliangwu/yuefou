@@ -20,28 +20,5 @@ module.exports = {
         NODE_ENV: 'production'
       }
     }
-  ],
-
-  /**
-   * Deployment section
-   * http://pm2.keymetrics.io/docs/usage/deployment/
-   */
-  deploy : {
-    production : {
-      user : 'ubuntu',
-      host : '58.87.91.173',
-      ref  : 'origin/master',
-      repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/home/ubuntu/yuefou',
-      'post-deploy' : 'yarn install && yarn prod:start'
-    },
-    staging : {
-      user : 'ubuntu',
-      host : '58.87.91.173',
-      ref  : 'origin/staging',
-      repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/home/ubuntu/yuefou',
-      'post-deploy' : 'yarn install && yarn prod:start'
-    }
-  }
+  ]
 };
