@@ -10,8 +10,15 @@ function tasks(parent, args, ctx: Context, info) {
     orderBy: "updatedAt_DESC",
     where: {
       OR: [
+        {
+          activity: {
+            OR: [
+              { participants_some: { id } },
+              { creator: { id } }
+            ]
+          }
+        },
         { assignee: { id } },
-        { activity: { participants_some: { id } } }
       ]
     },
   }, info)
@@ -28,8 +35,15 @@ function tasksConnection(parent, { pagination = {} }, ctx: Context, info) {
     orderBy: "updatedAt_DESC",
     where: {
       OR: [
+        {
+          activity: {
+            OR: [
+              { participants_some: { id } },
+              { creator: { id } }
+            ]
+          }
+        },
         { assignee: { id } },
-        { activity: { participants_some: { id } } }
       ]
     },
   }, info)
