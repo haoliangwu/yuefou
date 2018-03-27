@@ -1,7 +1,7 @@
 require('dotenv').config({ path: './.env' })
 
 module.exports = {
-
+  
   /**
    * Application configuration section
    * http://pm2.keymetrics.io/docs/usage/application-declaration/
@@ -14,7 +14,12 @@ module.exports = {
       "env_webhook": {
         "port": 23928,
         "path": "/webhook",
-        "secret": "littlelyon"
+        "secret": "littlelyon",
+        "action": "pull",
+        "post_hook": "yarn prod:deploy"
+      },
+      env_production: {
+        NODE_ENV: 'production'
       }
     }
   ],
