@@ -28,22 +28,22 @@ module.exports = {
    * Deployment section
    * http://pm2.keymetrics.io/docs/usage/deployment/
    */
-  deploy : {
-    production : {
-      user : 'ubuntu',
-      host : '58.87.91.173',
-      ref  : 'origin/master',
-      repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/var/www/yuefou',
-      'post-deploy' : 'yarn install && yarn prod:start'
-    },
-    dev : {
-      user : 'ubuntu',
-      host : '58.87.91.173',
-      ref  : 'origin/staging',
-      repo : 'git@github.com:haoliangwu/yuefou.git',
-      path : '/var/www/yuefou',
-      'post-deploy' : 'yarn install && yarn prod:start'
-    }
-  }
+  // deploy : {
+  //   production : {
+  //     user : 'ubuntu',
+  //     host : '58.87.91.173',
+  //     ref  : 'origin/master',
+  //     repo : 'git@github.com:haoliangwu/yuefou.git',
+  //     path : '/var/www/yuefou',
+  //     'post-deploy' : 'yarn install && yarn prod:start'
+  //   },
+  //   dev : {
+  //     user : 'ubuntu',
+  //     host : '58.87.91.173',
+  //     ref  : 'origin/staging',
+  //     repo : 'git@github.com:haoliangwu/yuefou.git',
+  //     path : '/var/www/yuefou',
+  //     'post-deploy' : 'yarn install && yarn prod:start'
+  //   }
+  // }
 };
