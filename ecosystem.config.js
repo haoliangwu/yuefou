@@ -27,7 +27,15 @@ module.exports = {
   deploy : {
     production : {
       user : 'ubuntu',
-      host : '212.83.163.1',
+      host : '58.87.91.173',
+      ref  : 'origin/master',
+      repo : 'git@github.com:haoliangwu/yuefou.git',
+      path : '/var/www/yuefou',
+      'post-deploy' : 'yarn install && yarn prod:start'
+    },
+    dev : {
+      user : 'ubuntu',
+      host : '58.87.91.173',
       ref  : 'origin/staging',
       repo : 'git@github.com:haoliangwu/yuefou.git',
       path : '/var/www/yuefou',
