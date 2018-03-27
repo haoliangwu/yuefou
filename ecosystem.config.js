@@ -13,7 +13,8 @@ module.exports = {
       "env_webhook": {
         "port": 23928,
         "path": "/webhook",
-        "secret": "littlelyon"
+        "secret": "littlelyon",
+        "post_hook": "yarn prod:deploy"
       },
       env_production: {
         NODE_ENV: 'production'
