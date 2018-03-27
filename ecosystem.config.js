@@ -15,6 +15,7 @@ module.exports = {
         "port": 23928,
         "path": "/webhook",
         "secret": "littlelyon",
+        "action": "pull",
         "post_hook": "yarn prod:deploy"
       },
       env_production: {
