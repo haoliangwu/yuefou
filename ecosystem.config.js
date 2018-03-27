@@ -12,7 +12,7 @@ module.exports = {
       "env_webhook": {
         "port": 23928,
         "path": "/webhook",
-        "secret": "yuefouweb"
+        "secret": "littlelyon"
       },
       env_production: {
         NODE_ENV: 'production'
