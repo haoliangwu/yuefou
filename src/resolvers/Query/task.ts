@@ -9,7 +9,10 @@ function tasks(parent, args, ctx: Context, info) {
   return ctx.db.query.activityTasks({
     orderBy: "updatedAt_DESC",
     where: {
-      assignee: { id }
+      OR: [
+        { assignee: { id } },
+        { activity: { participants_some: { id } } }
+      ]
     },
   }, info)
 }
@@ -24,7 +27,10 @@ function tasksConnection(parent, { pagination = {} }, ctx: Context, info) {
     ...pagination,
     orderBy: "updatedAt_DESC",
     where: {
-      assignee: { id }
+      OR: [
+        { assignee: { id } },
+        { activity: { participants_some: { id } } }
+      ]
     },
   }, info)
 }
