@@ -11,3 +11,6 @@
 ## Front-end stack
 * mvvm framework: angular 5
 * store management: apollo-client
+
+## DevOps
+* pm2 
