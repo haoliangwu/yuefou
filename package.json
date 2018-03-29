@@ -13,6 +13,7 @@
     "prod:restart": "pm2 restart ecosystem.config.js"
   },
   "dependencies": {
+    "apollo-engine": "^1.0.4",
     "bcryptjs": "2.4.3",
     "graphql-yoga": "1.5.0",
     "jsonwebtoken": "8.2.0",

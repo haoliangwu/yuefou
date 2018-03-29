@@ -27,6 +27,12 @@
     request-promise "^4.1.1"
     yargs "^8.0.2"
 
+"@types/accepts@*":
+  version "1.3.5"
+  resolved "http://registry.npm.taobao.org/@types/accepts/download/@types/accepts-1.3.5.tgz#c34bec115cfc746e04fe5a059df4ce7e7b391575"
+  dependencies:
+    "@types/node" "*"
+
 "@types/bcryptjs@2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@types/bcryptjs/-/bcryptjs-2.4.1.tgz#7fb63922b5b106edacdcfe084cd38850f78aacfc"
@@ -36,6 +42,28 @@
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.16.8.tgz#687ec34140624a3bec2b1a8ea9268478ae8f3be3"
   dependencies:
     "@types/express" "*"
+    "@types/node" "*"
+
+"@types/bunyan@*":
+  version "1.8.4"
+  resolved "http://registry.npm.taobao.org/@types/bunyan/download/@types/bunyan-1.8.4.tgz#69c11adc7b50538d45fb68d9ae39d062b9432f38"
+  dependencies:
+    "@types/events" "*"
+    "@types/node" "*"
+
+"@types/connect@*", "@types/connect@^3.4.31":
+  version "3.4.31"
+  resolved "http://registry.npm.taobao.org/@types/connect/download/@types/connect-3.4.31.tgz#1f92d6b117ecc05076c49ecd024f7976e528bad9"
+  dependencies:
+    "@types/node" "*"
+
+"@types/cookies@*":
+  version "0.7.1"
+  resolved "http://registry.npm.taobao.org/@types/cookies/download/@types/cookies-0.7.1.tgz#f9f204bd6767d389eea3b87609e30c090c77a540"
+  dependencies:
+    "@types/connect" "*"
+    "@types/express" "*"
+    "@types/keygrip" "*"
     "@types/node" "*"
 
 "@types/cors@^2.8.3":
@@ -63,9 +91,53 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/express@^4.0.36":
+  version "4.11.1"
+  resolved "http://registry.npm.taobao.org/@types/express/download/@types/express-4.11.1.tgz#f99663b3ab32d04cb11db612ef5dd7933f75465b"
+  dependencies:
+    "@types/body-parser" "*"
+    "@types/express-serve-static-core" "*"
+    "@types/serve-static" "*"
+
 "@types/graphql@^0.12.0":
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.12.3.tgz#c429585aaa4523135e0ab4e12dec72d2d913946f"
+
+"@types/http-assert@*":
+  version "1.2.2"
+  resolved "http://registry.npm.taobao.org/@types/http-assert/download/@types/http-assert-1.2.2.tgz#17dfe5a82184a8898935d96fe2eaedd37d22d9a4"
+
+"@types/keygrip@*":
+  version "1.0.1"
+  resolved "http://registry.npm.taobao.org/@types/keygrip/download/@types/keygrip-1.0.1.tgz#ff540462d2fb4d0a88441ceaf27d287b01c3d878"
+
+"@types/koa-bodyparser@^4.2.0":
+  version "4.2.0"
+  resolved "http://registry.npm.taobao.org/@types/koa-bodyparser/download/@types/koa-bodyparser-4.2.0.tgz#04febc567f3d3dd40e3d1a0e095cdf7b07c4d7ce"
+  dependencies:
+    "@types/koa" "*"
+
+"@types/koa-compose@*":
+  version "3.2.2"
+  resolved "http://registry.npm.taobao.org/@types/koa-compose/download/@types/koa-compose-3.2.2.tgz#dc106e000bbf92a3ac900f756df47344887ee847"
+
+"@types/koa-router@^7.0.27":
+  version "7.0.27"
+  resolved "http://registry.npm.taobao.org/@types/koa-router/download/@types/koa-router-7.0.27.tgz#4993d50cb9efdfcfb11f16c726a4b34f8fb3e0d4"
+  dependencies:
+    "@types/koa" "*"
+
+"@types/koa@*", "@types/koa@^2.0.39":
+  version "2.0.44"
+  resolved "http://registry.npm.taobao.org/@types/koa/download/@types/koa-2.0.44.tgz#4d972a3dec4d6eb89bd3c16775de26305d1c51a6"
+  dependencies:
+    "@types/accepts" "*"
+    "@types/cookies" "*"
+    "@types/events" "*"
+    "@types/http-assert" "*"
+    "@types/keygrip" "*"
+    "@types/koa-compose" "*"
+    "@types/node" "*"
 
 "@types/mime@*":
   version "2.0.0"
@@ -83,12 +155,26 @@
   version "0.25.20"
   resolved "http://registry.npm.taobao.org/@types/ramda/download/@types/ramda-0.25.20.tgz#d95056b3ef221bc05993fa9f4e6a22031a033936"
 
+"@types/restify@^5.0.7":
+  version "5.0.7"
+  resolved "http://registry.npm.taobao.org/@types/restify/download/@types/restify-5.0.7.tgz#09b736ad96af04814f9501b7b50e84dabcd77228"
+  dependencies:
+    "@types/bunyan" "*"
+    "@types/node" "*"
+    "@types/spdy" "*"
+
 "@types/serve-static@*":
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/@types/serve-static/-/serve-static-1.13.1.tgz#1d2801fa635d274cd97d4ec07e26b21b44127492"
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
+
+"@types/spdy@*":
+  version "3.4.4"
+  resolved "http://registry.npm.taobao.org/@types/spdy/download/@types/spdy-3.4.4.tgz#3282fd4ad8c4603aa49f7017dd520a08a345b2bc"
+  dependencies:
+    "@types/node" "*"
 
 "@types/strip-bom@^3.0.0":
   version "3.0.0"
@@ -188,6 +274,33 @@ apollo-cache-control@^0.0.x:
   resolved "https://registry.yarnpkg.com/apollo-cache-control/-/apollo-cache-control-0.0.9.tgz#77100f456fb19526d33b7f595c8ab1a2980dcbb4"
   dependencies:
     graphql-extensions "^0.0.x"
+
+apollo-engine-binary-darwin@0.2018.2-197-g8bb3880fd:
+  version "0.2018.2-197-g8bb3880fd"
+  resolved "http://registry.npm.taobao.org/apollo-engine-binary-darwin/download/apollo-engine-binary-darwin-0.2018.2-197-g8bb3880fd.tgz#ad90f90e4b0f83b03c8941941c59c05ce13fcb5e"
+
+apollo-engine-binary-linux@0.2018.2-197-g8bb3880fd:
+  version "0.2018.2-197-g8bb3880fd"
+  resolved "http://registry.npm.taobao.org/apollo-engine-binary-linux/download/apollo-engine-binary-linux-0.2018.2-197-g8bb3880fd.tgz#1c65445f8cd503be532732198674a3b41fa62856"
+
+apollo-engine-binary-windows@0.2018.2-197-g8bb3880fd:
+  version "0.2018.2-197-g8bb3880fd"
+  resolved "http://registry.npm.taobao.org/apollo-engine-binary-windows/download/apollo-engine-binary-windows-0.2018.2-197-g8bb3880fd.tgz#5a27920fec209cd66533033b55e3419535448e90"
+
+apollo-engine@^1.0.4:
+  version "1.0.4"
+  resolved "http://registry.npm.taobao.org/apollo-engine/download/apollo-engine-1.0.4.tgz#3bfb5d1b5a4b9703324dc1d5e7394e573c0b836a"
+  dependencies:
+    "@types/connect" "^3.4.31"
+    "@types/express" "^4.0.36"
+    "@types/koa" "^2.0.39"
+    "@types/koa-bodyparser" "^4.2.0"
+    "@types/koa-router" "^7.0.27"
+    "@types/restify" "^5.0.7"
+  optionalDependencies:
+    apollo-engine-binary-darwin "0.2018.2-197-g8bb3880fd"
+    apollo-engine-binary-linux "0.2018.2-197-g8bb3880fd"
+    apollo-engine-binary-windows "0.2018.2-197-g8bb3880fd"
 
 apollo-link-error@1.0.7:
   version "1.0.7"
