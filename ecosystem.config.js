@@ -23,7 +23,7 @@ module.exports = {
   ],
   deploy: {
     "staging": {
-      "key": "~/.ssh/id_rsa_1",
+      "key": "~/.ssh/id_rsa",
       "user": "ubuntu",
       "host": "58.87.91.173",
       "ref": "origin/staging",
