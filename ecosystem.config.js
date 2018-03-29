@@ -30,7 +30,7 @@ module.exports = {
       "repo": "git@github.com:haoliangwu/yuefou.git",
       "path": "/home/ubuntu/yuefou",
       "ssh_options": ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
-      "post-deploy": "yarn prod:deploy",
+      "post-deploy": "yarn install && yarn prod:deploy",
       "env": {
         "NODE_ENV": "staging"
       }
