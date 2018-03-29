@@ -6,7 +6,7 @@
     "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
     "playground": "graphql playground",
     "build": "rimraf dist && tsc",
-    "deploy:staging": "pm2 deploy staging update",
+    "deploy:staging": "git checkout origin/staging && git push && pm2 deploy staging update",
     "prod:deploy": "yarn build && yarn prod:start",
     "prod:start": "pm2 startOrGracefulReload ecosystem.config.js",
     "prod:stop": "pm2 stop ecosystem.config.js",
