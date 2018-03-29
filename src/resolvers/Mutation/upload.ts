@@ -29,7 +29,7 @@ export const uploadMutation = {
   /*
    单个文件上传 
    */
-  async singleUpload(parent, { file }, ctx: Context, info) {
+  async singleUpload(parent, { file }, ctx: Context, info?) {
     const userId = getUserId(ctx)
 
     const { stream, filename, mimetype, encoding } = await file
@@ -42,7 +42,7 @@ export const uploadMutation = {
   /* 
    多个文件上传
    */
-  async multipleUpload(parent, { files }, ctx: Context, info) {
+  async multipleUpload(parent, { files }, ctx: Context, info?) {
     return Promise.all(files.map(file => {
       return uploadMutation.singleUpload(parent, { file }, ctx, info)
     }))

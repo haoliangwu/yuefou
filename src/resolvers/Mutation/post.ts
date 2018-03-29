@@ -1,7 +1,7 @@
 import { getUserId, Context } from '../../utils'
 
 export const postMutation = {
-  async createDraft(parent, { title, text }, ctx: Context, info) {
+  async createDraft(parent, { title, text }, ctx: Context, info?) {
     const userId = getUserId(ctx)
     return ctx.db.mutation.createPost(
       {
@@ -18,7 +18,7 @@ export const postMutation = {
     )
   },
 
-  async publish(parent, { id }, ctx: Context, info) {
+  async publish(parent, { id }, ctx: Context, info?) {
     const userId = getUserId(ctx)
     const postExists = await ctx.db.exists.Post({
       id,
@@ -37,7 +37,7 @@ export const postMutation = {
     )
   },
 
-  async deletePost(parent, { id }, ctx: Context, info) {
+  async deletePost(parent, { id }, ctx: Context, info?) {
     const userId = getUserId(ctx)
     const postExists = await ctx.db.exists.Post({
       id,

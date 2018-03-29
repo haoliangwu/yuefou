@@ -3,7 +3,7 @@ import { getUserId, Context } from '../../utils'
 /* 
 获取当前用户可见的所有活动
 */
-function activities(parent, args, ctx: Context, info) {
+function activities(parent, args, ctx: Context, info?) {
   const id = getUserId(ctx)
 
   return ctx.db.query.activities({
@@ -28,7 +28,7 @@ function activities(parent, args, ctx: Context, info) {
 /* 
 获取当前用户可见的所有活动（分页）
 */
-function activitiesConnection(parent, { pagination = {} }, ctx: Context, info) {
+function activitiesConnection(parent, { pagination = {} }, ctx: Context, info?) {
   const id = getUserId(ctx)
 
   return ctx.db.query.activitiesConnection({
@@ -54,7 +54,7 @@ function activitiesConnection(parent, { pagination = {} }, ctx: Context, info) {
 /* 
 根据 id 获取活动详情
 */
-function activity(parent, args, ctx: Context, info) {
+function activity(parent, args, ctx: Context, info?) {
   const { id } = args
 
   return ctx.db.query.activity({

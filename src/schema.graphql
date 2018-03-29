@@ -27,8 +27,8 @@ type Mutation {
   updateUser(user: UpdateUserInput!): User!
   uploadAvatar(file: Upload!): User!
   # activity
-  createActivity(activity: CreateActivityInput!): Activity!
-  updateActivity(activity: UpdateActivityInput!): Activity!
+  createActivity(activity: CreateActivityInput!, tasksMeta: TasksMetaInput): Activity!
+  updateActivity(activity: UpdateActivityInput!, tasksMeta: TasksMetaInput): Activity!
   deleteActivity(id: ID!): Activity!
   attendActivity(id: ID!): Activity!
   quitActivity(id: ID!): Activity!

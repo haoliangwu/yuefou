@@ -7,7 +7,7 @@ export const authMutation = {
   /*
    用户注册 
    */
-  async signup(parent, args, ctx: Context, info) {
+  async signup(parent, args, ctx: Context, info?) {
     const password = await bcrypt.hash(args.password, 10)
     const user = await ctx.db.mutation.createUser({
       data: { ...args, password },
@@ -22,7 +22,7 @@ export const authMutation = {
   /*
    用户登录
    */
-  async login(parent, { email, password }, ctx: Context, info) {
+  async login(parent, { email, password }, ctx: Context, info?) {
     const user = await ctx.db.query.user({ where: { email } })
     if (!user) {
       throw new Error(NO_EXISTED_USER)

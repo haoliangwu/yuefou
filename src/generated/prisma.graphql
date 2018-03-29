@@ -12,7 +12,7 @@ type Activity implements Node {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus
+  status: ProcessStatus!
   startedAt: DateTime!
   endedAt: DateTime!
   location: String!
@@ -183,7 +183,7 @@ type ActivityPreviousValues {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus
+  status: ProcessStatus!
   startedAt: DateTime!
   endedAt: DateTime!
   location: String!
@@ -242,7 +242,7 @@ type ActivityTaskConnection {
 input ActivityTaskCreateInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
   assignee: UserCreateOneWithoutMyTasksInput
@@ -261,7 +261,7 @@ input ActivityTaskCreateManyWithoutAssigneeInput {
 input ActivityTaskCreateWithoutActivityInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   assignee: UserCreateOneWithoutMyTasksInput
 }
@@ -269,7 +269,7 @@ input ActivityTaskCreateWithoutActivityInput {
 input ActivityTaskCreateWithoutAssigneeInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
 }

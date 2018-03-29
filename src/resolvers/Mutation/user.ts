@@ -13,7 +13,7 @@ export async function isUserExisted(id, ctx: Context) {
   }
 }
 
-async function updateUser(parent, { user }, ctx: Context, info) {
+async function updateUser(parent, { user }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const data = R.filter(R.complement(R.isNil), user) as UserUpdateInput
@@ -24,7 +24,7 @@ async function updateUser(parent, { user }, ctx: Context, info) {
   }, info)
 }
 
-async function uploadAvatar(parent, { file }, ctx: Context, info) {
+async function uploadAvatar(parent, { file }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const { path } = await uploadMutation.singleUpload(parent, { file }, ctx, info)

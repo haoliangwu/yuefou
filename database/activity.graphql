@@ -29,7 +29,7 @@ type ActivityTask {
   updatedAt: DateTime!
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus @default(value: "INIT")
   endedAt: DateTime
   activity: Activity @relation(name: "BelongActivity")
   assignee: User @relation(name: "ActivityTaskAssignee")

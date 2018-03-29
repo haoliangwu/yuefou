@@ -43,3 +43,9 @@ input UpdateTaskInput {
   id: ID!
   name: String
 }
+
+input TasksMetaInput {
+  create: [CreateTaskInput!]!,
+  update: [UpdateTaskInput!]!
+  delete: [ID!]!
+}

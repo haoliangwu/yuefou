@@ -39,7 +39,7 @@ export async function isCurrentUserIsCreatorOrParticipant(id, ctx: Context) {
 /* 
 创建一个任务
 */
-async function createTask(parent, { id, task }, ctx: Context, info) {
+async function createTask(parent, { id, task }, ctx: Context, info?) {
   await whenActivityExistedById(id, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
@@ -66,7 +66,7 @@ async function createTask(parent, { id, task }, ctx: Context, info) {
 /* 
 更新一个任务
 */
-async function updateTask(parent, { id, task }, ctx: Context, info) {
+async function updateTask(parent, { id, task }, ctx: Context, info?) {
   const { id: taskId, ...updateProps } = task
 
   await whenTaskExistedById(taskId, ctx)
@@ -85,7 +85,7 @@ async function updateTask(parent, { id, task }, ctx: Context, info) {
 /* 
 更新一个任务
 */
-async function updateTaskStatus(parent, { id, taskId, status = 'INIT' as ProcessStatus }, ctx: Context, info) {
+async function updateTaskStatus(parent, { id, taskId, status = 'INIT' as ProcessStatus }, ctx: Context, info?) {
   await whenTaskExistedById(taskId, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
@@ -104,7 +104,7 @@ async function updateTaskStatus(parent, { id, taskId, status = 'INIT' as Process
 /* 
 删除一个任务
 */
-async function deleteTask(parent, { id, taskId }, ctx: Context, info) {
+async function deleteTask(parent, { id, taskId }, ctx: Context, info?) {
   await whenTaskExistedById(taskId, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 
@@ -116,7 +116,7 @@ async function deleteTask(parent, { id, taskId }, ctx: Context, info) {
 /* 
 指定任务委托人
 */
-async function assignTask(parent, { id, taskId, assigneeId }, ctx: Context, info) {
+async function assignTask(parent, { id, taskId, assigneeId }, ctx: Context, info?) {
   await whenTaskExistedById(taskId, ctx)
   await isCurrentUserIsCreatorOrParticipant(id, ctx)
 

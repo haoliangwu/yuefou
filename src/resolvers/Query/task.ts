@@ -3,7 +3,7 @@ import { getUserId, Context } from '../../utils'
 /* 
 获取当前用户可见的所有活动
 */
-function tasks(parent, args, ctx: Context, info) {
+function tasks(parent, args, ctx: Context, info?) {
   const id = getUserId(ctx)
 
   return ctx.db.query.activityTasks({
@@ -27,7 +27,7 @@ function tasks(parent, args, ctx: Context, info) {
 /* 
 获取当前用户可见的所有活动（分页）
 */
-function tasksConnection(parent, { pagination = {} }, ctx: Context, info) {
+function tasksConnection(parent, { pagination = {} }, ctx: Context, info?) {
   const id = getUserId(ctx)
 
   return ctx.db.query.activityTasksConnection({
@@ -52,7 +52,7 @@ function tasksConnection(parent, { pagination = {} }, ctx: Context, info) {
 /* 
 根据 id 获取活动详情
 */
-function task(parent, args, ctx: Context, info) {
+function task(parent, args, ctx: Context, info?) {
   const { id } = args
 
   return ctx.db.query.activityTask({

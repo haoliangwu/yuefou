@@ -4,6 +4,8 @@ import { getUserId, Context } from '../../utils';
 import { ActivityCreateInput, Activity, ActivityWhereUniqueInput, ActivityUpdateInput } from '../../generated/prisma';
 import * as ERROR from '../../constants/error';
 
+import { taskMutation } from './task';
+
 /* 
 一个活动是否存在
 */
@@ -36,7 +38,7 @@ export async function whenCurrentUserIsActivityCreator(id, ctx: Context) {
 /*
 创建一个活动 
 */
-function createActivity(parent, { activity }, ctx: Context, info) {
+function createActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const { title, location, type, desc, startedAt, endedAt } = activity
@@ -53,7 +55,13 @@ function createActivity(parent, { activity }, ctx: Context, info) {
     type: type || 'HOST',
     startedAt: startedAt || now.toISOString(),
     endedAt: endedAt || now.toISOString(),
-    location: location || 'somewhere'
+    location: location || 'somewhere',
+    tasks: {
+      create: tasksMeta ? R.propOr([], 'create', tasksMeta) : []
+    },
+    participants: {
+      create: []
+    }
   }
 
   return ctx.db.mutation.createActivity({ data }, info)
@@ -62,16 +70,37 @@ function createActivity(parent, { activity }, ctx: Context, info) {
 /* 
 更新一个活动
 */
-async function updateActivity(parent, { activity }, ctx: Context, info) {
+async function updateActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
   const { id, ...updateProps } = activity
 
   await whenActivityExistedById(id, ctx)
   await whenCurrentUserIsActivityCreator(id, ctx)
 
+  // 批量删除任务
+  if (tasksMeta && tasksMeta.delete && tasksMeta.delete.length > 0) {
+    await ctx.db.mutation.deleteManyActivityTasks({
+      where: {
+        id_in: tasksMeta.delete
+      }
+    })
+  }
+
+  // 批量更新任务
+  if (tasksMeta && tasksMeta.update && tasksMeta.update.length > 0) {
+    await Promise.all(tasksMeta.update.map(task => {
+      return taskMutation.updateTask(parent, { id: activity.id, task }, ctx)
+    }))
+  }
+
   const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
 
   return ctx.db.mutation.updateActivity({
-    data,
+    data: {
+      ...data,
+      tasks: {
+        create: tasksMeta ? R.propOr([], 'create', tasksMeta) : []
+      }
+    },
     where: { id }
   }, info)
 }
@@ -79,7 +108,7 @@ async function updateActivity(parent, { activity }, ctx: Context, info) {
 /* 
 删除一个活动
 */
-async function deleteActivity(parent, { id }, ctx: Context, info) {
+async function deleteActivity(parent, { id }, ctx: Context, info?) {
   await whenActivityExistedById(id, ctx)
   await whenCurrentUserIsActivityCreator(id, ctx)
 
@@ -91,7 +120,7 @@ async function deleteActivity(parent, { id }, ctx: Context, info) {
 /* 
 参与一个活动
 */
-async function attendActivity(parent, { id }, ctx: Context, info) {
+async function attendActivity(parent, { id }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const isCreator = await ctx.db.exists.Activity({
@@ -136,7 +165,7 @@ async function attendActivity(parent, { id }, ctx: Context, info) {
 /* 
 退出一个活动
 */
-async function quitActivity(parent, { id }, ctx: Context, info) {
+async function quitActivity(parent, { id }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const isExitedActivity = await ctx.db.exists.Activity({

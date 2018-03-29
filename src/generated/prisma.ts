@@ -9,7 +9,7 @@ type Activity implements Node {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus
+  status: ProcessStatus!
   startedAt: DateTime!
   endedAt: DateTime!
   location: String!
@@ -175,7 +175,7 @@ type ActivityPreviousValues {
   title: String!
   desc: String
   type: ActivityType!
-  status: ProcessStatus
+  status: ProcessStatus!
   startedAt: DateTime!
   endedAt: DateTime!
   location: String!
@@ -234,7 +234,7 @@ type ActivityTaskConnection {
 input ActivityTaskCreateInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
   assignee: UserCreateOneWithoutMyTasksInput
@@ -253,7 +253,7 @@ input ActivityTaskCreateManyWithoutAssigneeInput {
 input ActivityTaskCreateWithoutActivityInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   assignee: UserCreateOneWithoutMyTasksInput
 }
@@ -261,7 +261,7 @@ input ActivityTaskCreateWithoutActivityInput {
 input ActivityTaskCreateWithoutAssigneeInput {
   name: String!
   desc: String
-  status: ProcessStatus!
+  status: ProcessStatus
   endedAt: DateTime
   activity: ActivityCreateOneWithoutTasksInput
 }
@@ -2605,7 +2605,7 @@ export interface ActivityWhereUniqueInput {
 export interface ActivityTaskCreateWithoutActivityInput {
   name: String
   desc?: String
-  status: ProcessStatus
+  status?: ProcessStatus
   endedAt?: DateTime
   assignee?: UserCreateOneWithoutMyTasksInput
 }
@@ -2684,7 +2684,7 @@ export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
 export interface ActivityTaskCreateInput {
   name: String
   desc?: String
-  status: ProcessStatus
+  status?: ProcessStatus
   endedAt?: DateTime
   activity?: ActivityCreateOneWithoutTasksInput
   assignee?: UserCreateOneWithoutMyTasksInput
@@ -3149,7 +3149,7 @@ export interface UserUpdateOneWithoutMyActivitiesInput {
 export interface ActivityTaskCreateWithoutAssigneeInput {
   name: String
   desc?: String
-  status: ProcessStatus
+  status?: ProcessStatus
   endedAt?: DateTime
   activity?: ActivityCreateOneWithoutTasksInput
 }
@@ -3287,7 +3287,7 @@ export interface Activity extends Node {
   title: String
   desc?: String
   type: ActivityType
-  status?: ProcessStatus
+  status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
   location: String
@@ -3357,7 +3357,7 @@ export interface ActivityPreviousValues {
   title: String
   desc?: String
   type: ActivityType
-  status?: ProcessStatus
+  status: ProcessStatus
   startedAt: DateTime
   endedAt: DateTime
   location: String
