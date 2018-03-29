@@ -39,13 +39,13 @@ input CreateTaskInput {
   name: String!
 }
 
-input UpdateTaskInput {
+input UpdateTaskInput{
   id: ID!
   name: String
 }
 
-input TasksMetaInput {
-  create: [CreateTaskInput!]!,
-  update: [UpdateTaskInput!]!
-  delete: [ID!]!
+input TasksMetaInput{
+  create: [CreateTaskInput!],
+  update: [UpdateTaskInput!]
+  delete: [ID!]
 }
