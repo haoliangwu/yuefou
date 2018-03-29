@@ -22,6 +22,10 @@ module.exports = {
     }
   ],
   deploy: {
+    // TODO 等正式环境在配置
+    "production": {
+
+    },
     "staging": {
       "key": "~/.ssh/id_rsa",
       "user": "ubuntu",
