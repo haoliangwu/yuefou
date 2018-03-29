@@ -50,9 +50,9 @@ async function createTask(parent, { id, task }, ctx: Context, info?) {
   const data: ActivityTaskCreateInput = {
     name,
     status: 'INIT',
-    assignee: {
-      connect: { id: userId }
-    },
+    // assignee: {
+    //   connect: { id: userId }
+    // },
     activity: {
       connect: { id }
     }
