@@ -6,6 +6,7 @@ export interface Context {
   db: Prisma
   pubsub: PubSub
   request: any
+  cacheControl: any
 }
 
 export function getUserId(ctx: Context) {

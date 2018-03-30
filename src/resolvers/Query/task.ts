@@ -1,10 +1,14 @@
 import { getUserId, Context } from '../../utils'
+import { GraphQLResolveInfo } from 'graphql';
+import { CacheScope } from 'apollo-cache-control';
 
 /* 
 获取当前用户可见的所有活动
 */
-function tasks(parent, args, ctx: Context, info?) {
+function tasks(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
   const id = getUserId(ctx)
+
+  info.cacheControl.setCacheHint({ maxAge: 60 });
 
   return ctx.db.query.activityTasks({
     orderBy: "updatedAt_DESC",
