@@ -43,7 +43,7 @@ const options: Options = {
   },
 }
 
-server.start(options, () => console.log(`Server is running on http://localhost:${process.env.PORT}`))
+server.start(options, () => console.log(`GraphQL Server is running on http://localhost:${process.env.PORT}`))
 
 // Define the Engine configuration.
 const launcher = new ApolloEngineLauncher({
@@ -60,7 +60,7 @@ const launcher = new ApolloEngineLauncher({
   stores: [{
     // Every store must have a unique name. The empty string is a valid name; there is a default in-memory 50MB cache with the empty string for its name which is used for any caching feature if you don’t specify a store name. 
     name: 'yuefou-privite-cache',
-    
+
     // Resize the default in-memory cache size to 100 MB; defaults to 50MB.
     inMemory: {
       cacheSize: 104857600,
@@ -85,4 +85,8 @@ const launcher = new ApolloEngineLauncher({
 });
 
 // Start the Proxy; crash on errors.
-launcher.start().catch(err => { throw err; });
+launcher.start()
+  .then(() => {
+    console.log(`Apollo Engine Proxy Server is running on http://localhost:${process.env.PROXY_PORT}`)
+  })
+  .catch(err => { throw err; });

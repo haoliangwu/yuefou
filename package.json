@@ -35,5 +35,10 @@
     "rimraf": "2.6.2",
     "ts-node": "4.1.0",
     "typescript": "2.7.2"
-  }
+  },
+  "author": {
+    "name": "Lyon Wu",
+    "email": "littlelyon@aliyun.com"
+  },
+  "license": "MIT"
 }
