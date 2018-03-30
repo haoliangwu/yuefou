@@ -1,13 +1,23 @@
+enum CacheScope {
+  PRIVATE
+  PUBLIC
+}
+
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheScope
+) on OBJECT | FIELD_DEFINITION
+
 type User {
   id: ID!
   email: String! 
   name: String!
   posts: [Post!]!
-  myActivities: [Activity!]!
-  myTasks: [ActivityTask!]!
   myRecipes: [Recipe!]!
   myTags: [Tag!]!
-  attendedActivities: [Activity!]!
+  myActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
+  myTasks: [ActivityTask!]! @cacheControl(maxAge: 60, scope: PRIVATE)
+  attendedActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   avatar: String
 }
 

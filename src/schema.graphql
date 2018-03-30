@@ -8,18 +8,18 @@ scalar Upload
 
 type Query {
   # user
-  me: User!
+  me: User! @cacheControl(maxAge: 3600, scope: PRIVATE)
   # tag
   tags: [Tag!]!
   myRecipeTags: [Tag!]!
   tag(id: ID!): Tag
   # activity
-  activities: [Activity!]!
-  activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection!
+  activities: [Activity!]! @cacheControl(maxAge: 60)
+  activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection! @cacheControl(maxAge: 60)
   activity(id: ID!): Activity
   # task
-  tasks: [ActivityTask!]!
-  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection!
+  tasks: [ActivityTask!]! @cacheControl(maxAge: 60)
+  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection @cacheControl(maxAge: 60)
   task(id: ID!): ActivityTask
   # recipe
   recipes: [Recipe!]!

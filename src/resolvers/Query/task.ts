@@ -8,7 +8,7 @@ import { CacheScope } from 'apollo-cache-control';
 function tasks(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
   const id = getUserId(ctx)
 
-  info.cacheControl.setCacheHint({ maxAge: 60 });
+  // info.cacheControl.setCacheHint({ maxAge: 60 });
 
   return ctx.db.query.activityTasks({
     orderBy: "updatedAt_DESC",
