@@ -1,8 +1,25 @@
 # import Activity from './activity.graphql'
+# import User from './user.graphql'
 
 enum ProcessStatus {
   INIT
   PENDING
   DONE
   STOP
+}
+
+enum TagCategory {
+  DEFAULT
+  RECIPE
+}
+
+type Tag {
+  id: ID! @unique
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  creator: User! @relation(name: "MyTags")
+  type: RecipeTagType @default(value: "STYLE")
+  category: TagCategory! @default(value: "DEFAULT")
+  default: Boolean @default(value: false)
 }

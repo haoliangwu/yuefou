@@ -1,5 +1,5 @@
-import { userQuery, activityQuery, taskQuery } from './Query'
-import { authMutation, activityMutation, uploadMutation, taskMutation, userMutation } from './Mutation'
+import { userQuery, activityQuery, taskQuery, recipeMutation } from './Query'
+import { authMutation, activityMutation, uploadMutation, taskMutation, userMutation, recipeQuery } from './Mutation'
 import { AuthPayload } from './Payload';
 import { taskSubscription } from './Subscription/task';
 
@@ -8,14 +8,16 @@ export default {
   Query: {
     ...activityQuery,
     ...taskQuery,
-    ...userQuery
+    ...userQuery,
+    ...recipeQuery
   },
   Mutation: {
     ...authMutation,
     ...activityMutation,
     ...uploadMutation,
     ...taskMutation,
-    ...userMutation
+    ...userMutation,
+    ...recipeMutation
   },
   Subscription: {
     ...taskSubscription

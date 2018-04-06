@@ -1,0 +1,20 @@
+# import Tag, TagCategory from './common.graphql'
+# import User from './user.graphql'
+
+enum RecipeTagType {
+  STYLE
+  TASTE
+  METHOD
+  BASIC
+}
+
+type Recipe {
+  id: ID! @unique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  tags: [Tag!]!
+  creator: User! @relation(name: "MyRecipes")
+  time: Int @default(value: 0)
+  desc: String,
+}

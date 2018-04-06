@@ -1,4 +1,4 @@
-# import Post, Activity, ActivityType, ActivityTask, ActivityConnection, ActivityTaskConnection, ProcessStatus from "./generated/prisma.graphql"
+# import Post, Activity, ActivityType, ActivityTask, ActivityConnection, ActivityTaskConnection, ProcessStatus, Recipe from "./generated/prisma.graphql"
 # import * from "./input.graphql"
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
@@ -15,8 +15,12 @@ type Query {
   activity(id: ID!): Activity
   # task
   tasks: [ActivityTask!]!
-  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection
+  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection!
   task(id: ID!): ActivityTask
+  # recipe
+  recipes: [Recipe!]!
+  recipesConnection(pagination: ForwardPaginationInput): RecipeConnection!
+  recipe(id: ID!): Recipe
 }
 
 type Mutation {

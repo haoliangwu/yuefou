@@ -13,6 +13,7 @@ datamodel:
   - common.graphql
   - user.graphql
   - activity.graphql
+  - recipe.graphql
 
 # seed your service with initial data based on seed.graphql
 seed:
