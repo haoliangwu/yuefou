@@ -37,6 +37,12 @@ const server = new GraphQLServer({
 // });
 
 const options: Options = {
+  cors: {
+    "origin": "*",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204
+  },
   tracing: true,
   cacheControl: true,
   port: parseInt(process.env.PORT, 10) || 3000,
