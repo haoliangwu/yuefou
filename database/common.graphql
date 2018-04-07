@@ -22,4 +22,5 @@ type Tag {
   type: RecipeTagType @default(value: "STYLE")
   category: TagCategory! @default(value: "DEFAULT")
   default: Boolean @default(value: false)
+  recipes: [Recipe!]! @relation(name: "RecipeTags")
 }

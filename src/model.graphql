@@ -5,6 +5,8 @@ type User {
   posts: [Post!]!
   myActivities: [Activity!]!
   myTasks: [ActivityTask!]!
+  myRecipes: [Recipe!]!
+  myTags: [Tag!]!
   attendedActivities: [Activity!]!
   avatar: String
 }

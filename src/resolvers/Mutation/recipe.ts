@@ -1,46 +1,89 @@
+import * as R from 'ramda';
+
 import { getUserId, Context } from '../../utils';
 import { GraphQLResolveInfo } from 'graphql';
+import * as ERROR from '../../constants/error';
+import { RecipeCreateInput, RecipeUpdateInput } from '../../generated/prisma';
+import { whenActivityExistedById } from '.';
 
 /* 
-获取当前用户可见的所有菜谱
+一个菜谱是否存在
 */
-function recipes(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
-  const id = getUserId(ctx)
+export async function whenRecipeExistedById(id, ctx: Context) {
+  const isExistedRecipe = await ctx.db.exists.Recipe({ id })
 
-  return ctx.db.query.recipes({
-    orderBy: "updatedAt_DESC",
-    where: {
-      creator: { id }
-    }
-  }, info)
+  if (!isExistedRecipe) return Promise.reject(ERROR.NO_EXISTED_ACTIVITY_RECIPE)
 }
 
 /* 
-获取当前用户可见的所有菜谱（分页）
+当前用户是菜谱的创建者
 */
-function recipesConnection(parent, { pagination = {} }, ctx: Context, info?) {
-  const id = getUserId(ctx)
+export async function whenCurrentUserIsRecipeCreator(id, ctx: Context) {
+  const userId = getUserId(ctx)
 
-  return ctx.db.query.recipesConnection({
-    ...pagination,
-    orderBy: "updatedAt_DESC",
-    where: {
-      creator: { id }
+  const isCreator = await ctx.db.exists.Recipe({
+    id,
+    creator: {
+      id: userId
     }
-  }, info)
+  })
+
+  if (!isCreator) {
+    return Promise.reject(ERROR.ONLY_BY_CREATOR)
+  }
 }
 
 /* 
-根据 id 获取菜谱详情
+创建一个菜谱
 */
-function recipe(parent, args, ctx: Context, info?) {
-  const { id } = args
+async function createRecipe(parent, { recipe }, ctx: Context, info?: GraphQLResolveInfo) {
+  const userId = getUserId(ctx)
 
-  return ctx.db.query.recipe({
+  const { name, desc, time, tags } = recipe
+
+  const data: RecipeCreateInput = {
+    name,
+    creator: {
+      connect: { id: userId }
+    },
+    desc,
+    time
+  }
+
+  return ctx.db.mutation.createRecipe({ data }, info)
+}
+
+/* 
+更新一个菜谱
+*/
+async function updateRecipe(parent, { recipe }, ctx: Context, info?: GraphQLResolveInfo) {
+  const { id, ...updateProps } = recipe
+
+  await whenRecipeExistedById(id, ctx)
+  await whenCurrentUserIsRecipeCreator(id, ctx)
+
+  const data = R.filter(R.complement(R.isNil), updateProps) as RecipeUpdateInput
+
+  return ctx.db.mutation.updateRecipe({
+    data,
     where: { id }
   }, info)
 }
 
-export const recipeQuery = {
-  recipes
+/* 
+删除一个菜谱
+*/
+async function deleteRecipe(parent, { id }, ctx: Context, info?: GraphQLResolveInfo) {
+  await whenActivityExistedById(id, ctx)
+  await whenCurrentUserIsRecipeCreator(id, ctx)
+
+  return await ctx.db.mutation.deleteRecipe({
+    where: { id }
+  }, info)
+}
+
+export const recipeMutation = {
+  createRecipe,
+  updateRecipe,
+  deleteRecipe
 }

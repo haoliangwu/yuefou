@@ -8,8 +8,6 @@ import { CacheScope } from 'apollo-cache-control';
 function me(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
   const id = getUserId(ctx)
 
-  info.cacheControl.setCacheHint({ maxAge: 3600, scope: CacheScope.Private });
-
   return ctx.db.query.user({ where: { id } }, info)
 }
 

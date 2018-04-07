@@ -1,4 +1,4 @@
-# import Post, Activity, ActivityType, ActivityTask, ActivityConnection, ActivityTaskConnection, ProcessStatus, Recipe from "./generated/prisma.graphql"
+# import Post, Activity, ActivityType, ActivityTask, ActivityConnection, ActivityTaskConnection, ProcessStatus, Recipe, Tag from "./generated/prisma.graphql"
 # import * from "./input.graphql"
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
@@ -9,6 +9,10 @@ scalar Upload
 type Query {
   # user
   me: User!
+  # tag
+  tags: [Tag!]!
+  myRecipeTags: [Tag!]!
+  tag(id: ID!): Tag
   # activity
   activities: [Activity!]!
   activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection!
@@ -30,6 +34,10 @@ type Mutation {
   # user
   updateUser(user: UpdateUserInput!): User!
   uploadAvatar(file: Upload!): User!
+  # tag
+  createTag(tag: CreateTagInput!): Tag!
+  updateTag(tag: UpdateTagInput!): Tag!
+  deleteTag(id: ID!): Tag!
   # activity
   createActivity(activity: CreateActivityInput!, tasksMeta: TasksMetaInput): Activity!
   updateActivity(activity: UpdateActivityInput!, tasksMeta: TasksMetaInput): Activity!
@@ -42,6 +50,10 @@ type Mutation {
   updateTaskStatus(id: ID!, taskId: ID!, status: ProcessStatus!): ActivityTask!
   deleteTask(id: ID!, taskId: ID!): ActivityTask!
   assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
+  # recipe
+  createRecipe(recipe: CreateRecipeInput): Recipe!,
+  updateRecipe(recipe: UpdateRecipeInput): Recipe!,
+  deleteRecipe(id: ID!): Recipe!
   # upload
   singleUpload (file: Upload!): File!
   multipleUpload (files: [Upload!]!): [File!]!

@@ -13,7 +13,7 @@ type Recipe {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
-  tags: [Tag!]!
+  tags: [Tag!]! @relation(name: "RecipeTags")
   creator: User! @relation(name: "MyRecipes")
   time: Int @default(value: 0)
   desc: String,

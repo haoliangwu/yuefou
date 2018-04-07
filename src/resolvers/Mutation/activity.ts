@@ -10,9 +10,9 @@ import { taskMutation } from './task';
 一个活动是否存在
 */
 export async function whenActivityExistedById(id, ctx: Context) {
-  const isExitedActivity = await ctx.db.exists.Activity({ id })
+  const isExistedActivity = await ctx.db.exists.Activity({ id })
 
-  if (!isExitedActivity) {
+  if (!isExistedActivity) {
     return Promise.reject(ERROR.NO_EXISTED_ACTIVITY)
   }
 }

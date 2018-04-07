@@ -48,20 +48,22 @@ type Recipe implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
+  creator(where: UserWhereInput): User!
   time: Int
   desc: String
-  tags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag!]
-  creator(where: UserWhereInput): User!
 }
 
-type RecipeTag implements Node {
+type Tag implements Node {
   id: ID!
   name: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   creator(where: UserWhereInput): User!
   type: RecipeTagType
+  category: TagCategory!
   default: Boolean
+  recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
 }
 
 type User implements Node {
@@ -73,7 +75,7 @@ type User implements Node {
   myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
   myRecipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
-  myTags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag!]
+  myTags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   attendedActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   avatar: String
 }
@@ -1215,7 +1217,7 @@ type AggregateRecipe {
   count: Int!
 }
 
-type AggregateRecipeTag {
+type AggregateTag {
   count: Int!
 }
 
@@ -1239,41 +1241,41 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
+  createTag(data: TagCreateInput!): Tag!
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
   createActivity(data: ActivityCreateInput!): Activity!
   createActivityTask(data: ActivityTaskCreateInput!): ActivityTask!
-  createRecipeTag(data: RecipeTagCreateInput!): RecipeTag!
   createRecipe(data: RecipeCreateInput!): Recipe!
+  updateTag(data: TagUpdateInput!, where: TagWhereUniqueInput!): Tag
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateActivity(data: ActivityUpdateInput!, where: ActivityWhereUniqueInput!): Activity
   updateActivityTask(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereUniqueInput!): ActivityTask
-  updateRecipeTag(data: RecipeTagUpdateInput!, where: RecipeTagWhereUniqueInput!): RecipeTag
   updateRecipe(data: RecipeUpdateInput!, where: RecipeWhereUniqueInput!): Recipe
+  deleteTag(where: TagWhereUniqueInput!): Tag
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
   deleteActivity(where: ActivityWhereUniqueInput!): Activity
   deleteActivityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  deleteRecipeTag(where: RecipeTagWhereUniqueInput!): RecipeTag
   deleteRecipe(where: RecipeWhereUniqueInput!): Recipe
+  upsertTag(where: TagWhereUniqueInput!, create: TagCreateInput!, update: TagUpdateInput!): Tag!
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertActivity(where: ActivityWhereUniqueInput!, create: ActivityCreateInput!, update: ActivityUpdateInput!): Activity!
   upsertActivityTask(where: ActivityTaskWhereUniqueInput!, create: ActivityTaskCreateInput!, update: ActivityTaskUpdateInput!): ActivityTask!
-  upsertRecipeTag(where: RecipeTagWhereUniqueInput!, create: RecipeTagCreateInput!, update: RecipeTagUpdateInput!): RecipeTag!
   upsertRecipe(where: RecipeWhereUniqueInput!, create: RecipeCreateInput!, update: RecipeUpdateInput!): Recipe!
+  updateManyTags(data: TagUpdateInput!, where: TagWhereInput!): BatchPayload!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyActivities(data: ActivityUpdateInput!, where: ActivityWhereInput!): BatchPayload!
   updateManyActivityTasks(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereInput!): BatchPayload!
-  updateManyRecipeTags(data: RecipeTagUpdateInput!, where: RecipeTagWhereInput!): BatchPayload!
   updateManyRecipes(data: RecipeUpdateInput!, where: RecipeWhereInput!): BatchPayload!
+  deleteManyTags(where: TagWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyActivities(where: ActivityWhereInput!): BatchPayload!
   deleteManyActivityTasks(where: ActivityTaskWhereInput!): BatchPayload!
-  deleteManyRecipeTags(where: RecipeTagWhereInput!): BatchPayload!
   deleteManyRecipes(where: RecipeWhereInput!): BatchPayload!
 }
 
@@ -1700,23 +1702,23 @@ enum ProcessStatus {
 }
 
 type Query {
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag]!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity]!
   activityTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask]!
-  recipeTags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag]!
   recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe]!
+  tag(where: TagWhereUniqueInput!): Tag
   post(where: PostWhereUniqueInput!): Post
   user(where: UserWhereUniqueInput!): User
   activity(where: ActivityWhereUniqueInput!): Activity
   activityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  recipeTag(where: RecipeTagWhereUniqueInput!): RecipeTag
   recipe(where: RecipeWhereUniqueInput!): Recipe
+  tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   activitiesConnection(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityConnection!
   activityTasksConnection(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityTaskConnection!
-  recipeTagsConnection(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecipeTagConnection!
   recipesConnection(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecipeConnection!
   """
   Fetches an object given its ID
@@ -1746,7 +1748,7 @@ input RecipeCreateInput {
   name: String!
   time: Int
   desc: String
-  tags: RecipeTagCreateManyInput
+  tags: TagCreateManyWithoutRecipesInput
   creator: UserCreateOneWithoutMyRecipesInput!
 }
 
@@ -1755,11 +1757,23 @@ input RecipeCreateManyWithoutCreatorInput {
   connect: [RecipeWhereUniqueInput!]
 }
 
+input RecipeCreateManyWithoutTagsInput {
+  create: [RecipeCreateWithoutTagsInput!]
+  connect: [RecipeWhereUniqueInput!]
+}
+
 input RecipeCreateWithoutCreatorInput {
   name: String!
   time: Int
   desc: String
-  tags: RecipeTagCreateManyInput
+  tags: TagCreateManyWithoutRecipesInput
+}
+
+input RecipeCreateWithoutTagsInput {
+  name: String!
+  time: Int
+  desc: String
+  creator: UserCreateOneWithoutMyRecipesInput!
 }
 
 """
@@ -1835,117 +1849,6 @@ input RecipeSubscriptionWhereInput {
   node: RecipeWhereInput
 }
 
-"""
-A connection to a list of items.
-"""
-type RecipeTagConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [RecipeTagEdge]!
-  aggregate: AggregateRecipeTag!
-}
-
-input RecipeTagCreateInput {
-  name: String!
-  type: RecipeTagType
-  default: Boolean
-  creator: UserCreateOneWithoutMyTagsInput!
-}
-
-input RecipeTagCreateManyInput {
-  create: [RecipeTagCreateInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-}
-
-input RecipeTagCreateManyWithoutCreatorInput {
-  create: [RecipeTagCreateWithoutCreatorInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-}
-
-input RecipeTagCreateWithoutCreatorInput {
-  name: String!
-  type: RecipeTagType
-  default: Boolean
-}
-
-"""
-An edge in a connection.
-"""
-type RecipeTagEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: RecipeTag!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum RecipeTagOrderByInput {
-  id_ASC
-  id_DESC
-  name_ASC
-  name_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  type_ASC
-  type_DESC
-  default_ASC
-  default_DESC
-}
-
-type RecipeTagPreviousValues {
-  id: ID!
-  name: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  type: RecipeTagType
-  default: Boolean
-}
-
-type RecipeTagSubscriptionPayload {
-  mutation: MutationType!
-  node: RecipeTag
-  updatedFields: [String!]
-  previousValues: RecipeTagPreviousValues
-}
-
-input RecipeTagSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [RecipeTagSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [RecipeTagSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: RecipeTagWhereInput
-}
-
 enum RecipeTagType {
   STYLE
   TASTE
@@ -1953,269 +1856,11 @@ enum RecipeTagType {
   BASIC
 }
 
-input RecipeTagUpdateDataInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-  creator: UserUpdateOneWithoutMyTagsInput
-}
-
-input RecipeTagUpdateInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-  creator: UserUpdateOneWithoutMyTagsInput
-}
-
-input RecipeTagUpdateManyInput {
-  create: [RecipeTagCreateInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-  disconnect: [RecipeTagWhereUniqueInput!]
-  delete: [RecipeTagWhereUniqueInput!]
-  update: [RecipeTagUpdateWithWhereUniqueNestedInput!]
-  upsert: [RecipeTagUpsertWithWhereUniqueNestedInput!]
-}
-
-input RecipeTagUpdateManyWithoutCreatorInput {
-  create: [RecipeTagCreateWithoutCreatorInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-  disconnect: [RecipeTagWhereUniqueInput!]
-  delete: [RecipeTagWhereUniqueInput!]
-  update: [RecipeTagUpdateWithWhereUniqueWithoutCreatorInput!]
-  upsert: [RecipeTagUpsertWithWhereUniqueWithoutCreatorInput!]
-}
-
-input RecipeTagUpdateWithoutCreatorDataInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-}
-
-input RecipeTagUpdateWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput!
-  data: RecipeTagUpdateDataInput!
-}
-
-input RecipeTagUpdateWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput!
-  data: RecipeTagUpdateWithoutCreatorDataInput!
-}
-
-input RecipeTagUpsertWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput!
-  update: RecipeTagUpdateDataInput!
-  create: RecipeTagCreateInput!
-}
-
-input RecipeTagUpsertWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput!
-  update: RecipeTagUpdateWithoutCreatorDataInput!
-  create: RecipeTagCreateWithoutCreatorInput!
-}
-
-input RecipeTagWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [RecipeTagWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [RecipeTagWhereInput!]
-  id: ID
-  """
-  All values that are not equal to given value.
-  """
-  id_not: ID
-  """
-  All values that are contained in given list.
-  """
-  id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
-  id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
-  id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
-  id_lte: ID
-  """
-  All values greater than the given value.
-  """
-  id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
-  name: String
-  """
-  All values that are not equal to given value.
-  """
-  name_not: String
-  """
-  All values that are contained in given list.
-  """
-  name_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  name_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  name_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  name_lte: String
-  """
-  All values greater than the given value.
-  """
-  name_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  name_gte: String
-  """
-  All values containing the given string.
-  """
-  name_contains: String
-  """
-  All values not containing the given string.
-  """
-  name_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  name_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  name_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  name_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  name_not_ends_with: String
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  updatedAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  updatedAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  updatedAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  updatedAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  updatedAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  updatedAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  updatedAt_gte: DateTime
-  type: RecipeTagType
-  """
-  All values that are not equal to given value.
-  """
-  type_not: RecipeTagType
-  """
-  All values that are contained in given list.
-  """
-  type_in: [RecipeTagType!]
-  """
-  All values that are not contained in given list.
-  """
-  type_not_in: [RecipeTagType!]
-  default: Boolean
-  """
-  All values that are not equal to given value.
-  """
-  default_not: Boolean
-  creator: UserWhereInput
-}
-
-input RecipeTagWhereUniqueInput {
-  id: ID
-}
-
 input RecipeUpdateInput {
   name: String
   time: Int
   desc: String
-  tags: RecipeTagUpdateManyInput
+  tags: TagUpdateManyWithoutRecipesInput
   creator: UserUpdateOneWithoutMyRecipesInput
 }
 
@@ -2228,11 +1873,27 @@ input RecipeUpdateManyWithoutCreatorInput {
   upsert: [RecipeUpsertWithWhereUniqueWithoutCreatorInput!]
 }
 
+input RecipeUpdateManyWithoutTagsInput {
+  create: [RecipeCreateWithoutTagsInput!]
+  connect: [RecipeWhereUniqueInput!]
+  disconnect: [RecipeWhereUniqueInput!]
+  delete: [RecipeWhereUniqueInput!]
+  update: [RecipeUpdateWithWhereUniqueWithoutTagsInput!]
+  upsert: [RecipeUpsertWithWhereUniqueWithoutTagsInput!]
+}
+
 input RecipeUpdateWithoutCreatorDataInput {
   name: String
   time: Int
   desc: String
-  tags: RecipeTagUpdateManyInput
+  tags: TagUpdateManyWithoutRecipesInput
+}
+
+input RecipeUpdateWithoutTagsDataInput {
+  name: String
+  time: Int
+  desc: String
+  creator: UserUpdateOneWithoutMyRecipesInput
 }
 
 input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
@@ -2240,10 +1901,21 @@ input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
   data: RecipeUpdateWithoutCreatorDataInput!
 }
 
+input RecipeUpdateWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput!
+  data: RecipeUpdateWithoutTagsDataInput!
+}
+
 input RecipeUpsertWithWhereUniqueWithoutCreatorInput {
   where: RecipeWhereUniqueInput!
   update: RecipeUpdateWithoutCreatorDataInput!
   create: RecipeCreateWithoutCreatorInput!
+}
+
+input RecipeUpsertWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput!
+  update: RecipeUpdateWithoutTagsDataInput!
+  create: RecipeCreateWithoutTagsInput!
 }
 
 input RecipeWhereInput {
@@ -2501,9 +2173,9 @@ input RecipeWhereInput {
   All values not ending with the given string.
   """
   desc_not_ends_with: String
-  tags_every: RecipeTagWhereInput
-  tags_some: RecipeTagWhereInput
-  tags_none: RecipeTagWhereInput
+  tags_every: TagWhereInput
+  tags_some: TagWhereInput
+  tags_none: TagWhereInput
   creator: UserWhereInput
 }
 
@@ -2512,12 +2184,422 @@ input RecipeWhereUniqueInput {
 }
 
 type Subscription {
+  tag(where: TagSubscriptionWhereInput): TagSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   activity(where: ActivitySubscriptionWhereInput): ActivitySubscriptionPayload
   activityTask(where: ActivityTaskSubscriptionWhereInput): ActivityTaskSubscriptionPayload
-  recipeTag(where: RecipeTagSubscriptionWhereInput): RecipeTagSubscriptionPayload
   recipe(where: RecipeSubscriptionWhereInput): RecipeSubscriptionPayload
+}
+
+enum TagCategory {
+  DEFAULT
+  RECIPE
+}
+
+"""
+A connection to a list of items.
+"""
+type TagConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [TagEdge]!
+  aggregate: AggregateTag!
+}
+
+input TagCreateInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserCreateOneWithoutMyTagsInput!
+  recipes: RecipeCreateManyWithoutTagsInput
+}
+
+input TagCreateManyWithoutCreatorInput {
+  create: [TagCreateWithoutCreatorInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateManyWithoutRecipesInput {
+  create: [TagCreateWithoutRecipesInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateWithoutCreatorInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  recipes: RecipeCreateManyWithoutTagsInput
+}
+
+input TagCreateWithoutRecipesInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserCreateOneWithoutMyTagsInput!
+}
+
+"""
+An edge in a connection.
+"""
+type TagEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Tag!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum TagOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  type_ASC
+  type_DESC
+  category_ASC
+  category_DESC
+  default_ASC
+  default_DESC
+}
+
+type TagPreviousValues {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  type: RecipeTagType
+  category: TagCategory!
+  default: Boolean
+}
+
+type TagSubscriptionPayload {
+  mutation: MutationType!
+  node: Tag
+  updatedFields: [String!]
+  previousValues: TagPreviousValues
+}
+
+input TagSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [TagSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [TagSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: TagWhereInput
+}
+
+input TagUpdateInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserUpdateOneWithoutMyTagsInput
+  recipes: RecipeUpdateManyWithoutTagsInput
+}
+
+input TagUpdateManyWithoutCreatorInput {
+  create: [TagCreateWithoutCreatorInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+  update: [TagUpdateWithWhereUniqueWithoutCreatorInput!]
+  upsert: [TagUpsertWithWhereUniqueWithoutCreatorInput!]
+}
+
+input TagUpdateManyWithoutRecipesInput {
+  create: [TagCreateWithoutRecipesInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+  update: [TagUpdateWithWhereUniqueWithoutRecipesInput!]
+  upsert: [TagUpsertWithWhereUniqueWithoutRecipesInput!]
+}
+
+input TagUpdateWithoutCreatorDataInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  recipes: RecipeUpdateManyWithoutTagsInput
+}
+
+input TagUpdateWithoutRecipesDataInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserUpdateOneWithoutMyTagsInput
+}
+
+input TagUpdateWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutCreatorDataInput!
+}
+
+input TagUpdateWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutRecipesDataInput!
+}
+
+input TagUpsertWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutCreatorDataInput!
+  create: TagCreateWithoutCreatorInput!
+}
+
+input TagUpsertWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutRecipesDataInput!
+  create: TagCreateWithoutRecipesInput!
+}
+
+input TagWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [TagWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [TagWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  type: RecipeTagType
+  """
+  All values that are not equal to given value.
+  """
+  type_not: RecipeTagType
+  """
+  All values that are contained in given list.
+  """
+  type_in: [RecipeTagType!]
+  """
+  All values that are not contained in given list.
+  """
+  type_not_in: [RecipeTagType!]
+  category: TagCategory
+  """
+  All values that are not equal to given value.
+  """
+  category_not: TagCategory
+  """
+  All values that are contained in given list.
+  """
+  category_in: [TagCategory!]
+  """
+  All values that are not contained in given list.
+  """
+  category_not_in: [TagCategory!]
+  default: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  default_not: Boolean
+  creator: UserWhereInput
+  recipes_every: RecipeWhereInput
+  recipes_some: RecipeWhereInput
+  recipes_none: RecipeWhereInput
+}
+
+input TagWhereUniqueInput {
+  id: ID
 }
 
 """
@@ -2544,7 +2626,7 @@ input UserCreateInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2587,7 +2669,7 @@ input UserCreateWithoutAttendedActivitiesInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
 }
 
 input UserCreateWithoutMyActivitiesInput {
@@ -2598,7 +2680,7 @@ input UserCreateWithoutMyActivitiesInput {
   posts: PostCreateManyWithoutAuthorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2610,7 +2692,7 @@ input UserCreateWithoutMyRecipesInput {
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2634,7 +2716,7 @@ input UserCreateWithoutMyTasksInput {
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2646,7 +2728,7 @@ input UserCreateWithoutPostsInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2733,7 +2815,7 @@ input UserUpdateInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2800,7 +2882,7 @@ input UserUpdateWithoutAttendedActivitiesDataInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
 }
 
 input UserUpdateWithoutMyActivitiesDataInput {
@@ -2811,7 +2893,7 @@ input UserUpdateWithoutMyActivitiesDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2823,7 +2905,7 @@ input UserUpdateWithoutMyRecipesDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2847,7 +2929,7 @@ input UserUpdateWithoutMyTasksDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2859,7 +2941,7 @@ input UserUpdateWithoutPostsDataInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -3185,9 +3267,9 @@ input UserWhereInput {
   myRecipes_every: RecipeWhereInput
   myRecipes_some: RecipeWhereInput
   myRecipes_none: RecipeWhereInput
-  myTags_every: RecipeTagWhereInput
-  myTags_some: RecipeTagWhereInput
-  myTags_none: RecipeTagWhereInput
+  myTags_every: TagWhereInput
+  myTags_some: TagWhereInput
+  myTags_none: TagWhereInput
   attendedActivities_every: ActivityWhereInput
   attendedActivities_some: ActivityWhereInput
   attendedActivities_none: ActivityWhereInput

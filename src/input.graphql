@@ -1,4 +1,4 @@
-# import ProcessStatus from "./generated/prisma.graphql"
+# import ProcessStatus, RecipeTagType, TagCategory, Tag, Recipe from "./generated/prisma.graphql"
 
 input ForwardPaginationInput {
   first: Int!
@@ -48,4 +48,32 @@ input TasksMetaInput{
   create: [CreateTaskInput!],
   update: [UpdateTaskInput!]
   delete: [ID!]
+}
+
+input CreateTagInput {
+  name: String!
+  category: TagCategory
+  type: RecipeTagType
+  default: Boolean
+}
+
+input UpdateTagInput {
+  id: ID!
+  name: String
+  category: TagCategory
+  type: RecipeTagType
+  default: Boolean
+}
+
+input CreateRecipeInput {
+  name: String!
+  time: Int!
+  desc: String
+}
+
+input UpdateRecipeInput {
+  id: ID!
+  name: String
+  desc: String
+  time: Int
 }

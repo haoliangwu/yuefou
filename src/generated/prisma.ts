@@ -45,20 +45,22 @@ type Recipe implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
+  creator(where: UserWhereInput): User!
   time: Int
   desc: String
-  tags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag!]
-  creator(where: UserWhereInput): User!
 }
 
-type RecipeTag implements Node {
+type Tag implements Node {
   id: ID!
   name: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   creator(where: UserWhereInput): User!
   type: RecipeTagType
+  category: TagCategory!
   default: Boolean
+  recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
 }
 
 type User implements Node {
@@ -70,7 +72,7 @@ type User implements Node {
   myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
   myRecipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
-  myTags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag!]
+  myTags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   attendedActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   avatar: String
 }
@@ -1207,7 +1209,7 @@ type AggregateRecipe {
   count: Int!
 }
 
-type AggregateRecipeTag {
+type AggregateTag {
   count: Int!
 }
 
@@ -1671,7 +1673,7 @@ input RecipeCreateInput {
   name: String!
   time: Int
   desc: String
-  tags: RecipeTagCreateManyInput
+  tags: TagCreateManyWithoutRecipesInput
   creator: UserCreateOneWithoutMyRecipesInput!
 }
 
@@ -1680,11 +1682,23 @@ input RecipeCreateManyWithoutCreatorInput {
   connect: [RecipeWhereUniqueInput!]
 }
 
+input RecipeCreateManyWithoutTagsInput {
+  create: [RecipeCreateWithoutTagsInput!]
+  connect: [RecipeWhereUniqueInput!]
+}
+
 input RecipeCreateWithoutCreatorInput {
   name: String!
   time: Int
   desc: String
-  tags: RecipeTagCreateManyInput
+  tags: TagCreateManyWithoutRecipesInput
+}
+
+input RecipeCreateWithoutTagsInput {
+  name: String!
+  time: Int
+  desc: String
+  creator: UserCreateOneWithoutMyRecipesInput!
 }
 
 """
@@ -1760,117 +1774,6 @@ input RecipeSubscriptionWhereInput {
   node: RecipeWhereInput
 }
 
-"""
-A connection to a list of items.
-"""
-type RecipeTagConnection {
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  A list of edges.
-  """
-  edges: [RecipeTagEdge]!
-  aggregate: AggregateRecipeTag!
-}
-
-input RecipeTagCreateInput {
-  name: String!
-  type: RecipeTagType
-  default: Boolean
-  creator: UserCreateOneWithoutMyTagsInput!
-}
-
-input RecipeTagCreateManyInput {
-  create: [RecipeTagCreateInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-}
-
-input RecipeTagCreateManyWithoutCreatorInput {
-  create: [RecipeTagCreateWithoutCreatorInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-}
-
-input RecipeTagCreateWithoutCreatorInput {
-  name: String!
-  type: RecipeTagType
-  default: Boolean
-}
-
-"""
-An edge in a connection.
-"""
-type RecipeTagEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: RecipeTag!
-  """
-  A cursor for use in pagination.
-  """
-  cursor: String!
-}
-
-enum RecipeTagOrderByInput {
-  id_ASC
-  id_DESC
-  name_ASC
-  name_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  type_ASC
-  type_DESC
-  default_ASC
-  default_DESC
-}
-
-type RecipeTagPreviousValues {
-  id: ID!
-  name: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  type: RecipeTagType
-  default: Boolean
-}
-
-type RecipeTagSubscriptionPayload {
-  mutation: MutationType!
-  node: RecipeTag
-  updatedFields: [String!]
-  previousValues: RecipeTagPreviousValues
-}
-
-input RecipeTagSubscriptionWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [RecipeTagSubscriptionWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [RecipeTagSubscriptionWhereInput!]
-  """
-  The subscription event gets dispatched when it's listed in mutation_in
-  """
-  mutation_in: [MutationType!]
-  """
-  The subscription event gets only dispatched when one of the updated fields names is included in this list
-  """
-  updatedFields_contains: String
-  """
-  The subscription event gets only dispatched when all of the field names included in this list have been updated
-  """
-  updatedFields_contains_every: [String!]
-  """
-  The subscription event gets only dispatched when some of the field names included in this list have been updated
-  """
-  updatedFields_contains_some: [String!]
-  node: RecipeTagWhereInput
-}
-
 enum RecipeTagType {
   STYLE
   TASTE
@@ -1878,269 +1781,11 @@ enum RecipeTagType {
   BASIC
 }
 
-input RecipeTagUpdateDataInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-  creator: UserUpdateOneWithoutMyTagsInput
-}
-
-input RecipeTagUpdateInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-  creator: UserUpdateOneWithoutMyTagsInput
-}
-
-input RecipeTagUpdateManyInput {
-  create: [RecipeTagCreateInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-  disconnect: [RecipeTagWhereUniqueInput!]
-  delete: [RecipeTagWhereUniqueInput!]
-  update: [RecipeTagUpdateWithWhereUniqueNestedInput!]
-  upsert: [RecipeTagUpsertWithWhereUniqueNestedInput!]
-}
-
-input RecipeTagUpdateManyWithoutCreatorInput {
-  create: [RecipeTagCreateWithoutCreatorInput!]
-  connect: [RecipeTagWhereUniqueInput!]
-  disconnect: [RecipeTagWhereUniqueInput!]
-  delete: [RecipeTagWhereUniqueInput!]
-  update: [RecipeTagUpdateWithWhereUniqueWithoutCreatorInput!]
-  upsert: [RecipeTagUpsertWithWhereUniqueWithoutCreatorInput!]
-}
-
-input RecipeTagUpdateWithoutCreatorDataInput {
-  name: String
-  type: RecipeTagType
-  default: Boolean
-}
-
-input RecipeTagUpdateWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput!
-  data: RecipeTagUpdateDataInput!
-}
-
-input RecipeTagUpdateWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput!
-  data: RecipeTagUpdateWithoutCreatorDataInput!
-}
-
-input RecipeTagUpsertWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput!
-  update: RecipeTagUpdateDataInput!
-  create: RecipeTagCreateInput!
-}
-
-input RecipeTagUpsertWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput!
-  update: RecipeTagUpdateWithoutCreatorDataInput!
-  create: RecipeTagCreateWithoutCreatorInput!
-}
-
-input RecipeTagWhereInput {
-  """
-  Logical AND on all given filters.
-  """
-  AND: [RecipeTagWhereInput!]
-  """
-  Logical OR on all given filters.
-  """
-  OR: [RecipeTagWhereInput!]
-  id: ID
-  """
-  All values that are not equal to given value.
-  """
-  id_not: ID
-  """
-  All values that are contained in given list.
-  """
-  id_in: [ID!]
-  """
-  All values that are not contained in given list.
-  """
-  id_not_in: [ID!]
-  """
-  All values less than the given value.
-  """
-  id_lt: ID
-  """
-  All values less than or equal the given value.
-  """
-  id_lte: ID
-  """
-  All values greater than the given value.
-  """
-  id_gt: ID
-  """
-  All values greater than or equal the given value.
-  """
-  id_gte: ID
-  """
-  All values containing the given string.
-  """
-  id_contains: ID
-  """
-  All values not containing the given string.
-  """
-  id_not_contains: ID
-  """
-  All values starting with the given string.
-  """
-  id_starts_with: ID
-  """
-  All values not starting with the given string.
-  """
-  id_not_starts_with: ID
-  """
-  All values ending with the given string.
-  """
-  id_ends_with: ID
-  """
-  All values not ending with the given string.
-  """
-  id_not_ends_with: ID
-  name: String
-  """
-  All values that are not equal to given value.
-  """
-  name_not: String
-  """
-  All values that are contained in given list.
-  """
-  name_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  name_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  name_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  name_lte: String
-  """
-  All values greater than the given value.
-  """
-  name_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  name_gte: String
-  """
-  All values containing the given string.
-  """
-  name_contains: String
-  """
-  All values not containing the given string.
-  """
-  name_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  name_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  name_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  name_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  name_not_ends_with: String
-  createdAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  createdAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  createdAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  createdAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  createdAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  createdAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  createdAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  """
-  All values that are not equal to given value.
-  """
-  updatedAt_not: DateTime
-  """
-  All values that are contained in given list.
-  """
-  updatedAt_in: [DateTime!]
-  """
-  All values that are not contained in given list.
-  """
-  updatedAt_not_in: [DateTime!]
-  """
-  All values less than the given value.
-  """
-  updatedAt_lt: DateTime
-  """
-  All values less than or equal the given value.
-  """
-  updatedAt_lte: DateTime
-  """
-  All values greater than the given value.
-  """
-  updatedAt_gt: DateTime
-  """
-  All values greater than or equal the given value.
-  """
-  updatedAt_gte: DateTime
-  type: RecipeTagType
-  """
-  All values that are not equal to given value.
-  """
-  type_not: RecipeTagType
-  """
-  All values that are contained in given list.
-  """
-  type_in: [RecipeTagType!]
-  """
-  All values that are not contained in given list.
-  """
-  type_not_in: [RecipeTagType!]
-  default: Boolean
-  """
-  All values that are not equal to given value.
-  """
-  default_not: Boolean
-  creator: UserWhereInput
-}
-
-input RecipeTagWhereUniqueInput {
-  id: ID
-}
-
 input RecipeUpdateInput {
   name: String
   time: Int
   desc: String
-  tags: RecipeTagUpdateManyInput
+  tags: TagUpdateManyWithoutRecipesInput
   creator: UserUpdateOneWithoutMyRecipesInput
 }
 
@@ -2153,11 +1798,27 @@ input RecipeUpdateManyWithoutCreatorInput {
   upsert: [RecipeUpsertWithWhereUniqueWithoutCreatorInput!]
 }
 
+input RecipeUpdateManyWithoutTagsInput {
+  create: [RecipeCreateWithoutTagsInput!]
+  connect: [RecipeWhereUniqueInput!]
+  disconnect: [RecipeWhereUniqueInput!]
+  delete: [RecipeWhereUniqueInput!]
+  update: [RecipeUpdateWithWhereUniqueWithoutTagsInput!]
+  upsert: [RecipeUpsertWithWhereUniqueWithoutTagsInput!]
+}
+
 input RecipeUpdateWithoutCreatorDataInput {
   name: String
   time: Int
   desc: String
-  tags: RecipeTagUpdateManyInput
+  tags: TagUpdateManyWithoutRecipesInput
+}
+
+input RecipeUpdateWithoutTagsDataInput {
+  name: String
+  time: Int
+  desc: String
+  creator: UserUpdateOneWithoutMyRecipesInput
 }
 
 input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
@@ -2165,10 +1826,21 @@ input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
   data: RecipeUpdateWithoutCreatorDataInput!
 }
 
+input RecipeUpdateWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput!
+  data: RecipeUpdateWithoutTagsDataInput!
+}
+
 input RecipeUpsertWithWhereUniqueWithoutCreatorInput {
   where: RecipeWhereUniqueInput!
   update: RecipeUpdateWithoutCreatorDataInput!
   create: RecipeCreateWithoutCreatorInput!
+}
+
+input RecipeUpsertWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput!
+  update: RecipeUpdateWithoutTagsDataInput!
+  create: RecipeCreateWithoutTagsInput!
 }
 
 input RecipeWhereInput {
@@ -2426,13 +2098,423 @@ input RecipeWhereInput {
   All values not ending with the given string.
   """
   desc_not_ends_with: String
-  tags_every: RecipeTagWhereInput
-  tags_some: RecipeTagWhereInput
-  tags_none: RecipeTagWhereInput
+  tags_every: TagWhereInput
+  tags_some: TagWhereInput
+  tags_none: TagWhereInput
   creator: UserWhereInput
 }
 
 input RecipeWhereUniqueInput {
+  id: ID
+}
+
+enum TagCategory {
+  DEFAULT
+  RECIPE
+}
+
+"""
+A connection to a list of items.
+"""
+type TagConnection {
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
+  edges: [TagEdge]!
+  aggregate: AggregateTag!
+}
+
+input TagCreateInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserCreateOneWithoutMyTagsInput!
+  recipes: RecipeCreateManyWithoutTagsInput
+}
+
+input TagCreateManyWithoutCreatorInput {
+  create: [TagCreateWithoutCreatorInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateManyWithoutRecipesInput {
+  create: [TagCreateWithoutRecipesInput!]
+  connect: [TagWhereUniqueInput!]
+}
+
+input TagCreateWithoutCreatorInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  recipes: RecipeCreateManyWithoutTagsInput
+}
+
+input TagCreateWithoutRecipesInput {
+  name: String!
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserCreateOneWithoutMyTagsInput!
+}
+
+"""
+An edge in a connection.
+"""
+type TagEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Tag!
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+}
+
+enum TagOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  type_ASC
+  type_DESC
+  category_ASC
+  category_DESC
+  default_ASC
+  default_DESC
+}
+
+type TagPreviousValues {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  type: RecipeTagType
+  category: TagCategory!
+  default: Boolean
+}
+
+type TagSubscriptionPayload {
+  mutation: MutationType!
+  node: Tag
+  updatedFields: [String!]
+  previousValues: TagPreviousValues
+}
+
+input TagSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [TagSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [TagSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: TagWhereInput
+}
+
+input TagUpdateInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserUpdateOneWithoutMyTagsInput
+  recipes: RecipeUpdateManyWithoutTagsInput
+}
+
+input TagUpdateManyWithoutCreatorInput {
+  create: [TagCreateWithoutCreatorInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+  update: [TagUpdateWithWhereUniqueWithoutCreatorInput!]
+  upsert: [TagUpsertWithWhereUniqueWithoutCreatorInput!]
+}
+
+input TagUpdateManyWithoutRecipesInput {
+  create: [TagCreateWithoutRecipesInput!]
+  connect: [TagWhereUniqueInput!]
+  disconnect: [TagWhereUniqueInput!]
+  delete: [TagWhereUniqueInput!]
+  update: [TagUpdateWithWhereUniqueWithoutRecipesInput!]
+  upsert: [TagUpsertWithWhereUniqueWithoutRecipesInput!]
+}
+
+input TagUpdateWithoutCreatorDataInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  recipes: RecipeUpdateManyWithoutTagsInput
+}
+
+input TagUpdateWithoutRecipesDataInput {
+  name: String
+  type: RecipeTagType
+  category: TagCategory
+  default: Boolean
+  creator: UserUpdateOneWithoutMyTagsInput
+}
+
+input TagUpdateWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutCreatorDataInput!
+}
+
+input TagUpdateWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput!
+  data: TagUpdateWithoutRecipesDataInput!
+}
+
+input TagUpsertWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutCreatorDataInput!
+  create: TagCreateWithoutCreatorInput!
+}
+
+input TagUpsertWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput!
+  update: TagUpdateWithoutRecipesDataInput!
+  create: TagCreateWithoutRecipesInput!
+}
+
+input TagWhereInput {
+  """
+  Logical AND on all given filters.
+  """
+  AND: [TagWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
+  OR: [TagWhereInput!]
+  id: ID
+  """
+  All values that are not equal to given value.
+  """
+  id_not: ID
+  """
+  All values that are contained in given list.
+  """
+  id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
+  id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
+  id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
+  id_lte: ID
+  """
+  All values greater than the given value.
+  """
+  id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
+  id_gte: ID
+  """
+  All values containing the given string.
+  """
+  id_contains: ID
+  """
+  All values not containing the given string.
+  """
+  id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
+  id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
+  id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
+  id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
+  id_not_ends_with: ID
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
+  createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
+  updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
+  updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
+  updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
+  updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
+  updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
+  updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
+  updatedAt_gte: DateTime
+  type: RecipeTagType
+  """
+  All values that are not equal to given value.
+  """
+  type_not: RecipeTagType
+  """
+  All values that are contained in given list.
+  """
+  type_in: [RecipeTagType!]
+  """
+  All values that are not contained in given list.
+  """
+  type_not_in: [RecipeTagType!]
+  category: TagCategory
+  """
+  All values that are not equal to given value.
+  """
+  category_not: TagCategory
+  """
+  All values that are contained in given list.
+  """
+  category_in: [TagCategory!]
+  """
+  All values that are not contained in given list.
+  """
+  category_not_in: [TagCategory!]
+  default: Boolean
+  """
+  All values that are not equal to given value.
+  """
+  default_not: Boolean
+  creator: UserWhereInput
+  recipes_every: RecipeWhereInput
+  recipes_some: RecipeWhereInput
+  recipes_none: RecipeWhereInput
+}
+
+input TagWhereUniqueInput {
   id: ID
 }
 
@@ -2460,7 +2542,7 @@ input UserCreateInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2503,7 +2585,7 @@ input UserCreateWithoutAttendedActivitiesInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
 }
 
 input UserCreateWithoutMyActivitiesInput {
@@ -2514,7 +2596,7 @@ input UserCreateWithoutMyActivitiesInput {
   posts: PostCreateManyWithoutAuthorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2526,7 +2608,7 @@ input UserCreateWithoutMyRecipesInput {
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2550,7 +2632,7 @@ input UserCreateWithoutMyTasksInput {
   posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2562,7 +2644,7 @@ input UserCreateWithoutPostsInput {
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: RecipeTagCreateManyWithoutCreatorInput
+  myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -2649,7 +2731,7 @@ input UserUpdateInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2716,7 +2798,7 @@ input UserUpdateWithoutAttendedActivitiesDataInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
 }
 
 input UserUpdateWithoutMyActivitiesDataInput {
@@ -2727,7 +2809,7 @@ input UserUpdateWithoutMyActivitiesDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2739,7 +2821,7 @@ input UserUpdateWithoutMyRecipesDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2763,7 +2845,7 @@ input UserUpdateWithoutMyTasksDataInput {
   posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -2775,7 +2857,7 @@ input UserUpdateWithoutPostsDataInput {
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: RecipeTagUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
 }
 
@@ -3101,9 +3183,9 @@ input UserWhereInput {
   myRecipes_every: RecipeWhereInput
   myRecipes_some: RecipeWhereInput
   myRecipes_none: RecipeWhereInput
-  myTags_every: RecipeTagWhereInput
-  myTags_some: RecipeTagWhereInput
-  myTags_none: RecipeTagWhereInput
+  myTags_every: TagWhereInput
+  myTags_some: TagWhereInput
+  myTags_none: TagWhereInput
   attendedActivities_every: ActivityWhereInput
   attendedActivities_some: ActivityWhereInput
   attendedActivities_none: ActivityWhereInput
@@ -3115,62 +3197,62 @@ input UserWhereUniqueInput {
 }
 
 type Mutation {
+  createTag(data: TagCreateInput!): Tag!
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
   createActivity(data: ActivityCreateInput!): Activity!
   createActivityTask(data: ActivityTaskCreateInput!): ActivityTask!
-  createRecipeTag(data: RecipeTagCreateInput!): RecipeTag!
   createRecipe(data: RecipeCreateInput!): Recipe!
+  updateTag(data: TagUpdateInput!, where: TagWhereUniqueInput!): Tag
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateActivity(data: ActivityUpdateInput!, where: ActivityWhereUniqueInput!): Activity
   updateActivityTask(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereUniqueInput!): ActivityTask
-  updateRecipeTag(data: RecipeTagUpdateInput!, where: RecipeTagWhereUniqueInput!): RecipeTag
   updateRecipe(data: RecipeUpdateInput!, where: RecipeWhereUniqueInput!): Recipe
+  deleteTag(where: TagWhereUniqueInput!): Tag
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
   deleteActivity(where: ActivityWhereUniqueInput!): Activity
   deleteActivityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  deleteRecipeTag(where: RecipeTagWhereUniqueInput!): RecipeTag
   deleteRecipe(where: RecipeWhereUniqueInput!): Recipe
+  upsertTag(where: TagWhereUniqueInput!, create: TagCreateInput!, update: TagUpdateInput!): Tag!
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertActivity(where: ActivityWhereUniqueInput!, create: ActivityCreateInput!, update: ActivityUpdateInput!): Activity!
   upsertActivityTask(where: ActivityTaskWhereUniqueInput!, create: ActivityTaskCreateInput!, update: ActivityTaskUpdateInput!): ActivityTask!
-  upsertRecipeTag(where: RecipeTagWhereUniqueInput!, create: RecipeTagCreateInput!, update: RecipeTagUpdateInput!): RecipeTag!
   upsertRecipe(where: RecipeWhereUniqueInput!, create: RecipeCreateInput!, update: RecipeUpdateInput!): Recipe!
+  updateManyTags(data: TagUpdateInput!, where: TagWhereInput!): BatchPayload!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyActivities(data: ActivityUpdateInput!, where: ActivityWhereInput!): BatchPayload!
   updateManyActivityTasks(data: ActivityTaskUpdateInput!, where: ActivityTaskWhereInput!): BatchPayload!
-  updateManyRecipeTags(data: RecipeTagUpdateInput!, where: RecipeTagWhereInput!): BatchPayload!
   updateManyRecipes(data: RecipeUpdateInput!, where: RecipeWhereInput!): BatchPayload!
+  deleteManyTags(where: TagWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyActivities(where: ActivityWhereInput!): BatchPayload!
   deleteManyActivityTasks(where: ActivityTaskWhereInput!): BatchPayload!
-  deleteManyRecipeTags(where: RecipeTagWhereInput!): BatchPayload!
   deleteManyRecipes(where: RecipeWhereInput!): BatchPayload!
 }
 
 type Query {
+  tags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag]!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity]!
   activityTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask]!
-  recipeTags(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [RecipeTag]!
   recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe]!
+  tag(where: TagWhereUniqueInput!): Tag
   post(where: PostWhereUniqueInput!): Post
   user(where: UserWhereUniqueInput!): User
   activity(where: ActivityWhereUniqueInput!): Activity
   activityTask(where: ActivityTaskWhereUniqueInput!): ActivityTask
-  recipeTag(where: RecipeTagWhereUniqueInput!): RecipeTag
   recipe(where: RecipeWhereUniqueInput!): Recipe
+  tagsConnection(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TagConnection!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   activitiesConnection(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityConnection!
   activityTasksConnection(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ActivityTaskConnection!
-  recipeTagsConnection(where: RecipeTagWhereInput, orderBy: RecipeTagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecipeTagConnection!
   recipesConnection(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): RecipeConnection!
   """
   Fetches an object given its ID
@@ -3182,11 +3264,11 @@ type Query {
 }
 
 type Subscription {
+  tag(where: TagSubscriptionWhereInput): TagSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   activity(where: ActivitySubscriptionWhereInput): ActivitySubscriptionPayload
   activityTask(where: ActivityTaskSubscriptionWhereInput): ActivityTaskSubscriptionPayload
-  recipeTag(where: RecipeTagSubscriptionWhereInput): RecipeTagSubscriptionPayload
   recipe(where: RecipeSubscriptionWhereInput): RecipeSubscriptionPayload
 }
 `
@@ -3207,11 +3289,32 @@ export type UserOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
-export type RecipeTagType = 
-  'STYLE' |
-  'TASTE' |
-  'METHOD' |
-  'BASIC'
+export type TagOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'name_ASC' |
+  'name_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'type_ASC' |
+  'type_DESC' |
+  'category_ASC' |
+  'category_DESC' |
+  'default_ASC' |
+  'default_DESC'
+
+export type ProcessStatus = 
+  'INIT' |
+  'PENDING' |
+  'DONE' |
+  'STOP'
+
+export type ActivityType = 
+  'HOST' |
+  'TASK' |
+  'POTLUCK'
 
 export type PostOrderByInput = 
   'id_ASC' |
@@ -3249,17 +3352,6 @@ export type ActivityOrderByInput =
   'location_ASC' |
   'location_DESC'
 
-export type ProcessStatus = 
-  'INIT' |
-  'PENDING' |
-  'DONE' |
-  'STOP'
-
-export type ActivityType = 
-  'HOST' |
-  'TASK' |
-  'POTLUCK'
-
 export type MutationType = 
   'CREATED' |
   'UPDATED' |
@@ -3281,6 +3373,16 @@ export type ActivityTaskOrderByInput =
   'endedAt_ASC' |
   'endedAt_DESC'
 
+export type TagCategory = 
+  'DEFAULT' |
+  'RECIPE'
+
+export type RecipeTagType = 
+  'STYLE' |
+  'TASTE' |
+  'METHOD' |
+  'BASIC'
+
 export type RecipeOrderByInput = 
   'id_ASC' |
   'id_DESC' |
@@ -3295,106 +3397,22 @@ export type RecipeOrderByInput =
   'desc_ASC' |
   'desc_DESC'
 
-export type RecipeTagOrderByInput = 
-  'id_ASC' |
-  'id_DESC' |
-  'name_ASC' |
-  'name_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'type_ASC' |
-  'type_DESC' |
-  'default_ASC' |
-  'default_DESC'
-
-export interface RecipeCreateInput {
-  name: String
-  time?: Int
+export interface ActivityCreateInput {
+  title: String
   desc?: String
-  tags?: RecipeTagCreateManyInput
-  creator: UserCreateOneWithoutMyRecipesInput
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
+  participants?: UserCreateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskCreateManyWithoutActivityInput
 }
 
-export interface PostWhereInput {
-  AND?: PostWhereInput[] | PostWhereInput
-  OR?: PostWhereInput[] | PostWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  createdAt?: DateTime
-  createdAt_not?: DateTime
-  createdAt_in?: DateTime[] | DateTime
-  createdAt_not_in?: DateTime[] | DateTime
-  createdAt_lt?: DateTime
-  createdAt_lte?: DateTime
-  createdAt_gt?: DateTime
-  createdAt_gte?: DateTime
-  updatedAt?: DateTime
-  updatedAt_not?: DateTime
-  updatedAt_in?: DateTime[] | DateTime
-  updatedAt_not_in?: DateTime[] | DateTime
-  updatedAt_lt?: DateTime
-  updatedAt_lte?: DateTime
-  updatedAt_gt?: DateTime
-  updatedAt_gte?: DateTime
-  isPublished?: Boolean
-  isPublished_not?: Boolean
-  title?: String
-  title_not?: String
-  title_in?: String[] | String
-  title_not_in?: String[] | String
-  title_lt?: String
-  title_lte?: String
-  title_gt?: String
-  title_gte?: String
-  title_contains?: String
-  title_not_contains?: String
-  title_starts_with?: String
-  title_not_starts_with?: String
-  title_ends_with?: String
-  title_not_ends_with?: String
-  text?: String
-  text_not?: String
-  text_in?: String[] | String
-  text_not_in?: String[] | String
-  text_lt?: String
-  text_lte?: String
-  text_gt?: String
-  text_gte?: String
-  text_contains?: String
-  text_not_contains?: String
-  text_starts_with?: String
-  text_not_starts_with?: String
-  text_ends_with?: String
-  text_not_ends_with?: String
-  author?: UserWhereInput
-}
-
-export interface ActivityUpdateManyWithoutCreatorInput {
-  create?: ActivityCreateWithoutCreatorInput[] | ActivityCreateWithoutCreatorInput
-  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  update?: ActivityUpdateWithWhereUniqueWithoutCreatorInput[] | ActivityUpdateWithWhereUniqueWithoutCreatorInput
-  upsert?: ActivityUpsertWithWhereUniqueWithoutCreatorInput[] | ActivityUpsertWithWhereUniqueWithoutCreatorInput
-}
-
-export interface RecipeTagWhereInput {
-  AND?: RecipeTagWhereInput[] | RecipeTagWhereInput
-  OR?: RecipeTagWhereInput[] | RecipeTagWhereInput
+export interface TagWhereInput {
+  AND?: TagWhereInput[] | TagWhereInput
+  OR?: TagWhereInput[] | TagWhereInput
   id?: ID_Input
   id_not?: ID_Input
   id_in?: ID_Input[] | ID_Input
@@ -3443,14 +3461,25 @@ export interface RecipeTagWhereInput {
   type_not?: RecipeTagType
   type_in?: RecipeTagType[] | RecipeTagType
   type_not_in?: RecipeTagType[] | RecipeTagType
+  category?: TagCategory
+  category_not?: TagCategory
+  category_in?: TagCategory[] | TagCategory
+  category_not_in?: TagCategory[] | TagCategory
   default?: Boolean
   default_not?: Boolean
   creator?: UserWhereInput
+  recipes_every?: RecipeWhereInput
+  recipes_some?: RecipeWhereInput
+  recipes_none?: RecipeWhereInput
 }
 
-export interface ActivityUpdateWithWhereUniqueWithoutCreatorInput {
-  where: ActivityWhereUniqueInput
-  data: ActivityUpdateWithoutCreatorDataInput
+export interface PostUpdateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  update?: PostUpdateWithWhereUniqueWithoutAuthorInput[] | PostUpdateWithWhereUniqueWithoutAuthorInput
+  upsert?: PostUpsertWithWhereUniqueWithoutAuthorInput[] | PostUpsertWithWhereUniqueWithoutAuthorInput
 }
 
 export interface RecipeWhereInput {
@@ -3522,46 +3551,118 @@ export interface RecipeWhereInput {
   desc_not_starts_with?: String
   desc_ends_with?: String
   desc_not_ends_with?: String
-  tags_every?: RecipeTagWhereInput
-  tags_some?: RecipeTagWhereInput
-  tags_none?: RecipeTagWhereInput
+  tags_every?: TagWhereInput
+  tags_some?: TagWhereInput
+  tags_none?: TagWhereInput
   creator?: UserWhereInput
 }
 
-export interface RecipeTagCreateInput {
+export interface PostUpdateWithWhereUniqueWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  data: PostUpdateWithoutAuthorDataInput
+}
+
+export interface ActivityTaskWhereInput {
+  AND?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
+  OR?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  createdAt?: DateTime
+  createdAt_not?: DateTime
+  createdAt_in?: DateTime[] | DateTime
+  createdAt_not_in?: DateTime[] | DateTime
+  createdAt_lt?: DateTime
+  createdAt_lte?: DateTime
+  createdAt_gt?: DateTime
+  createdAt_gte?: DateTime
+  updatedAt?: DateTime
+  updatedAt_not?: DateTime
+  updatedAt_in?: DateTime[] | DateTime
+  updatedAt_not_in?: DateTime[] | DateTime
+  updatedAt_lt?: DateTime
+  updatedAt_lte?: DateTime
+  updatedAt_gt?: DateTime
+  updatedAt_gte?: DateTime
+  name?: String
+  name_not?: String
+  name_in?: String[] | String
+  name_not_in?: String[] | String
+  name_lt?: String
+  name_lte?: String
+  name_gt?: String
+  name_gte?: String
+  name_contains?: String
+  name_not_contains?: String
+  name_starts_with?: String
+  name_not_starts_with?: String
+  name_ends_with?: String
+  name_not_ends_with?: String
+  desc?: String
+  desc_not?: String
+  desc_in?: String[] | String
+  desc_not_in?: String[] | String
+  desc_lt?: String
+  desc_lte?: String
+  desc_gt?: String
+  desc_gte?: String
+  desc_contains?: String
+  desc_not_contains?: String
+  desc_starts_with?: String
+  desc_not_starts_with?: String
+  desc_ends_with?: String
+  desc_not_ends_with?: String
+  status?: ProcessStatus
+  status_not?: ProcessStatus
+  status_in?: ProcessStatus[] | ProcessStatus
+  status_not_in?: ProcessStatus[] | ProcessStatus
+  endedAt?: DateTime
+  endedAt_not?: DateTime
+  endedAt_in?: DateTime[] | DateTime
+  endedAt_not_in?: DateTime[] | DateTime
+  endedAt_lt?: DateTime
+  endedAt_lte?: DateTime
+  endedAt_gt?: DateTime
+  endedAt_gte?: DateTime
+  activity?: ActivityWhereInput
+  assignee?: UserWhereInput
+}
+
+export interface RecipeCreateWithoutTagsInput {
   name: String
-  type?: RecipeTagType
-  default?: Boolean
-  creator: UserCreateOneWithoutMyTagsInput
+  time?: Int
+  desc?: String
+  creator: UserCreateOneWithoutMyRecipesInput
 }
 
-export interface RecipeTagUpdateManyWithoutCreatorInput {
-  create?: RecipeTagCreateWithoutCreatorInput[] | RecipeTagCreateWithoutCreatorInput
-  connect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  disconnect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  delete?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  update?: RecipeTagUpdateWithWhereUniqueWithoutCreatorInput[] | RecipeTagUpdateWithWhereUniqueWithoutCreatorInput
-  upsert?: RecipeTagUpsertWithWhereUniqueWithoutCreatorInput[] | RecipeTagUpsertWithWhereUniqueWithoutCreatorInput
+export interface ActivityTaskUpdateWithWhereUniqueWithoutActivityInput {
+  where: ActivityTaskWhereUniqueInput
+  data: ActivityTaskUpdateWithoutActivityDataInput
 }
 
-export interface UserCreateOneWithoutMyTagsInput {
-  create?: UserCreateWithoutMyTagsInput
+export interface UserCreateOneWithoutMyRecipesInput {
+  create?: UserCreateWithoutMyRecipesInput
   connect?: UserWhereUniqueInput
 }
 
-export interface ActivityUpdateWithoutCreatorDataInput {
+export interface PostUpdateWithoutAuthorDataInput {
+  isPublished?: Boolean
   title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: String
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
-  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+  text?: String
 }
 
-export interface UserCreateWithoutMyTagsInput {
+export interface UserCreateWithoutMyRecipesInput {
   email: String
   password: String
   name: String
@@ -3569,7 +3670,7 @@ export interface UserCreateWithoutMyTagsInput {
   posts?: PostCreateManyWithoutAuthorInput
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
   attendedActivities?: ActivityCreateManyWithoutParticipantsInput
 }
 
@@ -3586,6 +3687,688 @@ export interface RecipeSubscriptionWhereInput {
 export interface ActivityCreateManyWithoutParticipantsInput {
   create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
   connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+}
+
+export interface ActivityTaskSubscriptionWhereInput {
+  AND?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
+  OR?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: ActivityTaskWhereInput
+}
+
+export interface ActivityCreateWithoutParticipantsInput {
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
+  tasks?: ActivityTaskCreateManyWithoutActivityInput
+}
+
+export interface ActivitySubscriptionWhereInput {
+  AND?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
+  OR?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: ActivityWhereInput
+}
+
+export interface ActivityTaskCreateManyWithoutActivityInput {
+  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+}
+
+export interface PostSubscriptionWhereInput {
+  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: PostWhereInput
+}
+
+export interface ActivityTaskCreateWithoutActivityInput {
+  name: String
+  desc?: String
+  status?: ProcessStatus
+  endedAt?: DateTime
+  assignee?: UserCreateOneWithoutMyTasksInput
+}
+
+export interface TagWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface UserCreateOneWithoutMyTasksInput {
+  create?: UserCreateWithoutMyTasksInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserWhereUniqueInput {
+  id?: ID_Input
+  email?: String
+}
+
+export interface UserCreateWithoutMyTasksInput {
+  email: String
+  password: String
+  name: String
+  avatar?: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface ActivityTaskWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface PostCreateInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+  author: UserCreateOneWithoutPostsInput
+}
+
+export interface RecipeUpdateInput {
+  name?: String
+  time?: Int
+  desc?: String
+  tags?: TagUpdateManyWithoutRecipesInput
+  creator?: UserUpdateOneWithoutMyRecipesInput
+}
+
+export interface UserCreateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface ActivityUpdateInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  creator?: UserUpdateOneWithoutMyActivitiesInput
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+export interface UserCreateWithoutPostsInput {
+  email: String
+  password: String
+  name: String
+  avatar?: String
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface UserUpsertWithoutPostsInput {
+  update: UserUpdateWithoutPostsDataInput
+  create: UserCreateWithoutPostsInput
+}
+
+export interface UserCreateInput {
+  email: String
+  password: String
+  name: String
+  avatar?: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
+}
+
+export interface UserUpdateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutPostsDataInput
+  upsert?: UserUpsertWithoutPostsInput
+}
+
+export interface UserUpsertWithoutMyTasksInput {
+  update: UserUpdateWithoutMyTasksDataInput
+  create: UserCreateWithoutMyTasksInput
+}
+
+export interface UserUpsertWithoutMyTagsInput {
+  update: UserUpdateWithoutMyTagsDataInput
+  create: UserCreateWithoutMyTagsInput
+}
+
+export interface ActivityTaskCreateInput {
+  name: String
+  desc?: String
+  status?: ProcessStatus
+  endedAt?: DateTime
+  activity?: ActivityCreateOneWithoutTasksInput
+  assignee?: UserCreateOneWithoutMyTasksInput
+}
+
+export interface UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutAttendedActivitiesDataInput
+  create: UserCreateWithoutAttendedActivitiesInput
+}
+
+export interface RecipeCreateInput {
+  name: String
+  time?: Int
+  desc?: String
+  tags?: TagCreateManyWithoutRecipesInput
+  creator: UserCreateOneWithoutMyRecipesInput
+}
+
+export interface ActivityUpsertWithoutTasksInput {
+  update: ActivityUpdateWithoutTasksDataInput
+  create: ActivityCreateWithoutTasksInput
+}
+
+export interface TagUpdateInput {
+  name?: String
+  type?: RecipeTagType
+  category?: TagCategory
+  default?: Boolean
+  creator?: UserUpdateOneWithoutMyTagsInput
+  recipes?: RecipeUpdateManyWithoutTagsInput
+}
+
+export interface TagUpsertWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput
+  update: TagUpdateWithoutCreatorDataInput
+  create: TagCreateWithoutCreatorInput
+}
+
+export interface UserUpdateOneWithoutMyTagsInput {
+  create?: UserCreateWithoutMyTagsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutMyTagsDataInput
+  upsert?: UserUpsertWithoutMyTagsInput
+}
+
+export interface UserUpsertWithoutMyRecipesInput {
+  update: UserUpdateWithoutMyRecipesDataInput
+  create: UserCreateWithoutMyRecipesInput
+}
+
+export interface UserUpdateWithoutMyTagsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface ActivityTaskUpsertWithWhereUniqueWithoutActivityInput {
+  where: ActivityTaskWhereUniqueInput
+  update: ActivityTaskUpdateWithoutActivityDataInput
+  create: ActivityTaskCreateWithoutActivityInput
+}
+
+export interface UserUpdateWithoutMyTasksDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface UserCreateOneWithoutMyTagsInput {
+  create?: UserCreateWithoutMyTagsInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpdateOneWithoutMyTasksInput {
+  create?: UserCreateWithoutMyTasksInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutMyTasksDataInput
+  upsert?: UserUpsertWithoutMyTasksInput
+}
+
+export interface PostCreateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+}
+
+export interface ActivityTaskUpdateWithoutActivityDataInput {
+  name?: String
+  desc?: String
+  status?: ProcessStatus
+  endedAt?: DateTime
+  assignee?: UserUpdateOneWithoutMyTasksInput
+}
+
+export interface ActivityCreateManyWithoutCreatorInput {
+  create?: ActivityCreateWithoutCreatorInput[] | ActivityCreateWithoutCreatorInput
+  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+}
+
+export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  update: PostUpdateWithoutAuthorDataInput
+  create: PostCreateWithoutAuthorInput
+}
+
+export interface UserCreateManyWithoutAttendedActivitiesInput {
+  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+}
+
+export interface ActivityUpdateManyWithoutCreatorInput {
+  create?: ActivityCreateWithoutCreatorInput[] | ActivityCreateWithoutCreatorInput
+  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  update?: ActivityUpdateWithWhereUniqueWithoutCreatorInput[] | ActivityUpdateWithWhereUniqueWithoutCreatorInput
+  upsert?: ActivityUpsertWithWhereUniqueWithoutCreatorInput[] | ActivityUpsertWithWhereUniqueWithoutCreatorInput
+}
+
+export interface ActivityTaskCreateManyWithoutAssigneeInput {
+  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+}
+
+export interface ActivityUpdateWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput
+  data: ActivityUpdateWithoutCreatorDataInput
+}
+
+export interface ActivityCreateOneWithoutTasksInput {
+  create?: ActivityCreateWithoutTasksInput
+  connect?: ActivityWhereUniqueInput
+}
+
+export interface ActivityUpdateWithoutCreatorDataInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+  tasks?: ActivityTaskUpdateManyWithoutActivityInput
+}
+
+export interface UserCreateOneWithoutMyActivitiesInput {
+  create?: UserCreateWithoutMyActivitiesInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpdateManyWithoutAttendedActivitiesInput {
+  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
+  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput
+  update?: UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput
+  upsert?: UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput
+}
+
+export interface RecipeCreateManyWithoutCreatorInput {
+  create?: RecipeCreateWithoutCreatorInput[] | RecipeCreateWithoutCreatorInput
+  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+}
+
+export interface UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutAttendedActivitiesDataInput
+}
+
+export interface TagCreateManyWithoutRecipesInput {
+  create?: TagCreateWithoutRecipesInput[] | TagCreateWithoutRecipesInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+}
+
+export interface UserUpdateWithoutAttendedActivitiesDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+}
+
+export interface TagCreateManyWithoutCreatorInput {
+  create?: TagCreateWithoutCreatorInput[] | TagCreateWithoutCreatorInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+}
+
+export interface ActivityTaskUpdateManyWithoutAssigneeInput {
+  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  update?: ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput
+  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput
+}
+
+export interface RecipeCreateManyWithoutTagsInput {
+  create?: RecipeCreateWithoutTagsInput[] | RecipeCreateWithoutTagsInput
+  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+}
+
+export interface ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput
+  data: ActivityTaskUpdateWithoutAssigneeDataInput
+}
+
+export interface PostWhereInput {
+  AND?: PostWhereInput[] | PostWhereInput
+  OR?: PostWhereInput[] | PostWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  createdAt?: DateTime
+  createdAt_not?: DateTime
+  createdAt_in?: DateTime[] | DateTime
+  createdAt_not_in?: DateTime[] | DateTime
+  createdAt_lt?: DateTime
+  createdAt_lte?: DateTime
+  createdAt_gt?: DateTime
+  createdAt_gte?: DateTime
+  updatedAt?: DateTime
+  updatedAt_not?: DateTime
+  updatedAt_in?: DateTime[] | DateTime
+  updatedAt_not_in?: DateTime[] | DateTime
+  updatedAt_lt?: DateTime
+  updatedAt_lte?: DateTime
+  updatedAt_gt?: DateTime
+  updatedAt_gte?: DateTime
+  isPublished?: Boolean
+  isPublished_not?: Boolean
+  title?: String
+  title_not?: String
+  title_in?: String[] | String
+  title_not_in?: String[] | String
+  title_lt?: String
+  title_lte?: String
+  title_gt?: String
+  title_gte?: String
+  title_contains?: String
+  title_not_contains?: String
+  title_starts_with?: String
+  title_not_starts_with?: String
+  title_ends_with?: String
+  title_not_ends_with?: String
+  text?: String
+  text_not?: String
+  text_in?: String[] | String
+  text_not_in?: String[] | String
+  text_lt?: String
+  text_lte?: String
+  text_gt?: String
+  text_gte?: String
+  text_contains?: String
+  text_not_contains?: String
+  text_starts_with?: String
+  text_not_starts_with?: String
+  text_ends_with?: String
+  text_not_ends_with?: String
+  author?: UserWhereInput
+}
+
+export interface ActivityTaskUpdateWithoutAssigneeDataInput {
+  name?: String
+  desc?: String
+  status?: ProcessStatus
+  endedAt?: DateTime
+  activity?: ActivityUpdateOneWithoutTasksInput
+}
+
+export interface UserSubscriptionWhereInput {
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: UserWhereInput
+}
+
+export interface ActivityUpdateOneWithoutTasksInput {
+  create?: ActivityCreateWithoutTasksInput
+  connect?: ActivityWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: ActivityUpdateWithoutTasksDataInput
+  upsert?: ActivityUpsertWithoutTasksInput
+}
+
+export interface PostWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface ActivityUpdateWithoutTasksDataInput {
+  title?: String
+  desc?: String
+  type?: ActivityType
+  status?: ProcessStatus
+  startedAt?: DateTime
+  endedAt?: DateTime
+  location?: String
+  creator?: UserUpdateOneWithoutMyActivitiesInput
+  participants?: UserUpdateManyWithoutAttendedActivitiesInput
+}
+
+export interface RecipeWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface UserUpdateOneWithoutMyActivitiesInput {
+  create?: UserCreateWithoutMyActivitiesInput
+  connect?: UserWhereUniqueInput
+  disconnect?: Boolean
+  delete?: Boolean
+  update?: UserUpdateWithoutMyActivitiesDataInput
+  upsert?: UserUpsertWithoutMyActivitiesInput
+}
+
+export interface UserUpdateInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface UserUpdateWithoutMyActivitiesDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface PostUpdateInput {
+  isPublished?: Boolean
+  title?: String
+  text?: String
+  author?: UserUpdateOneWithoutPostsInput
+}
+
+export interface RecipeUpdateManyWithoutCreatorInput {
+  create?: RecipeCreateWithoutCreatorInput[] | RecipeCreateWithoutCreatorInput
+  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  disconnect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  delete?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  update?: RecipeUpdateWithWhereUniqueWithoutCreatorInput[] | RecipeUpdateWithWhereUniqueWithoutCreatorInput
+  upsert?: RecipeUpsertWithWhereUniqueWithoutCreatorInput[] | RecipeUpsertWithWhereUniqueWithoutCreatorInput
+}
+
+export interface ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput {
+  where: ActivityTaskWhereUniqueInput
+  update: ActivityTaskUpdateWithoutAssigneeDataInput
+  create: ActivityTaskCreateWithoutAssigneeInput
+}
+
+export interface RecipeUpdateWithWhereUniqueWithoutCreatorInput {
+  where: RecipeWhereUniqueInput
+  data: RecipeUpdateWithoutCreatorDataInput
+}
+
+export interface RecipeUpsertWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput
+  update: RecipeUpdateWithoutTagsDataInput
+  create: RecipeCreateWithoutTagsInput
+}
+
+export interface RecipeUpdateWithoutCreatorDataInput {
+  name?: String
+  time?: Int
+  desc?: String
+  tags?: TagUpdateManyWithoutRecipesInput
+}
+
+export interface TagCreateInput {
+  name: String
+  type?: RecipeTagType
+  category?: TagCategory
+  default?: Boolean
+  creator: UserCreateOneWithoutMyTagsInput
+  recipes?: RecipeCreateManyWithoutTagsInput
+}
+
+export interface TagUpdateManyWithoutRecipesInput {
+  create?: TagCreateWithoutRecipesInput[] | TagCreateWithoutRecipesInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  update?: TagUpdateWithWhereUniqueWithoutRecipesInput[] | TagUpdateWithWhereUniqueWithoutRecipesInput
+  upsert?: TagUpsertWithWhereUniqueWithoutRecipesInput[] | TagUpsertWithWhereUniqueWithoutRecipesInput
+}
+
+export interface PostCreateWithoutAuthorInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+}
+
+export interface TagUpdateWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput
+  data: TagUpdateWithoutRecipesDataInput
+}
+
+export interface UserCreateWithoutAttendedActivitiesInput {
+  email: String
+  password: String
+  name: String
+  avatar?: String
+  posts?: PostCreateManyWithoutAuthorInput
+  myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
+}
+
+export interface TagUpdateWithoutRecipesDataInput {
+  name?: String
+  type?: RecipeTagType
+  category?: TagCategory
+  default?: Boolean
+  creator?: UserUpdateOneWithoutMyTagsInput
+}
+
+export interface ActivityCreateWithoutTasksInput {
+  title: String
+  desc?: String
+  type: ActivityType
+  status?: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserCreateOneWithoutMyActivitiesInput
+  participants?: UserCreateManyWithoutAttendedActivitiesInput
+}
+
+export interface TagUpsertWithWhereUniqueWithoutRecipesInput {
+  where: TagWhereUniqueInput
+  update: TagUpdateWithoutRecipesDataInput
+  create: TagCreateWithoutRecipesInput
+}
+
+export interface RecipeCreateWithoutCreatorInput {
+  name: String
+  time?: Int
+  desc?: String
+  tags?: TagCreateManyWithoutRecipesInput
+}
+
+export interface RecipeUpsertWithWhereUniqueWithoutCreatorInput {
+  where: RecipeWhereUniqueInput
+  update: RecipeUpdateWithoutCreatorDataInput
+  create: RecipeCreateWithoutCreatorInput
+}
+
+export interface TagCreateWithoutCreatorInput {
+  name: String
+  type?: RecipeTagType
+  category?: TagCategory
+  default?: Boolean
+  recipes?: RecipeCreateManyWithoutTagsInput
+}
+
+export interface TagUpdateManyWithoutCreatorInput {
+  create?: TagCreateWithoutCreatorInput[] | TagCreateWithoutCreatorInput
+  connect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  disconnect?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  delete?: TagWhereUniqueInput[] | TagWhereUniqueInput
+  update?: TagUpdateWithWhereUniqueWithoutCreatorInput[] | TagUpdateWithWhereUniqueWithoutCreatorInput
+  upsert?: TagUpsertWithWhereUniqueWithoutCreatorInput[] | TagUpsertWithWhereUniqueWithoutCreatorInput
 }
 
 export interface UserWhereInput {
@@ -3673,102 +4456,87 @@ export interface UserWhereInput {
   myRecipes_every?: RecipeWhereInput
   myRecipes_some?: RecipeWhereInput
   myRecipes_none?: RecipeWhereInput
-  myTags_every?: RecipeTagWhereInput
-  myTags_some?: RecipeTagWhereInput
-  myTags_none?: RecipeTagWhereInput
+  myTags_every?: TagWhereInput
+  myTags_some?: TagWhereInput
+  myTags_none?: TagWhereInput
   attendedActivities_every?: ActivityWhereInput
   attendedActivities_some?: ActivityWhereInput
   attendedActivities_none?: ActivityWhereInput
 }
 
-export interface ActivityCreateWithoutParticipantsInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status?: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: String
-  creator: UserCreateOneWithoutMyActivitiesInput
-  tasks?: ActivityTaskCreateManyWithoutActivityInput
-}
-
-export interface ActivityTaskSubscriptionWhereInput {
-  AND?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
-  OR?: ActivityTaskSubscriptionWhereInput[] | ActivityTaskSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: ActivityTaskWhereInput
-}
-
-export interface ActivityTaskCreateManyWithoutActivityInput {
-  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-}
-
-export interface UserSubscriptionWhereInput {
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: UserWhereInput
-}
-
-export interface ActivityTaskCreateWithoutActivityInput {
-  name: String
-  desc?: String
-  status?: ProcessStatus
-  endedAt?: DateTime
-  assignee?: UserCreateOneWithoutMyTasksInput
-}
-
-export interface PostWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface UserCreateOneWithoutMyTasksInput {
-  create?: UserCreateWithoutMyTasksInput
-  connect?: UserWhereUniqueInput
+export interface TagUpdateWithWhereUniqueWithoutCreatorInput {
+  where: TagWhereUniqueInput
+  data: TagUpdateWithoutCreatorDataInput
 }
 
 export interface ActivityWhereUniqueInput {
   id?: ID_Input
 }
 
-export interface UserCreateWithoutMyTasksInput {
+export interface TagUpdateWithoutCreatorDataInput {
+  name?: String
+  type?: RecipeTagType
+  category?: TagCategory
+  default?: Boolean
+  recipes?: RecipeUpdateManyWithoutTagsInput
+}
+
+export interface UserUpdateWithoutPostsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes?: RecipeUpdateManyWithoutCreatorInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
+}
+
+export interface RecipeUpdateManyWithoutTagsInput {
+  create?: RecipeCreateWithoutTagsInput[] | RecipeCreateWithoutTagsInput
+  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  disconnect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  delete?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
+  update?: RecipeUpdateWithWhereUniqueWithoutTagsInput[] | RecipeUpdateWithWhereUniqueWithoutTagsInput
+  upsert?: RecipeUpsertWithWhereUniqueWithoutTagsInput[] | RecipeUpsertWithWhereUniqueWithoutTagsInput
+}
+
+export interface UserUpsertWithoutMyActivitiesInput {
+  update: UserUpdateWithoutMyActivitiesDataInput
+  create: UserCreateWithoutMyActivitiesInput
+}
+
+export interface RecipeUpdateWithWhereUniqueWithoutTagsInput {
+  where: RecipeWhereUniqueInput
+  data: RecipeUpdateWithoutTagsDataInput
+}
+
+export interface UserCreateWithoutMyTagsInput {
   email: String
   password: String
   name: String
   avatar?: String
   posts?: PostCreateManyWithoutAuthorInput
   myActivities?: ActivityCreateManyWithoutCreatorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes?: RecipeCreateManyWithoutCreatorInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
   attendedActivities?: ActivityCreateManyWithoutParticipantsInput
 }
 
-export interface RecipeTagWhereUniqueInput {
-  id?: ID_Input
+export interface RecipeUpdateWithoutTagsDataInput {
+  name?: String
+  time?: Int
+  desc?: String
+  creator?: UserUpdateOneWithoutMyRecipesInput
 }
 
-export interface RecipeTagCreateManyWithoutCreatorInput {
-  create?: RecipeTagCreateWithoutCreatorInput[] | RecipeTagCreateWithoutCreatorInput
-  connect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-}
-
-export interface UserUpsertWithoutMyRecipesInput {
-  update: UserUpdateWithoutMyRecipesDataInput
-  create: UserCreateWithoutMyRecipesInput
-}
-
-export interface RecipeTagCreateWithoutCreatorInput {
+export interface ActivityTaskCreateWithoutAssigneeInput {
   name: String
-  type?: RecipeTagType
-  default?: Boolean
+  desc?: String
+  status?: ProcessStatus
+  endedAt?: DateTime
+  activity?: ActivityCreateOneWithoutTasksInput
 }
 
 export interface UserUpdateOneWithoutMyRecipesInput {
@@ -3780,40 +4548,52 @@ export interface UserUpdateOneWithoutMyRecipesInput {
   upsert?: UserUpsertWithoutMyRecipesInput
 }
 
-export interface UserCreateInput {
-  email: String
-  password: String
+export interface TagCreateWithoutRecipesInput {
   name: String
-  avatar?: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myRecipes?: RecipeCreateManyWithoutCreatorInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
-export interface RecipeTagUpdateInput {
-  name?: String
   type?: RecipeTagType
+  category?: TagCategory
   default?: Boolean
-  creator?: UserUpdateOneWithoutMyTagsInput
+  creator: UserCreateOneWithoutMyTagsInput
 }
 
-export interface ActivityCreateInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status?: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: String
-  creator: UserCreateOneWithoutMyActivitiesInput
-  participants?: UserCreateManyWithoutAttendedActivitiesInput
-  tasks?: ActivityTaskCreateManyWithoutActivityInput
+export interface UserUpdateWithoutMyRecipesDataInput {
+  email?: String
+  password?: String
+  name?: String
+  avatar?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  myActivities?: ActivityUpdateManyWithoutCreatorInput
+  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
+  myTags?: TagUpdateManyWithoutCreatorInput
+  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
 }
 
-export interface ActivityUpdateInput {
+export interface TagSubscriptionWhereInput {
+  AND?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+  OR?: TagSubscriptionWhereInput[] | TagSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: TagWhereInput
+}
+
+export interface ActivityUpsertWithWhereUniqueWithoutCreatorInput {
+  where: ActivityWhereUniqueInput
+  update: ActivityUpdateWithoutCreatorDataInput
+  create: ActivityCreateWithoutCreatorInput
+}
+
+export interface ActivityTaskUpdateManyWithoutActivityInput {
+  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
+  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
+  update?: ActivityTaskUpdateWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpdateWithWhereUniqueWithoutActivityInput
+  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpsertWithWhereUniqueWithoutActivityInput
+}
+
+export interface ActivityUpdateWithoutParticipantsDataInput {
   title?: String
   desc?: String
   type?: ActivityType
@@ -3822,208 +4602,36 @@ export interface ActivityUpdateInput {
   endedAt?: DateTime
   location?: String
   creator?: UserUpdateOneWithoutMyActivitiesInput
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
   tasks?: ActivityTaskUpdateManyWithoutActivityInput
 }
 
-export interface ActivityTaskCreateInput {
-  name: String
+export interface ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput
+  data: ActivityUpdateWithoutParticipantsDataInput
+}
+
+export interface ActivityUpdateManyWithoutParticipantsInput {
+  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
+  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
+  update?: ActivityUpdateWithWhereUniqueWithoutParticipantsInput[] | ActivityUpdateWithWhereUniqueWithoutParticipantsInput
+  upsert?: ActivityUpsertWithWhereUniqueWithoutParticipantsInput[] | ActivityUpsertWithWhereUniqueWithoutParticipantsInput
+}
+
+export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
+  where: ActivityWhereUniqueInput
+  update: ActivityUpdateWithoutParticipantsDataInput
+  create: ActivityCreateWithoutParticipantsInput
+}
+
+export interface ActivityTaskUpdateInput {
+  name?: String
   desc?: String
   status?: ProcessStatus
   endedAt?: DateTime
-  activity?: ActivityCreateOneWithoutTasksInput
-  assignee?: UserCreateOneWithoutMyTasksInput
-}
-
-export interface UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput
-  create: UserCreateWithoutPostsInput
-}
-
-export interface UserUpsertWithoutMyTasksInput {
-  update: UserUpdateWithoutMyTasksDataInput
-  create: UserCreateWithoutMyTasksInput
-}
-
-export interface UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutAttendedActivitiesDataInput
-  create: UserCreateWithoutAttendedActivitiesInput
-}
-
-export interface UserCreateOneWithoutMyRecipesInput {
-  create?: UserCreateWithoutMyRecipesInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface ActivityUpsertWithoutTasksInput {
-  update: ActivityUpdateWithoutTasksDataInput
-  create: ActivityCreateWithoutTasksInput
-}
-
-export interface UserCreateWithoutMyRecipesInput {
-  email: String
-  password: String
-  name: String
-  avatar?: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
-export interface RecipeUpsertWithWhereUniqueWithoutCreatorInput {
-  where: RecipeWhereUniqueInput
-  update: RecipeUpdateWithoutCreatorDataInput
-  create: RecipeCreateWithoutCreatorInput
-}
-
-export interface PostUpdateInput {
-  isPublished?: Boolean
-  title?: String
-  text?: String
-  author?: UserUpdateOneWithoutPostsInput
-}
-
-export interface UserUpsertWithoutMyTagsInput {
-  update: UserUpdateWithoutMyTagsDataInput
-  create: UserCreateWithoutMyTagsInput
-}
-
-export interface UserUpdateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutPostsDataInput
-  upsert?: UserUpsertWithoutPostsInput
-}
-
-export interface ActivityTaskUpsertWithWhereUniqueWithoutActivityInput {
-  where: ActivityTaskWhereUniqueInput
-  update: ActivityTaskUpdateWithoutActivityDataInput
-  create: ActivityTaskCreateWithoutActivityInput
-}
-
-export interface UserUpdateWithoutPostsDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface RecipeTagUpsertWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput
-  update: RecipeTagUpdateWithoutCreatorDataInput
-  create: RecipeTagCreateWithoutCreatorInput
-}
-
-export interface ActivityCreateManyWithoutCreatorInput {
-  create?: ActivityCreateWithoutCreatorInput[] | ActivityCreateWithoutCreatorInput
-  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-}
-
-export interface RecipeTagUpdateWithoutCreatorDataInput {
-  name?: String
-  type?: RecipeTagType
-  default?: Boolean
-}
-
-export interface UserCreateManyWithoutAttendedActivitiesInput {
-  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
-}
-
-export interface RecipeTagUpdateWithWhereUniqueWithoutCreatorInput {
-  where: RecipeTagWhereUniqueInput
-  data: RecipeTagUpdateWithoutCreatorDataInput
-}
-
-export interface PostCreateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-}
-
-export interface UserUpdateManyWithoutAttendedActivitiesInput {
-  create?: UserCreateWithoutAttendedActivitiesInput[] | UserCreateWithoutAttendedActivitiesInput
-  connect?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  delete?: UserWhereUniqueInput[] | UserWhereUniqueInput
-  update?: UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput
-  upsert?: UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput[] | UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput
-}
-
-export interface ActivityTaskCreateManyWithoutAssigneeInput {
-  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-}
-
-export interface UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput {
-  where: UserWhereUniqueInput
-  data: UserUpdateWithoutAttendedActivitiesDataInput
-}
-
-export interface ActivityCreateOneWithoutTasksInput {
-  create?: ActivityCreateWithoutTasksInput
-  connect?: ActivityWhereUniqueInput
-}
-
-export interface UserUpdateWithoutAttendedActivitiesDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-}
-
-export interface UserCreateOneWithoutMyActivitiesInput {
-  create?: UserCreateWithoutMyActivitiesInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface PostUpdateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  update?: PostUpdateWithWhereUniqueWithoutAuthorInput[] | PostUpdateWithWhereUniqueWithoutAuthorInput
-  upsert?: PostUpsertWithWhereUniqueWithoutAuthorInput[] | PostUpsertWithWhereUniqueWithoutAuthorInput
-}
-
-export interface RecipeCreateManyWithoutCreatorInput {
-  create?: RecipeCreateWithoutCreatorInput[] | RecipeCreateWithoutCreatorInput
-  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
-}
-
-export interface PostUpdateWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  data: PostUpdateWithoutAuthorDataInput
-}
-
-export interface RecipeTagCreateManyInput {
-  create?: RecipeTagCreateInput[] | RecipeTagCreateInput
-  connect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-}
-
-export interface PostUpdateWithoutAuthorDataInput {
-  isPublished?: Boolean
-  title?: String
-  text?: String
+  activity?: ActivityUpdateOneWithoutTasksInput
+  assignee?: UserUpdateOneWithoutMyTasksInput
 }
 
 export interface ActivityWhereInput {
@@ -4134,142 +4742,16 @@ export interface ActivityWhereInput {
   tasks_none?: ActivityTaskWhereInput
 }
 
-export interface PostUpsertWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  update: PostUpdateWithoutAuthorDataInput
-  create: PostCreateWithoutAuthorInput
-}
-
-export interface ActivitySubscriptionWhereInput {
-  AND?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
-  OR?: ActivitySubscriptionWhereInput[] | ActivitySubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: ActivityWhereInput
-}
-
-export interface ActivityTaskUpdateManyWithoutAssigneeInput {
-  create?: ActivityTaskCreateWithoutAssigneeInput[] | ActivityTaskCreateWithoutAssigneeInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  update?: ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput
-  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput[] | ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput
-}
-
-export interface UserWhereUniqueInput {
-  id?: ID_Input
-  email?: String
-}
-
-export interface ActivityTaskUpdateWithWhereUniqueWithoutAssigneeInput {
-  where: ActivityTaskWhereUniqueInput
-  data: ActivityTaskUpdateWithoutAssigneeDataInput
-}
-
-export interface RecipeWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface ActivityTaskUpdateWithoutAssigneeDataInput {
-  name?: String
-  desc?: String
-  status?: ProcessStatus
-  endedAt?: DateTime
-  activity?: ActivityUpdateOneWithoutTasksInput
-}
-
-export interface RecipeUpdateInput {
-  name?: String
-  time?: Int
-  desc?: String
-  tags?: RecipeTagUpdateManyInput
-  creator?: UserUpdateOneWithoutMyRecipesInput
-}
-
-export interface ActivityUpdateOneWithoutTasksInput {
-  create?: ActivityCreateWithoutTasksInput
-  connect?: ActivityWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: ActivityUpdateWithoutTasksDataInput
-  upsert?: ActivityUpsertWithoutTasksInput
-}
-
-export interface UserUpdateInput {
-  email?: String
-  password?: String
-  name?: String
+export interface UserCreateWithoutMyActivitiesInput {
+  email: String
+  password: String
+  name: String
   avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface ActivityUpdateWithoutTasksDataInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: String
-  creator?: UserUpdateOneWithoutMyActivitiesInput
-  participants?: UserUpdateManyWithoutAttendedActivitiesInput
-}
-
-export interface ActivityTaskUpsertWithWhereUniqueWithoutAssigneeInput {
-  where: ActivityTaskWhereUniqueInput
-  update: ActivityTaskUpdateWithoutAssigneeDataInput
-  create: ActivityTaskCreateWithoutAssigneeInput
-}
-
-export interface UserUpdateOneWithoutMyActivitiesInput {
-  create?: UserCreateWithoutMyActivitiesInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutMyActivitiesDataInput
-  upsert?: UserUpsertWithoutMyActivitiesInput
-}
-
-export interface RecipeTagUpsertWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput
-  update: RecipeTagUpdateDataInput
-  create: RecipeTagCreateInput
-}
-
-export interface UserUpdateWithoutMyActivitiesDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface PostCreateInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-  author: UserCreateOneWithoutPostsInput
-}
-
-export interface RecipeUpdateManyWithoutCreatorInput {
-  create?: RecipeCreateWithoutCreatorInput[] | RecipeCreateWithoutCreatorInput
-  connect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
-  disconnect?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
-  delete?: RecipeWhereUniqueInput[] | RecipeWhereUniqueInput
-  update?: RecipeUpdateWithWhereUniqueWithoutCreatorInput[] | RecipeUpdateWithWhereUniqueWithoutCreatorInput
-  upsert?: RecipeUpsertWithWhereUniqueWithoutCreatorInput[] | RecipeUpsertWithWhereUniqueWithoutCreatorInput
+  posts?: PostCreateManyWithoutAuthorInput
+  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
+  myRecipes?: RecipeCreateManyWithoutCreatorInput
+  myTags?: TagCreateManyWithoutCreatorInput
+  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
 }
 
 export interface ActivityCreateWithoutCreatorInput {
@@ -4284,337 +4766,6 @@ export interface ActivityCreateWithoutCreatorInput {
   tasks?: ActivityTaskCreateManyWithoutActivityInput
 }
 
-export interface RecipeUpdateWithWhereUniqueWithoutCreatorInput {
-  where: RecipeWhereUniqueInput
-  data: RecipeUpdateWithoutCreatorDataInput
-}
-
-export interface PostCreateWithoutAuthorInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-}
-
-export interface RecipeUpdateWithoutCreatorDataInput {
-  name?: String
-  time?: Int
-  desc?: String
-  tags?: RecipeTagUpdateManyInput
-}
-
-export interface ActivityCreateWithoutTasksInput {
-  title: String
-  desc?: String
-  type: ActivityType
-  status?: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: String
-  creator: UserCreateOneWithoutMyActivitiesInput
-  participants?: UserCreateManyWithoutAttendedActivitiesInput
-}
-
-export interface RecipeTagUpdateManyInput {
-  create?: RecipeTagCreateInput[] | RecipeTagCreateInput
-  connect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  disconnect?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  delete?: RecipeTagWhereUniqueInput[] | RecipeTagWhereUniqueInput
-  update?: RecipeTagUpdateWithWhereUniqueNestedInput[] | RecipeTagUpdateWithWhereUniqueNestedInput
-  upsert?: RecipeTagUpsertWithWhereUniqueNestedInput[] | RecipeTagUpsertWithWhereUniqueNestedInput
-}
-
-export interface RecipeCreateWithoutCreatorInput {
-  name: String
-  time?: Int
-  desc?: String
-  tags?: RecipeTagCreateManyInput
-}
-
-export interface RecipeTagUpdateWithWhereUniqueNestedInput {
-  where: RecipeTagWhereUniqueInput
-  data: RecipeTagUpdateDataInput
-}
-
-export interface RecipeTagSubscriptionWhereInput {
-  AND?: RecipeTagSubscriptionWhereInput[] | RecipeTagSubscriptionWhereInput
-  OR?: RecipeTagSubscriptionWhereInput[] | RecipeTagSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: RecipeTagWhereInput
-}
-
-export interface RecipeTagUpdateDataInput {
-  name?: String
-  type?: RecipeTagType
-  default?: Boolean
-  creator?: UserUpdateOneWithoutMyTagsInput
-}
-
-export interface ActivityTaskWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface UserUpdateOneWithoutMyTagsInput {
-  create?: UserCreateWithoutMyTagsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutMyTagsDataInput
-  upsert?: UserUpsertWithoutMyTagsInput
-}
-
-export interface ActivityTaskUpdateInput {
-  name?: String
-  desc?: String
-  status?: ProcessStatus
-  endedAt?: DateTime
-  activity?: ActivityUpdateOneWithoutTasksInput
-  assignee?: UserUpdateOneWithoutMyTasksInput
-}
-
-export interface UserUpdateWithoutMyTagsDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface UserUpsertWithoutMyActivitiesInput {
-  update: UserUpdateWithoutMyActivitiesDataInput
-  create: UserCreateWithoutMyActivitiesInput
-}
-
-export interface ActivityUpdateManyWithoutParticipantsInput {
-  create?: ActivityCreateWithoutParticipantsInput[] | ActivityCreateWithoutParticipantsInput
-  connect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  disconnect?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  delete?: ActivityWhereUniqueInput[] | ActivityWhereUniqueInput
-  update?: ActivityUpdateWithWhereUniqueWithoutParticipantsInput[] | ActivityUpdateWithWhereUniqueWithoutParticipantsInput
-  upsert?: ActivityUpsertWithWhereUniqueWithoutParticipantsInput[] | ActivityUpsertWithWhereUniqueWithoutParticipantsInput
-}
-
-export interface UserCreateWithoutPostsInput {
-  email: String
-  password: String
-  name: String
-  avatar?: String
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myRecipes?: RecipeCreateManyWithoutCreatorInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
-export interface ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
-  where: ActivityWhereUniqueInput
-  data: ActivityUpdateWithoutParticipantsDataInput
-}
-
-export interface ActivityTaskCreateWithoutAssigneeInput {
-  name: String
-  desc?: String
-  status?: ProcessStatus
-  endedAt?: DateTime
-  activity?: ActivityCreateOneWithoutTasksInput
-}
-
-export interface ActivityUpdateWithoutParticipantsDataInput {
-  title?: String
-  desc?: String
-  type?: ActivityType
-  status?: ProcessStatus
-  startedAt?: DateTime
-  endedAt?: DateTime
-  location?: String
-  creator?: UserUpdateOneWithoutMyActivitiesInput
-  tasks?: ActivityTaskUpdateManyWithoutActivityInput
-}
-
-export interface ActivityTaskWhereInput {
-  AND?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
-  OR?: ActivityTaskWhereInput[] | ActivityTaskWhereInput
-  id?: ID_Input
-  id_not?: ID_Input
-  id_in?: ID_Input[] | ID_Input
-  id_not_in?: ID_Input[] | ID_Input
-  id_lt?: ID_Input
-  id_lte?: ID_Input
-  id_gt?: ID_Input
-  id_gte?: ID_Input
-  id_contains?: ID_Input
-  id_not_contains?: ID_Input
-  id_starts_with?: ID_Input
-  id_not_starts_with?: ID_Input
-  id_ends_with?: ID_Input
-  id_not_ends_with?: ID_Input
-  createdAt?: DateTime
-  createdAt_not?: DateTime
-  createdAt_in?: DateTime[] | DateTime
-  createdAt_not_in?: DateTime[] | DateTime
-  createdAt_lt?: DateTime
-  createdAt_lte?: DateTime
-  createdAt_gt?: DateTime
-  createdAt_gte?: DateTime
-  updatedAt?: DateTime
-  updatedAt_not?: DateTime
-  updatedAt_in?: DateTime[] | DateTime
-  updatedAt_not_in?: DateTime[] | DateTime
-  updatedAt_lt?: DateTime
-  updatedAt_lte?: DateTime
-  updatedAt_gt?: DateTime
-  updatedAt_gte?: DateTime
-  name?: String
-  name_not?: String
-  name_in?: String[] | String
-  name_not_in?: String[] | String
-  name_lt?: String
-  name_lte?: String
-  name_gt?: String
-  name_gte?: String
-  name_contains?: String
-  name_not_contains?: String
-  name_starts_with?: String
-  name_not_starts_with?: String
-  name_ends_with?: String
-  name_not_ends_with?: String
-  desc?: String
-  desc_not?: String
-  desc_in?: String[] | String
-  desc_not_in?: String[] | String
-  desc_lt?: String
-  desc_lte?: String
-  desc_gt?: String
-  desc_gte?: String
-  desc_contains?: String
-  desc_not_contains?: String
-  desc_starts_with?: String
-  desc_not_starts_with?: String
-  desc_ends_with?: String
-  desc_not_ends_with?: String
-  status?: ProcessStatus
-  status_not?: ProcessStatus
-  status_in?: ProcessStatus[] | ProcessStatus
-  status_not_in?: ProcessStatus[] | ProcessStatus
-  endedAt?: DateTime
-  endedAt_not?: DateTime
-  endedAt_in?: DateTime[] | DateTime
-  endedAt_not_in?: DateTime[] | DateTime
-  endedAt_lt?: DateTime
-  endedAt_lte?: DateTime
-  endedAt_gt?: DateTime
-  endedAt_gte?: DateTime
-  activity?: ActivityWhereInput
-  assignee?: UserWhereInput
-}
-
-export interface ActivityTaskUpdateManyWithoutActivityInput {
-  create?: ActivityTaskCreateWithoutActivityInput[] | ActivityTaskCreateWithoutActivityInput
-  connect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  disconnect?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  delete?: ActivityTaskWhereUniqueInput[] | ActivityTaskWhereUniqueInput
-  update?: ActivityTaskUpdateWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpdateWithWhereUniqueWithoutActivityInput
-  upsert?: ActivityTaskUpsertWithWhereUniqueWithoutActivityInput[] | ActivityTaskUpsertWithWhereUniqueWithoutActivityInput
-}
-
-export interface UserUpdateWithoutMyRecipesDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
-  where: ActivityWhereUniqueInput
-  update: ActivityUpdateWithoutParticipantsDataInput
-  create: ActivityCreateWithoutParticipantsInput
-}
-
-export interface UserUpdateWithoutMyTasksDataInput {
-  email?: String
-  password?: String
-  name?: String
-  avatar?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  myActivities?: ActivityUpdateManyWithoutCreatorInput
-  myRecipes?: RecipeUpdateManyWithoutCreatorInput
-  myTags?: RecipeTagUpdateManyWithoutCreatorInput
-  attendedActivities?: ActivityUpdateManyWithoutParticipantsInput
-}
-
-export interface UserUpdateOneWithoutMyTasksInput {
-  create?: UserCreateWithoutMyTasksInput
-  connect?: UserWhereUniqueInput
-  disconnect?: Boolean
-  delete?: Boolean
-  update?: UserUpdateWithoutMyTasksDataInput
-  upsert?: UserUpsertWithoutMyTasksInput
-}
-
-export interface ActivityTaskUpdateWithoutActivityDataInput {
-  name?: String
-  desc?: String
-  status?: ProcessStatus
-  endedAt?: DateTime
-  assignee?: UserUpdateOneWithoutMyTasksInput
-}
-
-export interface ActivityTaskUpdateWithWhereUniqueWithoutActivityInput {
-  where: ActivityTaskWhereUniqueInput
-  data: ActivityTaskUpdateWithoutActivityDataInput
-}
-
-export interface UserCreateWithoutAttendedActivitiesInput {
-  email: String
-  password: String
-  name: String
-  avatar?: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myActivities?: ActivityCreateManyWithoutCreatorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myRecipes?: RecipeCreateManyWithoutCreatorInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
-}
-
-export interface ActivityUpsertWithWhereUniqueWithoutCreatorInput {
-  where: ActivityWhereUniqueInput
-  update: ActivityUpdateWithoutCreatorDataInput
-  create: ActivityCreateWithoutCreatorInput
-}
-
-export interface PostSubscriptionWhereInput {
-  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: PostWhereInput
-}
-
-export interface UserCreateWithoutMyActivitiesInput {
-  email: String
-  password: String
-  name: String
-  avatar?: String
-  posts?: PostCreateManyWithoutAuthorInput
-  myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
-  myRecipes?: RecipeCreateManyWithoutCreatorInput
-  myTags?: RecipeTagCreateManyWithoutCreatorInput
-  attendedActivities?: ActivityCreateManyWithoutParticipantsInput
-}
-
 /*
  * An object with an ID
 
@@ -4627,10 +4778,10 @@ export interface Node {
  * A connection to a list of items.
 
  */
-export interface PostConnection {
+export interface TagConnection {
   pageInfo: PageInfo
-  edges: PostEdge[]
-  aggregate: AggregatePost
+  edges: TagEdge[]
+  aggregate: AggregateTag
 }
 
 export interface RecipePreviousValues {
@@ -4655,31 +4806,37 @@ export interface User extends Node {
   myActivities?: Activity[]
   myTasks?: ActivityTask[]
   myRecipes?: Recipe[]
-  myTags?: RecipeTag[]
+  myTags?: Tag[]
   attendedActivities?: Activity[]
   avatar?: String
 }
 
-export interface Post extends Node {
+export interface Tag extends Node {
   id: ID_Output
+  name: String
   createdAt: DateTime
   updatedAt: DateTime
-  isPublished: Boolean
-  title: String
-  text: String
-  author: User
+  creator: User
+  type?: RecipeTagType
+  category: TagCategory
+  default?: Boolean
+  recipes?: Recipe[]
 }
 
-export interface ActivityTask extends Node {
+export interface Activity extends Node {
   id: ID_Output
   createdAt: DateTime
   updatedAt: DateTime
-  name: String
+  title: String
   desc?: String
+  type: ActivityType
   status?: ProcessStatus
-  endedAt?: DateTime
-  activity?: Activity
-  assignee?: User
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: User
+  participants?: User[]
+  tasks?: ActivityTask[]
 }
 
 export interface RecipeSubscriptionPayload {
@@ -4702,17 +4859,68 @@ export interface RecipeEdge {
   cursor: String
 }
 
-export interface AggregateRecipeTag {
+export interface AggregateActivityTask {
   count: Int
 }
 
-export interface RecipeTag extends Node {
+export interface Recipe extends Node {
+  id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
+  name: String
+  tags?: Tag[]
+  creator: User
+  time?: Int
+  desc?: String
+}
+
+/*
+ * A connection to a list of items.
+
+ */
+export interface ActivityTaskConnection {
+  pageInfo: PageInfo
+  edges: ActivityTaskEdge[]
+  aggregate: AggregateActivityTask
+}
+
+export interface Post extends Node {
+  id: ID_Output
+  createdAt: DateTime
+  updatedAt: DateTime
+  isPublished: Boolean
+  title: String
+  text: String
+  author: User
+}
+
+/*
+ * An edge in a connection.
+
+ */
+export interface ActivityEdge {
+  node: Activity
+  cursor: String
+}
+
+export interface TagSubscriptionPayload {
+  mutation: MutationType
+  node?: Tag
+  updatedFields?: String[]
+  previousValues?: TagPreviousValues
+}
+
+export interface AggregateUser {
+  count: Int
+}
+
+export interface TagPreviousValues {
   id: ID_Output
   name: String
   createdAt: DateTime
   updatedAt: DateTime
-  creator: User
   type?: RecipeTagType
+  category: TagCategory
   default?: Boolean
 }
 
@@ -4720,34 +4928,28 @@ export interface RecipeTag extends Node {
  * A connection to a list of items.
 
  */
-export interface RecipeTagConnection {
+export interface UserConnection {
   pageInfo: PageInfo
-  edges: RecipeTagEdge[]
-  aggregate: AggregateRecipeTag
+  edges: UserEdge[]
+  aggregate: AggregateUser
 }
 
-export interface Activity extends Node {
+export interface ActivityTaskPreviousValues {
   id: ID_Output
   createdAt: DateTime
   updatedAt: DateTime
-  title: String
+  name: String
   desc?: String
-  type: ActivityType
   status?: ProcessStatus
-  startedAt: DateTime
-  endedAt: DateTime
-  location: String
-  creator: User
-  participants?: User[]
-  tasks?: ActivityTask[]
+  endedAt?: DateTime
 }
 
 /*
  * An edge in a connection.
 
  */
-export interface ActivityTaskEdge {
-  node: ActivityTask
+export interface PostEdge {
+  node: Post
   cursor: String
 }
 
@@ -4758,7 +4960,7 @@ export interface PostSubscriptionPayload {
   previousValues?: PostPreviousValues
 }
 
-export interface AggregateActivity {
+export interface AggregateTag {
   count: Int
 }
 
@@ -4772,53 +4974,6 @@ export interface PostPreviousValues {
 }
 
 /*
- * A connection to a list of items.
-
- */
-export interface ActivityConnection {
-  pageInfo: PageInfo
-  edges: ActivityEdge[]
-  aggregate: AggregateActivity
-}
-
-export interface RecipeTagPreviousValues {
-  id: ID_Output
-  name: String
-  createdAt: DateTime
-  updatedAt: DateTime
-  type?: RecipeTagType
-  default?: Boolean
-}
-
-/*
- * An edge in a connection.
-
- */
-export interface UserEdge {
-  node: User
-  cursor: String
-}
-
-export interface UserSubscriptionPayload {
-  mutation: MutationType
-  node?: User
-  updatedFields?: String[]
-  previousValues?: UserPreviousValues
-}
-
-export interface AggregatePost {
-  count: Int
-}
-
-export interface UserPreviousValues {
-  id: ID_Output
-  email: String
-  password: String
-  name: String
-  avatar?: String
-}
-
-/*
  * Information about pagination in a connection.
 
  */
@@ -4829,48 +4984,7 @@ export interface PageInfo {
   endCursor?: String
 }
 
-export interface Recipe extends Node {
-  id: ID_Output
-  createdAt: DateTime
-  updatedAt: DateTime
-  name: String
-  time?: Int
-  desc?: String
-  tags?: RecipeTag[]
-  creator: User
-}
-
-/*
- * An edge in a connection.
-
- */
-export interface RecipeTagEdge {
-  node: RecipeTag
-  cursor: String
-}
-
-export interface ActivitySubscriptionPayload {
-  mutation: MutationType
-  node?: Activity
-  updatedFields?: String[]
-  previousValues?: ActivityPreviousValues
-}
-
-/*
- * A connection to a list of items.
-
- */
-export interface ActivityTaskConnection {
-  pageInfo: PageInfo
-  edges: ActivityTaskEdge[]
-  aggregate: AggregateActivityTask
-}
-
-export interface AggregateUser {
-  count: Int
-}
-
-export interface ActivityTaskPreviousValues {
+export interface ActivityTask extends Node {
   id: ID_Output
   createdAt: DateTime
   updatedAt: DateTime
@@ -4878,20 +4992,38 @@ export interface ActivityTaskPreviousValues {
   desc?: String
   status?: ProcessStatus
   endedAt?: DateTime
+  activity?: Activity
+  assignee?: User
 }
 
-export interface ActivityTaskSubscriptionPayload {
-  mutation: MutationType
-  node?: ActivityTask
-  updatedFields?: String[]
-  previousValues?: ActivityTaskPreviousValues
+/*
+ * An edge in a connection.
+
+ */
+export interface ActivityTaskEdge {
+  node: ActivityTask
+  cursor: String
 }
 
-export interface RecipeTagSubscriptionPayload {
+export interface UserSubscriptionPayload {
   mutation: MutationType
-  node?: RecipeTag
+  node?: User
   updatedFields?: String[]
-  previousValues?: RecipeTagPreviousValues
+  previousValues?: UserPreviousValues
+}
+
+/*
+ * A connection to a list of items.
+
+ */
+export interface ActivityConnection {
+  pageInfo: PageInfo
+  edges: ActivityEdge[]
+  aggregate: AggregateActivity
+}
+
+export interface AggregatePost {
+  count: Int
 }
 
 export interface ActivityPreviousValues {
@@ -4907,26 +5039,48 @@ export interface ActivityPreviousValues {
   location: String
 }
 
+export interface ActivitySubscriptionPayload {
+  mutation: MutationType
+  node?: Activity
+  updatedFields?: String[]
+  previousValues?: ActivityPreviousValues
+}
+
+export interface ActivityTaskSubscriptionPayload {
+  mutation: MutationType
+  node?: ActivityTask
+  updatedFields?: String[]
+  previousValues?: ActivityTaskPreviousValues
+}
+
+export interface UserPreviousValues {
+  id: ID_Output
+  email: String
+  password: String
+  name: String
+  avatar?: String
+}
+
 /*
  * A connection to a list of items.
 
  */
-export interface UserConnection {
+export interface PostConnection {
   pageInfo: PageInfo
-  edges: UserEdge[]
-  aggregate: AggregateUser
+  edges: PostEdge[]
+  aggregate: AggregatePost
 }
 
 /*
  * An edge in a connection.
 
  */
-export interface ActivityEdge {
-  node: Activity
+export interface UserEdge {
+  node: User
   cursor: String
 }
 
-export interface AggregateActivityTask {
+export interface AggregateActivity {
   count: Int
 }
 
@@ -4944,8 +5098,8 @@ export interface RecipeConnection {
  * An edge in a connection.
 
  */
-export interface PostEdge {
-  node: Post
+export interface TagEdge {
+  node: Tag
   cursor: String
 }
 
@@ -4966,17 +5120,17 @@ The `ID` scalar type represents a unique identifier, often used to refetch an ob
 export type ID_Input = string | number
 export type ID_Output = string
 
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string
+
 export type DateTime = string
 
 /*
 The `Boolean` scalar type represents `true` or `false`.
 */
 export type Boolean = boolean
-
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string
 
 export interface Schema {
   query: Query
@@ -4985,72 +5139,72 @@ export interface Schema {
 }
 
 export type Query = {
+  tags: (args: { where?: TagWhereInput, orderBy?: TagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Tag[]>
   posts: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Post[]>
   users: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<User[]>
   activities: (args: { where?: ActivityWhereInput, orderBy?: ActivityOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Activity[]>
   activityTasks: (args: { where?: ActivityTaskWhereInput, orderBy?: ActivityTaskOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask[]>
-  recipeTags: (args: { where?: RecipeTagWhereInput, orderBy?: RecipeTagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag[]>
   recipes: (args: { where?: RecipeWhereInput, orderBy?: RecipeOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Recipe[]>
+  tag: (args: { where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
   post: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   activity: (args: { where: ActivityWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Activity | null>
   activityTask: (args: { where: ActivityTaskWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask | null>
-  recipeTag: (args: { where: RecipeTagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag | null>
   recipe: (args: { where: RecipeWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Recipe | null>
+  tagsConnection: (args: { where?: TagWhereInput, orderBy?: TagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<TagConnection>
   postsConnection: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<PostConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
   activitiesConnection: (args: { where?: ActivityWhereInput, orderBy?: ActivityOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ActivityConnection>
   activityTasksConnection: (args: { where?: ActivityTaskWhereInput, orderBy?: ActivityTaskOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<ActivityTaskConnection>
-  recipeTagsConnection: (args: { where?: RecipeTagWhereInput, orderBy?: RecipeTagOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<RecipeTagConnection>
   recipesConnection: (args: { where?: RecipeWhereInput, orderBy?: RecipeOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<RecipeConnection>
   node: (args: { id: ID_Output }, info?: GraphQLResolveInfo | string) => Promise<Node | null>
 }
 
 export type Mutation = {
+  createTag: (args: { data: TagCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Tag>
   createPost: (args: { data: PostCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   createUser: (args: { data: UserCreateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
   createActivity: (args: { data: ActivityCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Activity>
   createActivityTask: (args: { data: ActivityTaskCreateInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask>
-  createRecipeTag: (args: { data: RecipeTagCreateInput }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag>
   createRecipe: (args: { data: RecipeCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Recipe>
+  updateTag: (args: { data: TagUpdateInput, where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
   updatePost: (args: { data: PostUpdateInput, where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   updateUser: (args: { data: UserUpdateInput, where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   updateActivity: (args: { data: ActivityUpdateInput, where: ActivityWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Activity | null>
   updateActivityTask: (args: { data: ActivityTaskUpdateInput, where: ActivityTaskWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask | null>
-  updateRecipeTag: (args: { data: RecipeTagUpdateInput, where: RecipeTagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag | null>
   updateRecipe: (args: { data: RecipeUpdateInput, where: RecipeWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Recipe | null>
+  deleteTag: (args: { where: TagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Tag | null>
   deletePost: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   deleteUser: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   deleteActivity: (args: { where: ActivityWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Activity | null>
   deleteActivityTask: (args: { where: ActivityTaskWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask | null>
-  deleteRecipeTag: (args: { where: RecipeTagWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag | null>
   deleteRecipe: (args: { where: RecipeWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Recipe | null>
+  upsertTag: (args: { where: TagWhereUniqueInput, create: TagCreateInput, update: TagUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Tag>
   upsertPost: (args: { where: PostWhereUniqueInput, create: PostCreateInput, update: PostUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
   upsertActivity: (args: { where: ActivityWhereUniqueInput, create: ActivityCreateInput, update: ActivityUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Activity>
   upsertActivityTask: (args: { where: ActivityTaskWhereUniqueInput, create: ActivityTaskCreateInput, update: ActivityTaskUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<ActivityTask>
-  upsertRecipeTag: (args: { where: RecipeTagWhereUniqueInput, create: RecipeTagCreateInput, update: RecipeTagUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<RecipeTag>
   upsertRecipe: (args: { where: RecipeWhereUniqueInput, create: RecipeCreateInput, update: RecipeUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Recipe>
+  updateManyTags: (args: { data: TagUpdateInput, where: TagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyPosts: (args: { data: PostUpdateInput, where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyActivities: (args: { data: ActivityUpdateInput, where: ActivityWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyActivityTasks: (args: { data: ActivityTaskUpdateInput, where: ActivityTaskWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  updateManyRecipeTags: (args: { data: RecipeTagUpdateInput, where: RecipeTagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyRecipes: (args: { data: RecipeUpdateInput, where: RecipeWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyTags: (args: { where: TagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyPosts: (args: { where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyUsers: (args: { where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyActivities: (args: { where: ActivityWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyActivityTasks: (args: { where: ActivityTaskWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
-  deleteManyRecipeTags: (args: { where: RecipeTagWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyRecipes: (args: { where: RecipeWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
 }
 
 export type Subscription = {
+  tag: (args: { where?: TagSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<TagSubscriptionPayload>>
   post: (args: { where?: PostSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<PostSubscriptionPayload>>
   user: (args: { where?: UserSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<UserSubscriptionPayload>>
   activity: (args: { where?: ActivitySubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<ActivitySubscriptionPayload>>
   activityTask: (args: { where?: ActivityTaskSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<ActivityTaskSubscriptionPayload>>
-  recipeTag: (args: { where?: RecipeTagSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<RecipeTagSubscriptionPayload>>
   recipe: (args: { where?: RecipeSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<RecipeSubscriptionPayload>>
 }
 
@@ -5061,81 +5215,81 @@ export class Prisma extends BasePrisma {
   }
 
   exists = {
+    Tag: (where: TagWhereInput): Promise<boolean> => super.existsDelegate('query', 'tags', { where }, {}, '{ id }'),
     Post: (where: PostWhereInput): Promise<boolean> => super.existsDelegate('query', 'posts', { where }, {}, '{ id }'),
     User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }'),
     Activity: (where: ActivityWhereInput): Promise<boolean> => super.existsDelegate('query', 'activities', { where }, {}, '{ id }'),
     ActivityTask: (where: ActivityTaskWhereInput): Promise<boolean> => super.existsDelegate('query', 'activityTasks', { where }, {}, '{ id }'),
-    RecipeTag: (where: RecipeTagWhereInput): Promise<boolean> => super.existsDelegate('query', 'recipeTags', { where }, {}, '{ id }'),
     Recipe: (where: RecipeWhereInput): Promise<boolean> => super.existsDelegate('query', 'recipes', { where }, {}, '{ id }')
   }
 
   query: Query = {
+    tags: (args, info): Promise<Tag[]> => super.delegate('query', 'tags', args, {}, info),
     posts: (args, info): Promise<Post[]> => super.delegate('query', 'posts', args, {}, info),
     users: (args, info): Promise<User[]> => super.delegate('query', 'users', args, {}, info),
     activities: (args, info): Promise<Activity[]> => super.delegate('query', 'activities', args, {}, info),
     activityTasks: (args, info): Promise<ActivityTask[]> => super.delegate('query', 'activityTasks', args, {}, info),
-    recipeTags: (args, info): Promise<RecipeTag[]> => super.delegate('query', 'recipeTags', args, {}, info),
     recipes: (args, info): Promise<Recipe[]> => super.delegate('query', 'recipes', args, {}, info),
+    tag: (args, info): Promise<Tag | null> => super.delegate('query', 'tag', args, {}, info),
     post: (args, info): Promise<Post | null> => super.delegate('query', 'post', args, {}, info),
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
     activity: (args, info): Promise<Activity | null> => super.delegate('query', 'activity', args, {}, info),
     activityTask: (args, info): Promise<ActivityTask | null> => super.delegate('query', 'activityTask', args, {}, info),
-    recipeTag: (args, info): Promise<RecipeTag | null> => super.delegate('query', 'recipeTag', args, {}, info),
     recipe: (args, info): Promise<Recipe | null> => super.delegate('query', 'recipe', args, {}, info),
+    tagsConnection: (args, info): Promise<TagConnection> => super.delegate('query', 'tagsConnection', args, {}, info),
     postsConnection: (args, info): Promise<PostConnection> => super.delegate('query', 'postsConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
     activitiesConnection: (args, info): Promise<ActivityConnection> => super.delegate('query', 'activitiesConnection', args, {}, info),
     activityTasksConnection: (args, info): Promise<ActivityTaskConnection> => super.delegate('query', 'activityTasksConnection', args, {}, info),
-    recipeTagsConnection: (args, info): Promise<RecipeTagConnection> => super.delegate('query', 'recipeTagsConnection', args, {}, info),
     recipesConnection: (args, info): Promise<RecipeConnection> => super.delegate('query', 'recipesConnection', args, {}, info),
     node: (args, info): Promise<Node | null> => super.delegate('query', 'node', args, {}, info)
   }
 
   mutation: Mutation = {
+    createTag: (args, info): Promise<Tag> => super.delegate('mutation', 'createTag', args, {}, info),
     createPost: (args, info): Promise<Post> => super.delegate('mutation', 'createPost', args, {}, info),
     createUser: (args, info): Promise<User> => super.delegate('mutation', 'createUser', args, {}, info),
     createActivity: (args, info): Promise<Activity> => super.delegate('mutation', 'createActivity', args, {}, info),
     createActivityTask: (args, info): Promise<ActivityTask> => super.delegate('mutation', 'createActivityTask', args, {}, info),
-    createRecipeTag: (args, info): Promise<RecipeTag> => super.delegate('mutation', 'createRecipeTag', args, {}, info),
     createRecipe: (args, info): Promise<Recipe> => super.delegate('mutation', 'createRecipe', args, {}, info),
+    updateTag: (args, info): Promise<Tag | null> => super.delegate('mutation', 'updateTag', args, {}, info),
     updatePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'updatePost', args, {}, info),
     updateUser: (args, info): Promise<User | null> => super.delegate('mutation', 'updateUser', args, {}, info),
     updateActivity: (args, info): Promise<Activity | null> => super.delegate('mutation', 'updateActivity', args, {}, info),
     updateActivityTask: (args, info): Promise<ActivityTask | null> => super.delegate('mutation', 'updateActivityTask', args, {}, info),
-    updateRecipeTag: (args, info): Promise<RecipeTag | null> => super.delegate('mutation', 'updateRecipeTag', args, {}, info),
     updateRecipe: (args, info): Promise<Recipe | null> => super.delegate('mutation', 'updateRecipe', args, {}, info),
+    deleteTag: (args, info): Promise<Tag | null> => super.delegate('mutation', 'deleteTag', args, {}, info),
     deletePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'deletePost', args, {}, info),
     deleteUser: (args, info): Promise<User | null> => super.delegate('mutation', 'deleteUser', args, {}, info),
     deleteActivity: (args, info): Promise<Activity | null> => super.delegate('mutation', 'deleteActivity', args, {}, info),
     deleteActivityTask: (args, info): Promise<ActivityTask | null> => super.delegate('mutation', 'deleteActivityTask', args, {}, info),
-    deleteRecipeTag: (args, info): Promise<RecipeTag | null> => super.delegate('mutation', 'deleteRecipeTag', args, {}, info),
     deleteRecipe: (args, info): Promise<Recipe | null> => super.delegate('mutation', 'deleteRecipe', args, {}, info),
+    upsertTag: (args, info): Promise<Tag> => super.delegate('mutation', 'upsertTag', args, {}, info),
     upsertPost: (args, info): Promise<Post> => super.delegate('mutation', 'upsertPost', args, {}, info),
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
     upsertActivity: (args, info): Promise<Activity> => super.delegate('mutation', 'upsertActivity', args, {}, info),
     upsertActivityTask: (args, info): Promise<ActivityTask> => super.delegate('mutation', 'upsertActivityTask', args, {}, info),
-    upsertRecipeTag: (args, info): Promise<RecipeTag> => super.delegate('mutation', 'upsertRecipeTag', args, {}, info),
     upsertRecipe: (args, info): Promise<Recipe> => super.delegate('mutation', 'upsertRecipe', args, {}, info),
+    updateManyTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyTags', args, {}, info),
     updateManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyPosts', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
     updateManyActivities: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyActivities', args, {}, info),
     updateManyActivityTasks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyActivityTasks', args, {}, info),
-    updateManyRecipeTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyRecipeTags', args, {}, info),
     updateManyRecipes: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyRecipes', args, {}, info),
+    deleteManyTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyTags', args, {}, info),
     deleteManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyPosts', args, {}, info),
     deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info),
     deleteManyActivities: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyActivities', args, {}, info),
     deleteManyActivityTasks: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyActivityTasks', args, {}, info),
-    deleteManyRecipeTags: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyRecipeTags', args, {}, info),
     deleteManyRecipes: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyRecipes', args, {}, info)
   }
 
   subscription: Subscription = {
+    tag: (args, infoOrQuery): Promise<AsyncIterator<TagSubscriptionPayload>> => super.delegateSubscription('tag', args, {}, infoOrQuery),
     post: (args, infoOrQuery): Promise<AsyncIterator<PostSubscriptionPayload>> => super.delegateSubscription('post', args, {}, infoOrQuery),
     user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery),
     activity: (args, infoOrQuery): Promise<AsyncIterator<ActivitySubscriptionPayload>> => super.delegateSubscription('activity', args, {}, infoOrQuery),
     activityTask: (args, infoOrQuery): Promise<AsyncIterator<ActivityTaskSubscriptionPayload>> => super.delegateSubscription('activityTask', args, {}, infoOrQuery),
-    recipeTag: (args, infoOrQuery): Promise<AsyncIterator<RecipeTagSubscriptionPayload>> => super.delegateSubscription('recipeTag', args, {}, infoOrQuery),
     recipe: (args, infoOrQuery): Promise<AsyncIterator<RecipeSubscriptionPayload>> => super.delegateSubscription('recipe', args, {}, infoOrQuery)
   }
 }
