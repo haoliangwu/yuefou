@@ -55,8 +55,6 @@ async function createTag(parent, { tag }, ctx: Context, info?: GraphQLResolveInf
     default: false
   }
 
-  console.log(data);
-
   return ctx.db.mutation.createTag({ data }, info)
 }
 
