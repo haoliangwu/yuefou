@@ -106,7 +106,14 @@ async function uploadRecipePicture(parent, { id, file }, ctx: Context, info?: Gr
   await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
-  const { path } = await uploadMutation.singleUpload(parent, { file, namespace: 'shared/recipe' }, ctx)
+  const namespace = 'shared/recipe'
+  const recipe = await ctx.db.query.recipe({ where: { id } })
+
+  if (recipe.avatar) {
+    await removeUpload({ filename: recipe.avatar }, namespace)
+  }
+
+  const { path } = await uploadMutation.singleUpload(parent, { file, namespace }, ctx)
 
   return ctx.db.mutation.updateRecipe({
     data: {
