@@ -36,7 +36,7 @@ export async function whenCurrentUserIsRecipeCreator(id, ctx: Context) {
 /* 
 创建一个菜谱
 */
-async function createRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, info?: GraphQLResolveInfo) {
+async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
   const userId = getUserId(ctx)
 
   const { name, desc, time } = recipe
@@ -54,19 +54,13 @@ async function createRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, in
     }
   }
 
-  if (file) {
-    const { path } = await uploadMutation.singleUpload(parent, { file }, ctx)
-
-    data.avatar = path
-  }
-
   return ctx.db.mutation.createRecipe({ data }, info)
 }
 
 /* 
 更新一个菜谱
 */
-async function updateRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, info?: GraphQLResolveInfo) {
+async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
   const { id, ...updateProps } = recipe
 
   await whenRecipeExistedById(id, ctx)
@@ -87,14 +81,6 @@ async function updateRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, in
     }
   }
 
-  if (file) {
-    // await removeUpload({ filename: originRecipe.avatar })
-
-    const { path } = await uploadMutation.singleUpload(parent, { file }, ctx)
-
-    data.avatar = path
-  }
-
   return ctx.db.mutation.updateRecipe({
     data,
     where: { id }
@@ -108,7 +94,24 @@ async function deleteRecipe(parent, { id }, ctx: Context, info?: GraphQLResolveI
   await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
-  return await ctx.db.mutation.deleteRecipe({
+  return ctx.db.mutation.deleteRecipe({
+    where: { id }
+  }, info)
+}
+
+/* 
+上传菜谱缩略图
+*/
+async function uploadRecipePicture(parent, { id, file }, ctx: Context, info?: GraphQLResolveInfo) {
+  await whenRecipeExistedById(id, ctx)
+  await whenCurrentUserIsRecipeCreator(id, ctx)
+
+  const { path } = await uploadMutation.singleUpload(parent, { file, namespace: 'shared/recipe' }, ctx)
+
+  return ctx.db.mutation.updateRecipe({
+    data: {
+      avatar: path
+    },
     where: { id }
   }, info)
 }
@@ -116,5 +119,6 @@ async function deleteRecipe(parent, { id }, ctx: Context, info?: GraphQLResolveI
 export const recipeMutation = {
   createRecipe,
   updateRecipe,
-  deleteRecipe
+  deleteRecipe,
+  uploadRecipePicture
 }

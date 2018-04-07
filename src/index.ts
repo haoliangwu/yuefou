@@ -5,10 +5,6 @@ import { GraphQLServer, Options, PubSub } from 'graphql-yoga'
 import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
 
-// import persistQueryMap from '../webapp/persist_query.json';
-
-import 'apollo-cache-control';
-
 const pubsub = new PubSub()
 // base server
 const server = new GraphQLServer({

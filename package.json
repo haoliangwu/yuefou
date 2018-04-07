@@ -13,6 +13,7 @@
     "prod:restart": "pm2 restart ecosystem.config.js"
   },
   "dependencies": {
+    "@types/node": "^9.6.2",
     "apollo-cache-control": "^0.1.0",
     "apollo-engine": "^1.0.4",
     "bcryptjs": "2.4.3",

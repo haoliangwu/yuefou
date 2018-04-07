@@ -12,6 +12,11 @@
     "outDir": "dist",
     "lib": [
       "esnext", "dom"
+    ],
+    "types": [
+      "node",
+      "bcryptjs",
+      "ramda"
     ]
   }
 }

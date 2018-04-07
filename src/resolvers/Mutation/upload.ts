@@ -43,7 +43,7 @@ export const uploadMutation = {
   /*
    单个文件上传 
    */
-  async singleUpload(parent, { file, namespace = null }, ctx: Context, info?) {
+  async singleUpload(parent, { file, namespace = null }: UploadPayload, ctx: Context, info?) {
     const userId = getUserId(ctx)
 
     namespace = R.defaultTo(userId, namespace)
@@ -58,9 +58,9 @@ export const uploadMutation = {
   /* 
    多个文件上传
    */
-  async multipleUpload(parent, { files }, ctx: Context, info?) {
+  async multipleUpload(parent, { files, namespace = null }, ctx: Context, info?) {
     return Promise.all(files.map(file => {
-      return uploadMutation.singleUpload(parent, { file }, ctx, info)
+      return uploadMutation.singleUpload(parent, { file, namespace }, ctx, info)
     }))
   }
 }
