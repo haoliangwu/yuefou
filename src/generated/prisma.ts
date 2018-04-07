@@ -49,6 +49,7 @@ type Recipe implements Node {
   creator(where: UserWhereInput): User!
   time: Int
   desc: String
+  avatar: String
 }
 
 type Tag implements Node {
@@ -1672,6 +1673,7 @@ input RecipeCreateInput {
   name: String!
   time: Int
   desc: String
+  avatar: String
   tags: TagCreateManyWithoutRecipesInput
   creator: UserCreateOneWithoutMyRecipesInput!
 }
@@ -1690,6 +1692,7 @@ input RecipeCreateWithoutCreatorInput {
   name: String!
   time: Int
   desc: String
+  avatar: String
   tags: TagCreateManyWithoutRecipesInput
 }
 
@@ -1697,6 +1700,7 @@ input RecipeCreateWithoutTagsInput {
   name: String!
   time: Int
   desc: String
+  avatar: String
   creator: UserCreateOneWithoutMyRecipesInput!
 }
 
@@ -1727,6 +1731,8 @@ enum RecipeOrderByInput {
   time_DESC
   desc_ASC
   desc_DESC
+  avatar_ASC
+  avatar_DESC
 }
 
 type RecipePreviousValues {
@@ -1736,6 +1742,7 @@ type RecipePreviousValues {
   name: String!
   time: Int
   desc: String
+  avatar: String
 }
 
 type RecipeSubscriptionPayload {
@@ -1777,6 +1784,7 @@ input RecipeUpdateInput {
   name: String
   time: Int
   desc: String
+  avatar: String
   tags: TagUpdateManyWithoutRecipesInput
   creator: UserUpdateOneWithoutMyRecipesInput
 }
@@ -1803,6 +1811,7 @@ input RecipeUpdateWithoutCreatorDataInput {
   name: String
   time: Int
   desc: String
+  avatar: String
   tags: TagUpdateManyWithoutRecipesInput
 }
 
@@ -1810,6 +1819,7 @@ input RecipeUpdateWithoutTagsDataInput {
   name: String
   time: Int
   desc: String
+  avatar: String
   creator: UserUpdateOneWithoutMyRecipesInput
 }
 
@@ -2090,6 +2100,59 @@ input RecipeWhereInput {
   All values not ending with the given string.
   """
   desc_not_ends_with: String
+  avatar: String
+  """
+  All values that are not equal to given value.
+  """
+  avatar_not: String
+  """
+  All values that are contained in given list.
+  """
+  avatar_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  avatar_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  avatar_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  avatar_lte: String
+  """
+  All values greater than the given value.
+  """
+  avatar_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  avatar_gte: String
+  """
+  All values containing the given string.
+  """
+  avatar_contains: String
+  """
+  All values not containing the given string.
+  """
+  avatar_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  avatar_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  avatar_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  avatar_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  avatar_not_ends_with: String
   tags_every: TagWhereInput
   tags_some: TagWhereInput
   tags_none: TagWhereInput
@@ -3357,7 +3420,9 @@ export type RecipeOrderByInput =
   'time_ASC' |
   'time_DESC' |
   'desc_ASC' |
-  'desc_DESC'
+  'desc_DESC' |
+  'avatar_ASC' |
+  'avatar_DESC'
 
 export interface ActivityCreateInput {
   title: String
@@ -3509,6 +3574,20 @@ export interface RecipeWhereInput {
   desc_not_starts_with?: String
   desc_ends_with?: String
   desc_not_ends_with?: String
+  avatar?: String
+  avatar_not?: String
+  avatar_in?: String[] | String
+  avatar_not_in?: String[] | String
+  avatar_lt?: String
+  avatar_lte?: String
+  avatar_gt?: String
+  avatar_gte?: String
+  avatar_contains?: String
+  avatar_not_contains?: String
+  avatar_starts_with?: String
+  avatar_not_starts_with?: String
+  avatar_ends_with?: String
+  avatar_not_ends_with?: String
   tags_every?: TagWhereInput
   tags_some?: TagWhereInput
   tags_none?: TagWhereInput
@@ -3601,6 +3680,7 @@ export interface RecipeCreateWithoutTagsInput {
   name: String
   time?: Int
   desc?: String
+  avatar?: String
   creator: UserCreateOneWithoutMyRecipesInput
 }
 
@@ -3743,6 +3823,7 @@ export interface RecipeUpdateInput {
   name?: String
   time?: Int
   desc?: String
+  avatar?: String
   tags?: TagUpdateManyWithoutRecipesInput
   creator?: UserUpdateOneWithoutMyRecipesInput
 }
@@ -3833,6 +3914,7 @@ export interface RecipeCreateInput {
   name: String
   time?: Int
   desc?: String
+  avatar?: String
   tags?: TagCreateManyWithoutRecipesInput
   creator: UserCreateOneWithoutMyRecipesInput
 }
@@ -4228,6 +4310,7 @@ export interface RecipeUpdateWithoutCreatorDataInput {
   name?: String
   time?: Int
   desc?: String
+  avatar?: String
   tags?: TagUpdateManyWithoutRecipesInput
 }
 
@@ -4300,6 +4383,7 @@ export interface RecipeCreateWithoutCreatorInput {
   name: String
   time?: Int
   desc?: String
+  avatar?: String
   tags?: TagCreateManyWithoutRecipesInput
 }
 
@@ -4481,6 +4565,7 @@ export interface RecipeUpdateWithoutTagsDataInput {
   name?: String
   time?: Int
   desc?: String
+  avatar?: String
   creator?: UserUpdateOneWithoutMyRecipesInput
 }
 
@@ -4743,6 +4828,7 @@ export interface RecipePreviousValues {
   name: String
   time?: Int
   desc?: String
+  avatar?: String
 }
 
 export interface BatchPayload {
@@ -4823,6 +4909,7 @@ export interface Recipe extends Node {
   creator: User
   time?: Int
   desc?: String
+  avatar?: String
 }
 
 /*

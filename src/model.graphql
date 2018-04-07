@@ -1,3 +1,4 @@
+# apollo-engine directive 
 enum CacheScope {
   PRIVATE
   PUBLIC
@@ -8,6 +9,15 @@ directive @cacheControl(
   scope: CacheScope
 ) on OBJECT | FIELD_DEFINITION
 
+type File {
+  id: ID!
+  path: String!
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
+
+# app model
 type User {
   id: ID!
   email: String! 
@@ -19,12 +29,4 @@ type User {
   myTasks: [ActivityTask!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   attendedActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   avatar: String
-}
-
-type File {
-  id: ID!
-  path: String!
-  filename: String!
-  mimetype: String!
-  encoding: String!
 }

@@ -71,13 +71,13 @@ input UpdateTagInput {
 
 input CreateRecipeInput {
   name: String!
-  desc: String
   time: Int!
+  desc: String
 }
 
 input UpdateRecipeInput {
   id: ID!
   name: String
-  desc: String
   time: Int
+  desc: String
 }

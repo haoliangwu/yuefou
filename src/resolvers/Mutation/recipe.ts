@@ -4,7 +4,7 @@ import { getUserId, Context } from '../../utils';
 import { GraphQLResolveInfo } from 'graphql';
 import * as ERROR from '../../constants/error';
 import { RecipeCreateInput, RecipeUpdateInput } from '../../generated/prisma';
-import { whenActivityExistedById } from '.';
+import { uploadMutation, removeUpload } from '../Mutation/upload';
 
 /* 
 一个菜谱是否存在
@@ -36,7 +36,7 @@ export async function whenCurrentUserIsRecipeCreator(id, ctx: Context) {
 /* 
 创建一个菜谱
 */
-async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
+async function createRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, info?: GraphQLResolveInfo) {
   const userId = getUserId(ctx)
 
   const { name, desc, time } = recipe
@@ -54,19 +54,27 @@ async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
     }
   }
 
+  if (file) {
+    const { path } = await uploadMutation.singleUpload(parent, { file }, ctx)
+
+    data.avatar = path
+  }
+
   return ctx.db.mutation.createRecipe({ data }, info)
 }
 
 /* 
 更新一个菜谱
 */
-async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
+async function updateRecipe(parent, { recipe, tagsMeta, file }, ctx: Context, info?: GraphQLResolveInfo) {
   const { id, ...updateProps } = recipe
 
   await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
-  const { name, desc, time, tags = [] } = recipe
+  // const originRecipe = await ctx.db.query.recipe({ where: { id } })
+
+  const { name, desc, time, avatar } = recipe
 
   let data = R.filter(R.complement(R.isNil), updateProps) as RecipeUpdateInput
 
@@ -79,6 +87,14 @@ async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
     }
   }
 
+  if (file) {
+    // await removeUpload({ filename: originRecipe.avatar })
+
+    const { path } = await uploadMutation.singleUpload(parent, { file }, ctx)
+
+    data.avatar = path
+  }
+
   return ctx.db.mutation.updateRecipe({
     data,
     where: { id }
@@ -89,7 +105,7 @@ async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
 删除一个菜谱
 */
 async function deleteRecipe(parent, { id }, ctx: Context, info?: GraphQLResolveInfo) {
-  await whenActivityExistedById(id, ctx)
+  await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
   return await ctx.db.mutation.deleteRecipe({

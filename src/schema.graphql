@@ -3,6 +3,7 @@
 # import * from "./model.graphql"
 # import * from "./payload.graphql"
 
+# graphql-upload
 # this is needed for upload to work
 scalar Upload
 
@@ -51,8 +52,8 @@ type Mutation {
   deleteTask(id: ID!, taskId: ID!): ActivityTask!
   assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
   # recipe
-  createRecipe(recipe: CreateRecipeInput!, tagsMeta: TagsMetaInput): Recipe!,
-  updateRecipe(recipe: UpdateRecipeInput!, tagsMeta: TagsMetaInput): Recipe!,
+  createRecipe(recipe: CreateRecipeInput!, tagsMeta: TagsMetaInput, file: Upload): Recipe!,
+  updateRecipe(recipe: UpdateRecipeInput!, tagsMeta: TagsMetaInput, file: Upload): Recipe!,
   deleteRecipe(id: ID!): Recipe!
   # upload
   singleUpload (file: Upload!): File!

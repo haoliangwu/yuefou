@@ -9,5 +9,6 @@ type Recipe {
   tags: [Tag!]! @relation(name: "RecipeTags")
   creator: User! @relation(name: "MyRecipes")
   time: Int @default(value: 0)
-  desc: String,
+  desc: String
+  avatar: String
 }
