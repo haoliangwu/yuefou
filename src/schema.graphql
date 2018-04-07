@@ -51,8 +51,8 @@ type Mutation {
   deleteTask(id: ID!, taskId: ID!): ActivityTask!
   assignTask(id: ID!, taskId: ID!, assigneeId: ID): ActivityTask!
   # recipe
-  createRecipe(recipe: CreateRecipeInput): Recipe!,
-  updateRecipe(recipe: UpdateRecipeInput): Recipe!,
+  createRecipe(recipe: CreateRecipeInput!, tagsMeta: TagsMetaInput): Recipe!,
+  updateRecipe(recipe: UpdateRecipeInput!, tagsMeta: TagsMetaInput): Recipe!,
   deleteRecipe(id: ID!): Recipe!
   # upload
   singleUpload (file: Upload!): File!

@@ -19,7 +19,6 @@ type Tag {
   createdAt: DateTime!
   updatedAt: DateTime!
   creator: User! @relation(name: "MyTags")
-  type: RecipeTagType @default(value: "STYLE")
   category: TagCategory! @default(value: "DEFAULT")
   default: Boolean @default(value: false)
   recipes: [Recipe!]! @relation(name: "RecipeTags")

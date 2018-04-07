@@ -1,13 +1,6 @@
 # import Tag, TagCategory from './common.graphql'
 # import User from './user.graphql'
 
-enum RecipeTagType {
-  STYLE
-  TASTE
-  METHOD
-  BASIC
-}
-
 type Recipe {
   id: ID! @unique
   createdAt: DateTime!

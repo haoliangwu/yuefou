@@ -12,7 +12,7 @@ import { whenActivityExistedById } from '.';
 export async function whenRecipeExistedById(id, ctx: Context) {
   const isExistedRecipe = await ctx.db.exists.Recipe({ id })
 
-  if (!isExistedRecipe) return Promise.reject(ERROR.NO_EXISTED_ACTIVITY_RECIPE)
+  if (!isExistedRecipe) return Promise.reject(ERROR.NO_EXISTED_RECIPE)
 }
 
 /* 
@@ -36,10 +36,10 @@ export async function whenCurrentUserIsRecipeCreator(id, ctx: Context) {
 /* 
 创建一个菜谱
 */
-async function createRecipe(parent, { recipe }, ctx: Context, info?: GraphQLResolveInfo) {
+async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
   const userId = getUserId(ctx)
 
-  const { name, desc, time, tags } = recipe
+  const { name, desc, time } = recipe
 
   const data: RecipeCreateInput = {
     name,
@@ -47,7 +47,11 @@ async function createRecipe(parent, { recipe }, ctx: Context, info?: GraphQLReso
       connect: { id: userId }
     },
     desc,
-    time
+    time,
+    tags: {
+      connect: tagsMeta ? R.propOr([], 'connect', tagsMeta) : [],
+      create: tagsMeta ? R.propOr([], 'create', tagsMeta) : []
+    }
   }
 
   return ctx.db.mutation.createRecipe({ data }, info)
@@ -56,13 +60,24 @@ async function createRecipe(parent, { recipe }, ctx: Context, info?: GraphQLReso
 /* 
 更新一个菜谱
 */
-async function updateRecipe(parent, { recipe }, ctx: Context, info?: GraphQLResolveInfo) {
+async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: GraphQLResolveInfo) {
   const { id, ...updateProps } = recipe
 
   await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
-  const data = R.filter(R.complement(R.isNil), updateProps) as RecipeUpdateInput
+  const { name, desc, time, tags = [] } = recipe
+
+  let data = R.filter(R.complement(R.isNil), updateProps) as RecipeUpdateInput
+
+  data = {
+    ...data,
+    tags: {
+      disconnect: tagsMeta ? R.propOr([], 'disconnect', tagsMeta) : [],
+      connect: tagsMeta ? R.propOr([], 'connect', tagsMeta) : [],
+      create: tagsMeta ? R.propOr([], 'create', tagsMeta) : []
+    }
+  }
 
   return ctx.db.mutation.updateRecipe({
     data,

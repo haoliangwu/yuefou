@@ -57,7 +57,6 @@ type Tag implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   creator(where: UserWhereInput): User!
-  type: RecipeTagType
   category: TagCategory!
   default: Boolean
   recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
@@ -1774,13 +1773,6 @@ input RecipeSubscriptionWhereInput {
   node: RecipeWhereInput
 }
 
-enum RecipeTagType {
-  STYLE
-  TASTE
-  METHOD
-  BASIC
-}
-
 input RecipeUpdateInput {
   name: String
   time: Int
@@ -2130,7 +2122,6 @@ type TagConnection {
 
 input TagCreateInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserCreateOneWithoutMyTagsInput!
@@ -2149,7 +2140,6 @@ input TagCreateManyWithoutRecipesInput {
 
 input TagCreateWithoutCreatorInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   recipes: RecipeCreateManyWithoutTagsInput
@@ -2157,7 +2147,6 @@ input TagCreateWithoutCreatorInput {
 
 input TagCreateWithoutRecipesInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserCreateOneWithoutMyTagsInput!
@@ -2186,8 +2175,6 @@ enum TagOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  type_ASC
-  type_DESC
   category_ASC
   category_DESC
   default_ASC
@@ -2199,7 +2186,6 @@ type TagPreviousValues {
   name: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  type: RecipeTagType
   category: TagCategory!
   default: Boolean
 }
@@ -2241,7 +2227,6 @@ input TagSubscriptionWhereInput {
 
 input TagUpdateInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserUpdateOneWithoutMyTagsInput
@@ -2268,7 +2253,6 @@ input TagUpdateManyWithoutRecipesInput {
 
 input TagUpdateWithoutCreatorDataInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   recipes: RecipeUpdateManyWithoutTagsInput
@@ -2276,7 +2260,6 @@ input TagUpdateWithoutCreatorDataInput {
 
 input TagUpdateWithoutRecipesDataInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserUpdateOneWithoutMyTagsInput
@@ -2477,19 +2460,6 @@ input TagWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  type: RecipeTagType
-  """
-  All values that are not equal to given value.
-  """
-  type_not: RecipeTagType
-  """
-  All values that are contained in given list.
-  """
-  type_in: [RecipeTagType!]
-  """
-  All values that are not contained in given list.
-  """
-  type_not_in: [RecipeTagType!]
   category: TagCategory
   """
   All values that are not equal to given value.
@@ -3298,8 +3268,6 @@ export type TagOrderByInput =
   'createdAt_DESC' |
   'updatedAt_ASC' |
   'updatedAt_DESC' |
-  'type_ASC' |
-  'type_DESC' |
   'category_ASC' |
   'category_DESC' |
   'default_ASC' |
@@ -3377,12 +3345,6 @@ export type TagCategory =
   'DEFAULT' |
   'RECIPE'
 
-export type RecipeTagType = 
-  'STYLE' |
-  'TASTE' |
-  'METHOD' |
-  'BASIC'
-
 export type RecipeOrderByInput = 
   'id_ASC' |
   'id_DESC' |
@@ -3457,10 +3419,6 @@ export interface TagWhereInput {
   updatedAt_lte?: DateTime
   updatedAt_gt?: DateTime
   updatedAt_gte?: DateTime
-  type?: RecipeTagType
-  type_not?: RecipeTagType
-  type_in?: RecipeTagType[] | RecipeTagType
-  type_not_in?: RecipeTagType[] | RecipeTagType
   category?: TagCategory
   category_not?: TagCategory
   category_in?: TagCategory[] | TagCategory
@@ -3886,7 +3844,6 @@ export interface ActivityUpsertWithoutTasksInput {
 
 export interface TagUpdateInput {
   name?: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   creator?: UserUpdateOneWithoutMyTagsInput
@@ -4276,7 +4233,6 @@ export interface RecipeUpdateWithoutCreatorDataInput {
 
 export interface TagCreateInput {
   name: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   creator: UserCreateOneWithoutMyTagsInput
@@ -4317,7 +4273,6 @@ export interface UserCreateWithoutAttendedActivitiesInput {
 
 export interface TagUpdateWithoutRecipesDataInput {
   name?: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   creator?: UserUpdateOneWithoutMyTagsInput
@@ -4356,7 +4311,6 @@ export interface RecipeUpsertWithWhereUniqueWithoutCreatorInput {
 
 export interface TagCreateWithoutCreatorInput {
   name: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   recipes?: RecipeCreateManyWithoutTagsInput
@@ -4475,7 +4429,6 @@ export interface ActivityWhereUniqueInput {
 
 export interface TagUpdateWithoutCreatorDataInput {
   name?: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   recipes?: RecipeUpdateManyWithoutTagsInput
@@ -4550,7 +4503,6 @@ export interface UserUpdateOneWithoutMyRecipesInput {
 
 export interface TagCreateWithoutRecipesInput {
   name: String
-  type?: RecipeTagType
   category?: TagCategory
   default?: Boolean
   creator: UserCreateOneWithoutMyTagsInput
@@ -4817,7 +4769,6 @@ export interface Tag extends Node {
   createdAt: DateTime
   updatedAt: DateTime
   creator: User
-  type?: RecipeTagType
   category: TagCategory
   default?: Boolean
   recipes?: Recipe[]
@@ -4919,7 +4870,6 @@ export interface TagPreviousValues {
   name: String
   createdAt: DateTime
   updatedAt: DateTime
-  type?: RecipeTagType
   category: TagCategory
   default?: Boolean
 }

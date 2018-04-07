@@ -26,7 +26,7 @@ function myRecipeTags(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
           creator: { id: userId }
         },
         {
-          type: 'BASIC'
+          default: true
         },
       ]
     }

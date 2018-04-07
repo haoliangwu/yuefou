@@ -11,7 +11,7 @@ import { TagCreateInput, TagUpdateInput } from '../../generated/prisma';
 export async function whenTagExistedById(id, ctx: Context) {
   const isExistedTag = await ctx.db.exists.Tag({ id })
 
-  if (!isExistedTag) return Promise.reject(ERROR.NO_DUPLICATE_ATTEND)
+  if (!isExistedTag) return Promise.reject(ERROR.NO_EXISTED_TAG)
 }
 
 /* 
@@ -32,15 +32,23 @@ export async function whenCurrentUserisTagCreator(id, ctx: Context) {
   }
 }
 
+/* 
+是否是默认标签
+*/
+export async function whenTagIsNotDefault(id, ctx: Context) {
+  const tag = await ctx.db.query.tag({ where: id })
+
+  if (tag.default) return Promise.reject(ERROR.NO_DELETE_DEFAULT_TAG)
+}
+
 async function createTag(parent, { tag }, ctx: Context, info?: GraphQLResolveInfo) {
   const userId = getUserId(ctx)
 
-  const { name, category, type } = tag
+  const { name, category } = tag
 
   const data: TagCreateInput = {
     name,
     category,
-    type,
     creator: {
       connect: { id: userId }
     },
@@ -70,6 +78,7 @@ async function updateTag(parent, { tag }, ctx: Context, info?: GraphQLResolveInf
 async function deleteTag(parent, { id }, ctx: Context, info?: GraphQLResolveInfo) {
   await whenTagExistedById(id, ctx)
   await whenCurrentUserisTagCreator(id, ctx)
+  await whenTagIsNotDefault(id, ctx)
 
   return ctx.db.mutation.deleteTag({
     where: { id }

@@ -33,7 +33,7 @@ function recipesConnection(parent, { pagination = {} }, ctx: Context, info?) {
 /* 
 根据 id 获取菜谱详情
 */
-function recipe(parent, args, ctx: Context, info?) {
+async function recipe(parent, args, ctx: Context, info?) {
   const { id } = args
 
   return ctx.db.query.recipe({
@@ -42,5 +42,7 @@ function recipe(parent, args, ctx: Context, info?) {
 }
 
 export const recipeQuery = {
-  recipes
+  recipes,
+  recipesConnection,
+  recipe
 }

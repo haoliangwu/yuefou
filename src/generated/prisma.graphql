@@ -60,7 +60,6 @@ type Tag implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   creator(where: UserWhereInput): User!
-  type: RecipeTagType
   category: TagCategory!
   default: Boolean
   recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
@@ -1849,13 +1848,6 @@ input RecipeSubscriptionWhereInput {
   node: RecipeWhereInput
 }
 
-enum RecipeTagType {
-  STYLE
-  TASTE
-  METHOD
-  BASIC
-}
-
 input RecipeUpdateInput {
   name: String
   time: Int
@@ -2214,7 +2206,6 @@ type TagConnection {
 
 input TagCreateInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserCreateOneWithoutMyTagsInput!
@@ -2233,7 +2224,6 @@ input TagCreateManyWithoutRecipesInput {
 
 input TagCreateWithoutCreatorInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   recipes: RecipeCreateManyWithoutTagsInput
@@ -2241,7 +2231,6 @@ input TagCreateWithoutCreatorInput {
 
 input TagCreateWithoutRecipesInput {
   name: String!
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserCreateOneWithoutMyTagsInput!
@@ -2270,8 +2259,6 @@ enum TagOrderByInput {
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  type_ASC
-  type_DESC
   category_ASC
   category_DESC
   default_ASC
@@ -2283,7 +2270,6 @@ type TagPreviousValues {
   name: String!
   createdAt: DateTime!
   updatedAt: DateTime!
-  type: RecipeTagType
   category: TagCategory!
   default: Boolean
 }
@@ -2325,7 +2311,6 @@ input TagSubscriptionWhereInput {
 
 input TagUpdateInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserUpdateOneWithoutMyTagsInput
@@ -2352,7 +2337,6 @@ input TagUpdateManyWithoutRecipesInput {
 
 input TagUpdateWithoutCreatorDataInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   recipes: RecipeUpdateManyWithoutTagsInput
@@ -2360,7 +2344,6 @@ input TagUpdateWithoutCreatorDataInput {
 
 input TagUpdateWithoutRecipesDataInput {
   name: String
-  type: RecipeTagType
   category: TagCategory
   default: Boolean
   creator: UserUpdateOneWithoutMyTagsInput
@@ -2561,19 +2544,6 @@ input TagWhereInput {
   All values greater than or equal the given value.
   """
   updatedAt_gte: DateTime
-  type: RecipeTagType
-  """
-  All values that are not equal to given value.
-  """
-  type_not: RecipeTagType
-  """
-  All values that are contained in given list.
-  """
-  type_in: [RecipeTagType!]
-  """
-  All values that are not contained in given list.
-  """
-  type_not_in: [RecipeTagType!]
   category: TagCategory
   """
   All values that are not equal to given value.
