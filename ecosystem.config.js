@@ -10,15 +10,11 @@ module.exports = {
   apps: [
     {
       name: 'yuefou-graphql-server',
-      script: 'dist/index.js',
-      "env_webhook": {
-        "port": 23928,
-        "path": "/webhook",
-        "secret": "littlelyon"
-      },
-      env_production: {
-        NODE_ENV: 'production'
-      }
+      script: 'dist/index.js'
+    },
+    {
+      name: 'yuefou-graphql-engine-server',
+      script: 'dist/engine.js'
     }
   ],
   deploy: {
