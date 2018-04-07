@@ -4,6 +4,7 @@ import { UserUpdateInput } from "../../generated/prisma";
 import * as R from 'ramda'
 
 import { uploadMutation } from '../Mutation/upload';
+import { removeUpload } from "../Mutation/upload";
 
 export async function isUserExisted(id, ctx: Context) {
   const isExisted = await ctx.db.exists.User({ id })
@@ -26,6 +27,12 @@ async function updateUser(parent, { user }, ctx: Context, info?) {
 
 async function uploadAvatar(parent, { file }, ctx: Context, info?) {
   const userId = getUserId(ctx)
+
+  const user = await ctx.db.query.user({ where: { id: userId } })
+
+  if (user.avatar) {
+    await removeUpload({ filename: user.avatar }, userId)
+  }
 
   const { path } = await uploadMutation.singleUpload(parent, { file }, ctx, info)
 
