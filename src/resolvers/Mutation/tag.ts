@@ -36,7 +36,7 @@ export async function whenCurrentUserisTagCreator(id, ctx: Context) {
 是否是默认标签
 */
 export async function whenTagIsNotDefault(id, ctx: Context) {
-  const tag = await ctx.db.query.tag({ where: id })
+  const tag = await ctx.db.query.tag({ where: { id } })
 
   if (tag.default) return Promise.reject(ERROR.NO_DELETE_DEFAULT_TAG)
 }
