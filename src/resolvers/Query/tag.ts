@@ -4,10 +4,14 @@ import { GraphQLResolveInfo } from 'graphql';
 /* 
 查询所有标签
 */
-async function tags(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
+async function tags(parent, { category }, ctx: Context, info?: GraphQLResolveInfo) {
   const userId = getUserId(ctx)
 
-  const tags = await ctx.db.query.tags({}, info)
+  const tags = await ctx.db.query.tags({
+    where: {
+      category
+    }
+  }, info)
 
   return tags
 }
