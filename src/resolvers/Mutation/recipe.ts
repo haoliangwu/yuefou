@@ -3,8 +3,16 @@ import * as R from 'ramda';
 import { getUserId, Context } from '../../utils';
 import { GraphQLResolveInfo } from 'graphql';
 import * as ERROR from '../../constants/error';
-import { RecipeCreateInput, RecipeUpdateInput } from '../../generated/prisma';
+import { RecipeCreateInput, RecipeUpdateInput, TagCreateWithoutRecipesInput } from '../../generated/prisma';
 import { uploadMutation, removeUpload } from '../Mutation/upload';
+
+const mergeCreatorMetaFactory = creatorId => R.map<any, TagCreateWithoutRecipesInput>(R.merge(R.__, {
+  creator: {
+    connect: {
+      id: creatorId
+    }
+  }
+}))
 
 /* 
 一个菜谱是否存在
@@ -41,6 +49,8 @@ async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
 
   const { name, desc, time } = recipe
 
+  const mergeCreatorMeta = mergeCreatorMetaFactory(userId)
+
   const data: RecipeCreateInput = {
     name,
     creator: {
@@ -50,7 +60,7 @@ async function createRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
     time,
     tags: {
       connect: tagsMeta ? R.propOr([], 'connect', tagsMeta) : [],
-      create: tagsMeta ? R.propOr([], 'create', tagsMeta) : []
+      create: tagsMeta ? mergeCreatorMeta(R.propOr([], 'create', tagsMeta)) : []
     }
   }
 
@@ -66,9 +76,10 @@ async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
   await whenRecipeExistedById(id, ctx)
   await whenCurrentUserIsRecipeCreator(id, ctx)
 
-  // const originRecipe = await ctx.db.query.recipe({ where: { id } })
+  const userId = getUserId(ctx)
+  const { name, desc, time } = recipe
 
-  const { name, desc, time, avatar } = recipe
+  const mergeCreatorMeta = mergeCreatorMetaFactory(userId)
 
   let data = R.filter(R.complement(R.isNil), updateProps) as RecipeUpdateInput
 
@@ -77,7 +88,7 @@ async function updateRecipe(parent, { recipe, tagsMeta }, ctx: Context, info?: G
     tags: {
       disconnect: tagsMeta ? R.propOr([], 'disconnect', tagsMeta) : [],
       connect: tagsMeta ? R.propOr([], 'connect', tagsMeta) : [],
-      create: tagsMeta ? R.propOr([], 'create', tagsMeta) : []
+      create: tagsMeta ? mergeCreatorMeta(R.propOr([], 'create', tagsMeta)) : []
     }
   }
 
