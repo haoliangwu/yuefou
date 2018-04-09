@@ -40,8 +40,8 @@ type Mutation {
   updateTag(tag: UpdateTagInput!): Tag!
   deleteTag(id: ID!): Tag!
   # activity
-  createActivity(activity: CreateActivityInput!, tasksMeta: TasksMetaInput): Activity!
-  updateActivity(activity: UpdateActivityInput!, tasksMeta: TasksMetaInput): Activity!
+  createActivity(activity: CreateActivityInput!, tasksMeta: TasksMetaInput, recipesMeta: RecipesMetaInput): Activity!
+  updateActivity(activity: UpdateActivityInput!, tasksMeta: TasksMetaInput, recipesMeta: RecipesMetaInput): Activity!
   deleteActivity(id: ID!): Activity!
   attendActivity(id: ID!): Activity!
   quitActivity(id: ID!): Activity!

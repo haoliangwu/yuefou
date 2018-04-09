@@ -56,6 +56,11 @@ input TagsMetaInput {
   disconnect: [UpdateTagInput!]
 }
 
+input RecipesMetaInput {
+  connect: [UpdateRecipeInput!],
+  disconnect: [UpdateRecipeInput!]
+}
+
 input CreateTagInput {
   name: String!
   category: TagCategory

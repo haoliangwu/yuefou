@@ -1,5 +1,6 @@
 # import Tag, TagCategory from './common.graphql'
 # import User from './user.graphql'
+# import Activity from './activity.graphql'
 
 type Recipe {
   id: ID! @unique
@@ -11,4 +12,5 @@ type Recipe {
   time: Int @default(value: 0)
   desc: String
   avatar: String
+  activities: [Activity!]! @relation(name: "ActivityRecipes") 
 }

@@ -19,6 +19,7 @@ type Activity implements Node {
   creator(where: UserWhereInput): User!
   participants(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
   tasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
+  recipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
 }
 
 type ActivityTask implements Node {
@@ -53,6 +54,7 @@ type Recipe implements Node {
   time: Int
   desc: String
   avatar: String
+  activities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
 }
 
 type Tag implements Node {
@@ -111,6 +113,7 @@ input ActivityCreateInput {
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
+  recipes: RecipeCreateManyWithoutActivitiesInput
 }
 
 input ActivityCreateManyWithoutCreatorInput {
@@ -120,6 +123,11 @@ input ActivityCreateManyWithoutCreatorInput {
 
 input ActivityCreateManyWithoutParticipantsInput {
   create: [ActivityCreateWithoutParticipantsInput!]
+  connect: [ActivityWhereUniqueInput!]
+}
+
+input ActivityCreateManyWithoutRecipesInput {
+  create: [ActivityCreateWithoutRecipesInput!]
   connect: [ActivityWhereUniqueInput!]
 }
 
@@ -138,6 +146,7 @@ input ActivityCreateWithoutCreatorInput {
   location: String!
   participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
+  recipes: RecipeCreateManyWithoutActivitiesInput
 }
 
 input ActivityCreateWithoutParticipantsInput {
@@ -149,6 +158,20 @@ input ActivityCreateWithoutParticipantsInput {
   endedAt: DateTime!
   location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
+  tasks: ActivityTaskCreateManyWithoutActivityInput
+  recipes: RecipeCreateManyWithoutActivitiesInput
+}
+
+input ActivityCreateWithoutRecipesInput {
+  title: String!
+  desc: String
+  type: ActivityType!
+  status: ProcessStatus
+  startedAt: DateTime!
+  endedAt: DateTime!
+  location: String!
+  creator: UserCreateOneWithoutMyActivitiesInput!
+  participants: UserCreateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskCreateManyWithoutActivityInput
 }
 
@@ -162,6 +185,7 @@ input ActivityCreateWithoutTasksInput {
   location: String!
   creator: UserCreateOneWithoutMyActivitiesInput!
   participants: UserCreateManyWithoutAttendedActivitiesInput
+  recipes: RecipeCreateManyWithoutActivitiesInput
 }
 
 """
@@ -733,6 +757,7 @@ input ActivityUpdateInput {
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
+  recipes: RecipeUpdateManyWithoutActivitiesInput
 }
 
 input ActivityUpdateManyWithoutCreatorInput {
@@ -751,6 +776,15 @@ input ActivityUpdateManyWithoutParticipantsInput {
   delete: [ActivityWhereUniqueInput!]
   update: [ActivityUpdateWithWhereUniqueWithoutParticipantsInput!]
   upsert: [ActivityUpsertWithWhereUniqueWithoutParticipantsInput!]
+}
+
+input ActivityUpdateManyWithoutRecipesInput {
+  create: [ActivityCreateWithoutRecipesInput!]
+  connect: [ActivityWhereUniqueInput!]
+  disconnect: [ActivityWhereUniqueInput!]
+  delete: [ActivityWhereUniqueInput!]
+  update: [ActivityUpdateWithWhereUniqueWithoutRecipesInput!]
+  upsert: [ActivityUpsertWithWhereUniqueWithoutRecipesInput!]
 }
 
 input ActivityUpdateOneWithoutTasksInput {
@@ -772,6 +806,7 @@ input ActivityUpdateWithoutCreatorDataInput {
   location: String
   participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
+  recipes: RecipeUpdateManyWithoutActivitiesInput
 }
 
 input ActivityUpdateWithoutParticipantsDataInput {
@@ -783,6 +818,20 @@ input ActivityUpdateWithoutParticipantsDataInput {
   endedAt: DateTime
   location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
+  tasks: ActivityTaskUpdateManyWithoutActivityInput
+  recipes: RecipeUpdateManyWithoutActivitiesInput
+}
+
+input ActivityUpdateWithoutRecipesDataInput {
+  title: String
+  desc: String
+  type: ActivityType
+  status: ProcessStatus
+  startedAt: DateTime
+  endedAt: DateTime
+  location: String
+  creator: UserUpdateOneWithoutMyActivitiesInput
+  participants: UserUpdateManyWithoutAttendedActivitiesInput
   tasks: ActivityTaskUpdateManyWithoutActivityInput
 }
 
@@ -796,6 +845,7 @@ input ActivityUpdateWithoutTasksDataInput {
   location: String
   creator: UserUpdateOneWithoutMyActivitiesInput
   participants: UserUpdateManyWithoutAttendedActivitiesInput
+  recipes: RecipeUpdateManyWithoutActivitiesInput
 }
 
 input ActivityUpdateWithWhereUniqueWithoutCreatorInput {
@@ -806,6 +856,11 @@ input ActivityUpdateWithWhereUniqueWithoutCreatorInput {
 input ActivityUpdateWithWhereUniqueWithoutParticipantsInput {
   where: ActivityWhereUniqueInput!
   data: ActivityUpdateWithoutParticipantsDataInput!
+}
+
+input ActivityUpdateWithWhereUniqueWithoutRecipesInput {
+  where: ActivityWhereUniqueInput!
+  data: ActivityUpdateWithoutRecipesDataInput!
 }
 
 input ActivityUpsertWithoutTasksInput {
@@ -823,6 +878,12 @@ input ActivityUpsertWithWhereUniqueWithoutParticipantsInput {
   where: ActivityWhereUniqueInput!
   update: ActivityUpdateWithoutParticipantsDataInput!
   create: ActivityCreateWithoutParticipantsInput!
+}
+
+input ActivityUpsertWithWhereUniqueWithoutRecipesInput {
+  where: ActivityWhereUniqueInput!
+  update: ActivityUpdateWithoutRecipesDataInput!
+  create: ActivityCreateWithoutRecipesInput!
 }
 
 input ActivityWhereInput {
@@ -1195,6 +1256,9 @@ input ActivityWhereInput {
   tasks_every: ActivityTaskWhereInput
   tasks_some: ActivityTaskWhereInput
   tasks_none: ActivityTaskWhereInput
+  recipes_every: RecipeWhereInput
+  recipes_some: RecipeWhereInput
+  recipes_none: RecipeWhereInput
 }
 
 input ActivityWhereUniqueInput {
@@ -1751,6 +1815,12 @@ input RecipeCreateInput {
   avatar: String
   tags: TagCreateManyWithoutRecipesInput
   creator: UserCreateOneWithoutMyRecipesInput!
+  activities: ActivityCreateManyWithoutRecipesInput
+}
+
+input RecipeCreateManyWithoutActivitiesInput {
+  create: [RecipeCreateWithoutActivitiesInput!]
+  connect: [RecipeWhereUniqueInput!]
 }
 
 input RecipeCreateManyWithoutCreatorInput {
@@ -1763,12 +1833,22 @@ input RecipeCreateManyWithoutTagsInput {
   connect: [RecipeWhereUniqueInput!]
 }
 
+input RecipeCreateWithoutActivitiesInput {
+  name: String!
+  time: Int
+  desc: String
+  avatar: String
+  tags: TagCreateManyWithoutRecipesInput
+  creator: UserCreateOneWithoutMyRecipesInput!
+}
+
 input RecipeCreateWithoutCreatorInput {
   name: String!
   time: Int
   desc: String
   avatar: String
   tags: TagCreateManyWithoutRecipesInput
+  activities: ActivityCreateManyWithoutRecipesInput
 }
 
 input RecipeCreateWithoutTagsInput {
@@ -1777,6 +1857,7 @@ input RecipeCreateWithoutTagsInput {
   desc: String
   avatar: String
   creator: UserCreateOneWithoutMyRecipesInput!
+  activities: ActivityCreateManyWithoutRecipesInput
 }
 
 """
@@ -1862,6 +1943,16 @@ input RecipeUpdateInput {
   avatar: String
   tags: TagUpdateManyWithoutRecipesInput
   creator: UserUpdateOneWithoutMyRecipesInput
+  activities: ActivityUpdateManyWithoutRecipesInput
+}
+
+input RecipeUpdateManyWithoutActivitiesInput {
+  create: [RecipeCreateWithoutActivitiesInput!]
+  connect: [RecipeWhereUniqueInput!]
+  disconnect: [RecipeWhereUniqueInput!]
+  delete: [RecipeWhereUniqueInput!]
+  update: [RecipeUpdateWithWhereUniqueWithoutActivitiesInput!]
+  upsert: [RecipeUpsertWithWhereUniqueWithoutActivitiesInput!]
 }
 
 input RecipeUpdateManyWithoutCreatorInput {
@@ -1882,12 +1973,22 @@ input RecipeUpdateManyWithoutTagsInput {
   upsert: [RecipeUpsertWithWhereUniqueWithoutTagsInput!]
 }
 
+input RecipeUpdateWithoutActivitiesDataInput {
+  name: String
+  time: Int
+  desc: String
+  avatar: String
+  tags: TagUpdateManyWithoutRecipesInput
+  creator: UserUpdateOneWithoutMyRecipesInput
+}
+
 input RecipeUpdateWithoutCreatorDataInput {
   name: String
   time: Int
   desc: String
   avatar: String
   tags: TagUpdateManyWithoutRecipesInput
+  activities: ActivityUpdateManyWithoutRecipesInput
 }
 
 input RecipeUpdateWithoutTagsDataInput {
@@ -1896,6 +1997,12 @@ input RecipeUpdateWithoutTagsDataInput {
   desc: String
   avatar: String
   creator: UserUpdateOneWithoutMyRecipesInput
+  activities: ActivityUpdateManyWithoutRecipesInput
+}
+
+input RecipeUpdateWithWhereUniqueWithoutActivitiesInput {
+  where: RecipeWhereUniqueInput!
+  data: RecipeUpdateWithoutActivitiesDataInput!
 }
 
 input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
@@ -1906,6 +2013,12 @@ input RecipeUpdateWithWhereUniqueWithoutCreatorInput {
 input RecipeUpdateWithWhereUniqueWithoutTagsInput {
   where: RecipeWhereUniqueInput!
   data: RecipeUpdateWithoutTagsDataInput!
+}
+
+input RecipeUpsertWithWhereUniqueWithoutActivitiesInput {
+  where: RecipeWhereUniqueInput!
+  update: RecipeUpdateWithoutActivitiesDataInput!
+  create: RecipeCreateWithoutActivitiesInput!
 }
 
 input RecipeUpsertWithWhereUniqueWithoutCreatorInput {
@@ -2232,6 +2345,9 @@ input RecipeWhereInput {
   tags_some: TagWhereInput
   tags_none: TagWhereInput
   creator: UserWhereInput
+  activities_every: ActivityWhereInput
+  activities_some: ActivityWhereInput
+  activities_none: ActivityWhereInput
 }
 
 input RecipeWhereUniqueInput {

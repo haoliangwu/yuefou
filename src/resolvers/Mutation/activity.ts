@@ -38,7 +38,7 @@ export async function whenCurrentUserIsActivityCreator(id, ctx: Context) {
 /*
 创建一个活动 
 */
-function createActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
+function createActivity(parent, { activity, tasksMeta, recipesMeta }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
   const { title, location, type, desc, startedAt, endedAt } = activity
@@ -56,12 +56,25 @@ function createActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
     startedAt: startedAt || now.toISOString(),
     endedAt: endedAt || now.toISOString(),
     location: location || 'somewhere',
-    tasks: {
-      create: tasksMeta ? R.propOr([], 'create', tasksMeta) : []
-    },
     participants: {
       create: []
     }
+  }
+
+  switch (data.type) {
+    case 'HOST':
+      data.recipes = {
+        connect: recipesMeta ? R.propOr([], 'connect', recipesMeta) : []
+      }
+      break
+    case 'TASK':
+      data.tasks = {
+        create: tasksMeta ? R.propOr([], 'create', tasksMeta) : []
+      }
+      break
+    case 'POTLUCK':
+    default:
+      break
   }
 
   return ctx.db.mutation.createActivity({ data }, info)
@@ -70,37 +83,53 @@ function createActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
 /* 
 更新一个活动
 */
-async function updateActivity(parent, { activity, tasksMeta }, ctx: Context, info?) {
+async function updateActivity(parent, { activity, tasksMeta, recipesMeta }, ctx: Context, info?) {
   const { id, ...updateProps } = activity
 
   await whenActivityExistedById(id, ctx)
   await whenCurrentUserIsActivityCreator(id, ctx)
 
-  // 批量删除任务
-  if (tasksMeta && tasksMeta.delete && tasksMeta.delete.length > 0) {
-    await ctx.db.mutation.deleteManyActivityTasks({
-      where: {
-        id_in: tasksMeta.delete
-      }
-    })
-  }
-
-  // 批量更新任务
-  if (tasksMeta && tasksMeta.update && tasksMeta.update.length > 0) {
-    await Promise.all(tasksMeta.update.map(task => {
-      return taskMutation.updateTask(parent, { id: activity.id, task }, ctx)
-    }))
-  }
+  const originActivity = await ctx.db.query.activity({ where: { id } })
 
   const data = R.filter(R.complement(R.isNil), updateProps) as ActivityUpdateInput
 
-  return ctx.db.mutation.updateActivity({
-    data: {
-      ...data,
-      tasks: {
+  switch (originActivity.type) {
+    case 'HOST':
+      // TODO 更新菜单
+      data.recipes = {
+        connect: recipesMeta ? R.propOr([], 'connect', recipesMeta) : [],
+        disconnect: recipesMeta ? R.propOr([], 'disconnect', recipesMeta) : []
+      }
+      break
+    case 'TASK':
+      // 批量删除任务
+      if (tasksMeta && tasksMeta.delete && tasksMeta.delete.length > 0) {
+        await ctx.db.mutation.deleteManyActivityTasks({
+          where: {
+            id_in: tasksMeta.delete
+          }
+        })
+      }
+
+      // 批量更新任务
+      if (tasksMeta && tasksMeta.update && tasksMeta.update.length > 0) {
+        await Promise.all(tasksMeta.update.map(task => {
+          return taskMutation.updateTask(parent, { id: activity.id, task }, ctx)
+        }))
+      }
+
+      data.tasks = {
         create: tasksMeta ? R.propOr([], 'create', tasksMeta) : []
       }
-    },
+
+      break
+    case 'POTLUCK':
+    default:
+      break
+  }
+
+  return ctx.db.mutation.updateActivity({
+    data,
     where: { id }
   }, info)
 }
