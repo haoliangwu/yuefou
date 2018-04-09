@@ -1,7 +1,7 @@
 import * as R from 'ramda';
 
-import { getUserId, Context } from '../../utils';
-import { ActivityCreateInput, Activity, ActivityWhereUniqueInput, ActivityUpdateInput } from '../../generated/prisma';
+import { getUserId, Context, pickConnectUpdateMeta, pickDisconnectUpdateMeta, pickDeleteUpdateMeta } from '../../utils';
+import { ActivityCreateInput, Activity, ActivityWhereUniqueInput, ActivityUpdateInput, ID_Input } from '../../generated/prisma';
 import * as ERROR from '../../constants/error';
 
 import { taskMutation } from './task';
@@ -64,7 +64,7 @@ function createActivity(parent, { activity, tasksMeta, recipesMeta }, ctx: Conte
   switch (data.type) {
     case 'HOST':
       data.recipes = {
-        connect: recipesMeta ? R.propOr([], 'connect', recipesMeta) : []
+        connect: recipesMeta ? pickConnectUpdateMeta(recipesMeta) : []
       }
       break
     case 'TASK':
@@ -97,8 +97,8 @@ async function updateActivity(parent, { activity, tasksMeta, recipesMeta }, ctx:
     case 'HOST':
       // TODO 更新菜单
       data.recipes = {
-        connect: recipesMeta ? R.propOr([], 'connect', recipesMeta) : [],
-        disconnect: recipesMeta ? R.propOr([], 'disconnect', recipesMeta) : []
+        connect: recipesMeta ? pickConnectUpdateMeta(recipesMeta) : [],
+        disconnect: recipesMeta ? pickDisconnectUpdateMeta(recipesMeta) : []
       }
       break
     case 'TASK':
@@ -106,7 +106,7 @@ async function updateActivity(parent, { activity, tasksMeta, recipesMeta }, ctx:
       if (tasksMeta && tasksMeta.delete && tasksMeta.delete.length > 0) {
         await ctx.db.mutation.deleteManyActivityTasks({
           where: {
-            id_in: tasksMeta.delete
+            id_in: pickDeleteUpdateMeta(tasksMeta)
           }
         })
       }
