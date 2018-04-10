@@ -2,6 +2,7 @@
   "name": "yuefou",
   "scripts": {
     "start": "dotenv -- nodemon -e ts,graphql -x ts-node src/index.ts",
+    "start:engine": "dotenv -- nodemon -e ts,graphql -x ts-node src/engine.ts",
     "dev": "npm-run-all --parallel start playground",
     "debug": "dotenv -- nodemon -e ts,graphql -x ts-node --inspect src/index.ts",
     "playground": "graphql playground",
