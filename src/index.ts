@@ -1,9 +1,11 @@
 import * as R from 'ramda';
+import * as jwt from 'jsonwebtoken'
 
 import { GraphQLServer, Options, PubSub } from 'graphql-yoga'
 
 import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
+import { RequestHandler, Request, Response } from 'express';
 
 const pubsub = new PubSub()
 // base server
@@ -16,7 +18,7 @@ const server = new GraphQLServer({
     db: new Prisma({
       endpoint: process.env.PRISMA_ENDPOINT, // the endpoint of the Prisma DB service (value is set in .env)
       secret: process.env.PRISMA_SECRET, // taken from database/prisma.yml (value is set in .env)
-      debug: true, // log all GraphQL queries & mutations
+      debug: false, // log all GraphQL queries & mutations
     }),
   }),
 })
@@ -47,6 +49,27 @@ const options: Options = {
     maxFiles: 1
   },
 }
+
+// auth middleware
+const checkJwt: RequestHandler = function(req, res, next){
+  const Authorization = req.get('Authorization')
+
+  if (Authorization) {
+    const token = Authorization.replace('Bearer ', '')
+    const { userId } = jwt.verify(token, process.env.APP_SECRET) as { userId: string }
+
+    next()
+  }
+}
+
+server.express.post(
+  server.options.endpoint,
+  checkJwt,
+  (err, req: Request, res, next) => {
+    if (err) return res.json(401, err);
+    next()
+  }
+)
 
 server.start(options, () => console.log(`GraphQL Server is running on http://localhost:${process.env.PORT}`))
 
