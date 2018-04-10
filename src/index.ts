@@ -57,9 +57,9 @@ const checkJwt: RequestHandler = function(req, res, next){
   if (Authorization) {
     const token = Authorization.replace('Bearer ', '')
     const { userId } = jwt.verify(token, process.env.APP_SECRET) as { userId: string }
-
-    next()
   }
+  
+  next()
 }
 
 server.express.post(
