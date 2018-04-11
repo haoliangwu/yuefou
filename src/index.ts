@@ -1,11 +1,11 @@
 import * as R from 'ramda';
-import * as jwt from 'jsonwebtoken'
 
 import { GraphQLServer, Options, PubSub } from 'graphql-yoga'
 
 import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
 import { RequestHandler, Request, Response } from 'express';
+import { checkJwt } from './middlewares/jwt';
 
 const pubsub = new PubSub()
 // base server
@@ -50,25 +50,9 @@ const options: Options = {
   },
 }
 
-// auth middleware
-const checkJwt: RequestHandler = function(req, res, next){
-  const Authorization = req.get('Authorization')
-
-  if (Authorization) {
-    const token = Authorization.replace('Bearer ', '')
-    const { userId } = jwt.verify(token, process.env.APP_SECRET) as { userId: string }
-  }
-  
-  next()
-}
-
 server.express.post(
   server.options.endpoint,
-  checkJwt,
-  (err, req: Request, res, next) => {
-    if (err) return res.json(401, err);
-    next()
-  }
+  checkJwt
 )
 
 server.start(options, () => console.log(`GraphQL Server is running on http://localhost:${process.env.PORT}`))
