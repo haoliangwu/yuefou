@@ -19,6 +19,8 @@ export const checkJwt: RequestHandler = function (req, res, next) {
 
       next()
     })
+
+    return
   }
 
   // 如果没有则直接跳过校验
