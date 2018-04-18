@@ -6,7 +6,24 @@ import * as mkdirp from 'mkdirp'
 import * as rimraf from 'rimraf';
 import * as uuid from 'node-uuid';
 
+import COS from 'cos-nodejs-sdk-v5';
+
 import { Context, getUserId } from '../../utils'
+
+const cos = new COS({
+  AppId: process.env.COS_APP_ID,
+  SecretId: process.env.COS_SECRET_ID,
+  SecretKey: process.env.COS_SECRET_KEY,
+});
+
+// cos.sliceUploadFile({
+//   Bucket: 'test',
+//   Region: 'ap-guangzhou',
+//   Key: '1.zip',
+//   FilePath: './1.zip'
+// }, function (err, data) {
+//   console.log(err, data);
+// });
 
 export const removeUpload = async ({ filename }, namespace = '.') => {
   const fullPath = resolve(process.env.UPLOAD_DIR, namespace, filename)
