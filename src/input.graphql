@@ -78,6 +78,7 @@ input CreateRecipeInput {
   name: String!
   time: Int!
   desc: String
+  avatar: String
 }
 
 input UpdateRecipeInput {
@@ -85,4 +86,5 @@ input UpdateRecipeInput {
   name: String
   time: Int
   desc: String
+  avatar: String
 }
