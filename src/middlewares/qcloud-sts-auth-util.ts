@@ -141,11 +141,11 @@ export const getTempKeys = function (config, callback) {
   const params: any = {
     Action: Action,
     Nonce: Nonce,
-    Region: '',
+    Region: config.Region,
     SecretId: config.SecretId,
     Timestamp: Timestamp,
     durationSeconds: 7200,
-    name: '',
+    name: config.name,
     policy: policyStr,
   };
 
@@ -256,3 +256,55 @@ export const getAuthorization = function (keys, method, pathname) {
 
   return authorization;
 }
+
+export const getSTS = function (config, callback) {
+
+    var LongBucketName = config.Bucket;
+    var ShortBucketName = LongBucketName.substr(0, LongBucketName.indexOf('-'));
+    var AppId = LongBucketName.substr(LongBucketName.indexOf('-') + 1);
+    var policy = getPolicy(config)
+
+    var policyStr = JSON.stringify(policy);
+    var Action = 'GetFederationToken';
+    var Nonce = getRandom(10000, 20000);
+    var Timestamp = getTimestamp();
+    var Method = 'GET';
+    var Region = config.Region
+
+    var params: any = {
+      Action: Action,
+      Nonce: Nonce,
+      Region: Region,
+      name: config.name,
+      SecretId: config.SecretId,
+      Timestamp: Timestamp,
+      durationSeconds: 1800, // 最长 2 小时 7200
+      policy: policyStr,
+    };
+    params.Signature = encodeURIComponent(getSignature(params, config.SecretKey, Method, config.Domain));
+
+    var opt = {
+      method: Method,
+      url: config.Url + '?' + json2str(params, 1),
+      rejectUnauthorized: false,
+      headers: {
+        Host: config.Domain
+      },
+    };
+    request(opt, function (err, response, body) {
+      body = body && JSON.parse(body);
+      var data = body.data;
+      var message = body.message;
+      var error = err || message;
+      if (error) {
+        callback(err);
+      } else {
+        callback(null, {
+          SecretId: data.credentials && data.credentials.tmpSecretId,
+          SecretKey: data.credentials && data.credentials.tmpSecretKey,
+          XCosSecurityToken: data.credentials && data.credentials.sessionToken,
+          ExpiredTime: data.expiredTime,
+        });
+      }
+    });
+  }
