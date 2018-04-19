@@ -111,7 +111,7 @@ async function deleteRecipe(parent, { id }, ctx: Context, info?: GraphQLResolveI
 }
 
 /* 
-上传菜谱缩略图
+上传菜谱缩略图(已弃用)
 */
 async function uploadRecipePicture(parent, { id, file }, ctx: Context, info?: GraphQLResolveInfo) {
   await whenRecipeExistedById(id, ctx)

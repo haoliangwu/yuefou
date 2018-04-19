@@ -30,3 +30,14 @@ type User {
   attendedActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   avatar: String
 }
+
+# app config
+type CosConfig {
+  bucket: String!
+  region: String!
+  appId: String!
+}
+
+type AppConfig {
+  cos: CosConfig!
+}

@@ -8,6 +8,8 @@
 scalar Upload
 
 type Query {
+  # config
+  config: AppConfig!
   # user
   me: User! @cacheControl(maxAge: 3600, scope: PRIVATE)
   # tag
