@@ -6,6 +6,7 @@ import { Prisma } from './generated/prisma'
 import resolvers from './resolvers'
 import { RequestHandler, Request, Response } from 'express';
 import { checkJwt } from './middlewares/jwt';
+import { stsAuth } from './middlewares/sts-auth';
 
 const pubsub = new PubSub()
 // base server
@@ -53,6 +54,12 @@ const options: Options = {
 server.express.post(
   server.options.endpoint,
   checkJwt
+)
+
+server.express.get(
+  '/sts-auth',
+  checkJwt,
+  stsAuth
 )
 
 server.start(options, () => console.log(`GraphQL Server is running on http://localhost:${process.env.PORT}`))
