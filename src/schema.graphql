@@ -11,18 +11,18 @@ type Query {
   # config
   config: AppConfig!
   # user
-  me: User! @cacheControl(maxAge: 60, scope: PRIVATE)
+  me: User!
   # tag
   tags(category: TagCategory): [Tag!]!
   myRecipeTags: [Tag!]!
   tag(id: ID!): Tag
   # activity
-  activities: [Activity!]! @cacheControl(maxAge: 60)
-  activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection! @cacheControl(maxAge: 60)
+  activities: [Activity!]!
+  activitiesConnection(pagination: ForwardPaginationInput): ActivityConnection!
   activity(id: ID!): Activity
   # task
-  tasks: [ActivityTask!]! @cacheControl(maxAge: 60)
-  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection @cacheControl(maxAge: 60)
+  tasks: [ActivityTask!]!
+  tasksConnection(pagination: ForwardPaginationInput): ActivityTaskConnection
   task(id: ID!): ActivityTask
   # recipe
   recipes: [Recipe!]!

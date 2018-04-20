@@ -22,13 +22,13 @@ type User {
   id: ID!
   email: String! 
   name: String!
+  avatar: String
   posts: [Post!]!
-  myRecipes: [Recipe!]!
-  myTags: [Tag!]!
+  myRecipes: [Recipe!]! @cacheControl(maxAge: 60, scope: PRIVATE)
+  myTags: [Tag!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   myActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   myTasks: [ActivityTask!]! @cacheControl(maxAge: 60, scope: PRIVATE)
   attendedActivities: [Activity!]! @cacheControl(maxAge: 60, scope: PRIVATE)
-  avatar: String
 }
 
 # app config
