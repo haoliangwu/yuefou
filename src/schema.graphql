@@ -11,7 +11,7 @@ type Query {
   # config
   config: AppConfig!
   # user
-  me: User! @cacheControl(maxAge: 3600, scope: PRIVATE)
+  me: User! @cacheControl(maxAge: 60, scope: PRIVATE)
   # tag
   tags(category: TagCategory): [Tag!]!
   myRecipeTags: [Tag!]!
