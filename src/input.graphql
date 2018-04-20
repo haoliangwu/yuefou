@@ -13,7 +13,9 @@ input BackwardPaginationInput {
 }
 
 input UpdateUserInput {
-  name: String!
+  name: String
+  email: String
+  avatar: String
 }
 
 input CreateActivityInput {

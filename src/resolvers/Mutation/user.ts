@@ -17,6 +17,8 @@ export async function isUserExisted(id, ctx: Context) {
 async function updateUser(parent, { user }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
+  await isUserExisted(userId, ctx)
+
   const data = R.filter(R.complement(R.isNil), user) as UserUpdateInput
 
   return ctx.db.mutation.updateUser({
@@ -25,6 +27,7 @@ async function updateUser(parent, { user }, ctx: Context, info?) {
   }, info)
 }
 
+// 已弃用
 async function uploadAvatar(parent, { file }, ctx: Context, info?) {
   const userId = getUserId(ctx)
 
