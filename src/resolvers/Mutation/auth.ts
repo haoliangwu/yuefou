@@ -61,11 +61,11 @@ async function login(parent, { email, password }, ctx: Context, info?) {
 /* 
 微信登录
 */
-async function wxLogin(parent, { id }, ctx: Context, info?) {
+async function wxLogin(parent, { id, name }, ctx: Context, info?) {
   const user = await ctx.db.query.user({ where: { wxId: id } })
 
   if (!user) {
-    return wxSignup(parent, { id }, ctx, info)
+    return wxSignup(parent, { id, name }, ctx, info)
   }
 
   const valid = await bcrypt.compare(id, user.password)

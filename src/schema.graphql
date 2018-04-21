@@ -35,7 +35,7 @@ type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   wxSingup(id: ID!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
-  wxLogin(id: ID!): AuthPayload!
+  wxLogin(id: ID!, name: String!): AuthPayload!
   # user
   updateUser(user: UpdateUserInput!): User!
   uploadAvatar(file: Upload!): User!
