@@ -1,6 +1,7 @@
 // auth
 export const NO_EXISTED_USER = 'no-existed-user'
 export const INVALID_PASSWORD = 'invalid-password'
+export const INVALID_WX_ID = 'invalid-wx-id'
 
 // activity
 export const NO_INVITE_SELF = 'no-invite-self'

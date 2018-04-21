@@ -33,7 +33,9 @@ type Query {
 type Mutation {
   # auth
   signup(email: String!, password: String!, name: String!): AuthPayload!
+  wxSingup(id: ID!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
+  wxLogin(id: ID!): AuthPayload!
   # user
   updateUser(user: UpdateUserInput!): User!
   uploadAvatar(file: Upload!): User!

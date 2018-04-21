@@ -13,15 +13,14 @@ type Post {
 
 type User {
   id: ID! @unique
-  email: String! @unique
-  password: String!
   name: String!
-  posts: [Post!]!
+  password: String!
+  wxId: String @unique
+  email: String @unique
+  avatar: String
   myActivities: [Activity!]! @relation(name: "MyActivities" onDelete: CASCADE)
   myTasks: [ActivityTask!]! @relation(name: "ActivityTaskAssignee")
   myRecipes: [Recipe!]! @relation(name: "MyRecipes" onDelete: CASCADE)
   myTags: [Tag!]! @relation(name: "MyTags" onDelete: CASCADE)
   attendedActivities: [Activity!]! @relation(name: "AttendedActivities")
-  avatar: String
 }
-

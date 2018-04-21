@@ -70,10 +70,10 @@ type Tag implements Node {
 
 type User implements Node {
   id: ID!
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
   myRecipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
@@ -1400,18 +1400,7 @@ input PostCreateInput {
   isPublished: Boolean
   title: String!
   text: String!
-  author: UserCreateOneWithoutPostsInput!
-}
-
-input PostCreateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
-}
-
-input PostCreateWithoutAuthorInput {
-  isPublished: Boolean
-  title: String!
-  text: String!
+  author: UserCreateOneInput!
 }
 
 """
@@ -1491,33 +1480,7 @@ input PostUpdateInput {
   isPublished: Boolean
   title: String
   text: String
-  author: UserUpdateOneWithoutPostsInput
-}
-
-input PostUpdateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
-  disconnect: [PostWhereUniqueInput!]
-  delete: [PostWhereUniqueInput!]
-  update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
-  upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
-}
-
-input PostUpdateWithoutAuthorDataInput {
-  isPublished: Boolean
-  title: String
-  text: String
-}
-
-input PostUpdateWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  data: PostUpdateWithoutAuthorDataInput!
-}
-
-input PostUpsertWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  update: PostUpdateWithoutAuthorDataInput!
-  create: PostCreateWithoutAuthorInput!
+  author: UserUpdateOneInput
 }
 
 input PostWhereInput {
@@ -2767,11 +2730,11 @@ type UserConnection {
 }
 
 input UserCreateInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
-  posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
@@ -2782,6 +2745,11 @@ input UserCreateInput {
 input UserCreateManyWithoutAttendedActivitiesInput {
   create: [UserCreateWithoutAttendedActivitiesInput!]
   connect: [UserWhereUniqueInput!]
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutMyActivitiesInput {
@@ -2804,17 +2772,12 @@ input UserCreateOneWithoutMyTasksInput {
   connect: UserWhereUniqueInput
 }
 
-input UserCreateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
-  connect: UserWhereUniqueInput
-}
-
 input UserCreateWithoutAttendedActivitiesInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
-  posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
@@ -2822,11 +2785,11 @@ input UserCreateWithoutAttendedActivitiesInput {
 }
 
 input UserCreateWithoutMyActivitiesInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
-  posts: PostCreateManyWithoutAuthorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
   myTags: TagCreateManyWithoutCreatorInput
@@ -2834,11 +2797,11 @@ input UserCreateWithoutMyActivitiesInput {
 }
 
 input UserCreateWithoutMyRecipesInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
-  posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myTags: TagCreateManyWithoutCreatorInput
@@ -2846,11 +2809,11 @@ input UserCreateWithoutMyRecipesInput {
 }
 
 input UserCreateWithoutMyTagsInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
-  posts: PostCreateManyWithoutAuthorInput
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
@@ -2858,24 +2821,12 @@ input UserCreateWithoutMyTagsInput {
 }
 
 input UserCreateWithoutMyTasksInput {
-  email: String!
-  password: String!
-  name: String!
-  avatar: String
-  posts: PostCreateManyWithoutAuthorInput
-  myActivities: ActivityCreateManyWithoutCreatorInput
-  myRecipes: RecipeCreateManyWithoutCreatorInput
-  myTags: TagCreateManyWithoutCreatorInput
-  attendedActivities: ActivityCreateManyWithoutParticipantsInput
-}
-
-input UserCreateWithoutPostsInput {
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
-  myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
   myTags: TagCreateManyWithoutCreatorInput
   attendedActivities: ActivityCreateManyWithoutParticipantsInput
@@ -2898,6 +2849,8 @@ type UserEdge {
 enum UserOrderByInput {
   id_ASC
   id_DESC
+  wxId_ASC
+  wxId_DESC
   email_ASC
   email_DESC
   password_ASC
@@ -2914,7 +2867,8 @@ enum UserOrderByInput {
 
 type UserPreviousValues {
   id: ID!
-  email: String!
+  wxId: String
+  email: String
   password: String!
   name: String!
   avatar: String
@@ -2955,12 +2909,25 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
-input UserUpdateInput {
+input UserUpdateDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
+  myActivities: ActivityUpdateManyWithoutCreatorInput
+  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
+  myRecipes: RecipeUpdateManyWithoutCreatorInput
+  myTags: TagUpdateManyWithoutCreatorInput
+  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
+}
+
+input UserUpdateInput {
+  wxId: String
+  email: String
+  password: String
+  name: String
+  avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
@@ -2975,6 +2942,15 @@ input UserUpdateManyWithoutAttendedActivitiesInput {
   delete: [UserWhereUniqueInput!]
   update: [UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput!]
   upsert: [UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput!]
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutMyActivitiesInput {
@@ -3013,21 +2989,12 @@ input UserUpdateOneWithoutMyTasksInput {
   upsert: UserUpsertWithoutMyTasksInput
 }
 
-input UserUpdateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
-  connect: UserWhereUniqueInput
-  disconnect: Boolean
-  delete: Boolean
-  update: UserUpdateWithoutPostsDataInput
-  upsert: UserUpsertWithoutPostsInput
-}
-
 input UserUpdateWithoutAttendedActivitiesDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
@@ -3035,11 +3002,11 @@ input UserUpdateWithoutAttendedActivitiesDataInput {
 }
 
 input UserUpdateWithoutMyActivitiesDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
   myTags: TagUpdateManyWithoutCreatorInput
@@ -3047,11 +3014,11 @@ input UserUpdateWithoutMyActivitiesDataInput {
 }
 
 input UserUpdateWithoutMyRecipesDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myTags: TagUpdateManyWithoutCreatorInput
@@ -3059,11 +3026,11 @@ input UserUpdateWithoutMyRecipesDataInput {
 }
 
 input UserUpdateWithoutMyTagsDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
@@ -3071,24 +3038,12 @@ input UserUpdateWithoutMyTagsDataInput {
 }
 
 input UserUpdateWithoutMyTasksDataInput {
-  email: String
-  password: String
-  name: String
-  avatar: String
-  posts: PostUpdateManyWithoutAuthorInput
-  myActivities: ActivityUpdateManyWithoutCreatorInput
-  myRecipes: RecipeUpdateManyWithoutCreatorInput
-  myTags: TagUpdateManyWithoutCreatorInput
-  attendedActivities: ActivityUpdateManyWithoutParticipantsInput
-}
-
-input UserUpdateWithoutPostsDataInput {
+  wxId: String
   email: String
   password: String
   name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
-  myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
   myTags: TagUpdateManyWithoutCreatorInput
   attendedActivities: ActivityUpdateManyWithoutParticipantsInput
@@ -3097,6 +3052,11 @@ input UserUpdateWithoutPostsDataInput {
 input UserUpdateWithWhereUniqueWithoutAttendedActivitiesInput {
   where: UserWhereUniqueInput!
   data: UserUpdateWithoutAttendedActivitiesDataInput!
+}
+
+input UserUpsertNestedInput {
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserUpsertWithoutMyActivitiesInput {
@@ -3117,11 +3077,6 @@ input UserUpsertWithoutMyTagsInput {
 input UserUpsertWithoutMyTasksInput {
   update: UserUpdateWithoutMyTasksDataInput!
   create: UserCreateWithoutMyTasksInput!
-}
-
-input UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput!
-  create: UserCreateWithoutPostsInput!
 }
 
 input UserUpsertWithWhereUniqueWithoutAttendedActivitiesInput {
@@ -3192,6 +3147,59 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
+  wxId: String
+  """
+  All values that are not equal to given value.
+  """
+  wxId_not: String
+  """
+  All values that are contained in given list.
+  """
+  wxId_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  wxId_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  wxId_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  wxId_lte: String
+  """
+  All values greater than the given value.
+  """
+  wxId_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  wxId_gte: String
+  """
+  All values containing the given string.
+  """
+  wxId_contains: String
+  """
+  All values not containing the given string.
+  """
+  wxId_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  wxId_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  wxId_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  wxId_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  wxId_not_ends_with: String
   email: String
   """
   All values that are not equal to given value.
@@ -3404,9 +3412,6 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   avatar_not_ends_with: String
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
   myActivities_every: ActivityWhereInput
   myActivities_some: ActivityWhereInput
   myActivities_none: ActivityWhereInput
@@ -3426,5 +3431,6 @@ input UserWhereInput {
 
 input UserWhereUniqueInput {
   id: ID
+  wxId: String
   email: String
 }
