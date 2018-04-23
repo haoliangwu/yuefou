@@ -21,12 +21,13 @@ async function signup(parent, args, ctx: Context, info?) {
 /* 
  微信注册
 */
-async function wxSignup(parent, args, ctx: Context, info?) {
-  const password = await bcrypt.hash(args.id, 10)
+async function wxSignup(parent, { userInput: { id, name, avatar } }, ctx: Context, info?) {
+  const password = await bcrypt.hash(id, 10)
   const user = await ctx.db.mutation.createUser({
     data: {
-      name: args.name,
-      wxId: args.id,
+      name: name,
+      wxId: id,
+      avatar: avatar,
       password
     }
   })
@@ -61,14 +62,14 @@ async function login(parent, { email, password }, ctx: Context, info?) {
 /* 
 微信登录
 */
-async function wxLogin(parent, { id, name }, ctx: Context, info?) {
-  const user = await ctx.db.query.user({ where: { wxId: id } })
+async function wxLogin(parent, { user: userInput }, ctx: Context, info?) {
+  const user = await ctx.db.query.user({ where: { wxId: userInput.id } })
 
   if (!user) {
-    return wxSignup(parent, { id, name }, ctx, info)
+    return wxSignup(parent, { userInput }, ctx, info)
   }
 
-  const valid = await bcrypt.compare(id, user.password)
+  const valid = await bcrypt.compare(userInput.id, user.password)
   if (!valid) {
     throw new Error(INVALID_WX_ID)
   }

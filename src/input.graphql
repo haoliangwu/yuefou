@@ -18,6 +18,12 @@ input UpdateUserInput {
   avatar: String
 }
 
+input WxUserBindInput {
+  id: ID!
+  name: String!
+  avatar: String
+}
+
 input CreateActivityInput {
   title: String!
   type: ActivityType
