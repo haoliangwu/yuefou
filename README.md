@@ -1,4 +1,4 @@
-## Yuefou
+## YueFou
 使用 GraphQL 的 DEMO 项目
 
 ## Back-end stack
