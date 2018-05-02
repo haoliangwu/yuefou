@@ -67,16 +67,16 @@ type Tag implements Node {
 
 type User implements Node {
   id: ID!
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
+  avatar: String
   myActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
   myTasks(where: ActivityTaskWhereInput, orderBy: ActivityTaskOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ActivityTask!]
   myRecipes(where: RecipeWhereInput, orderBy: RecipeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Recipe!]
   myTags(where: TagWhereInput, orderBy: TagOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Tag!]
   attendedActivities(where: ActivityWhereInput, orderBy: ActivityOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Activity!]
-  avatar: String
 }
 
 """
@@ -2646,10 +2646,10 @@ type UserConnection {
 }
 
 input UserCreateInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2689,10 +2689,10 @@ input UserCreateOneWithoutMyTasksInput {
 }
 
 input UserCreateWithoutAttendedActivitiesInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2701,10 +2701,10 @@ input UserCreateWithoutAttendedActivitiesInput {
 }
 
 input UserCreateWithoutMyActivitiesInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
@@ -2713,10 +2713,10 @@ input UserCreateWithoutMyActivitiesInput {
 }
 
 input UserCreateWithoutMyRecipesInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2725,10 +2725,10 @@ input UserCreateWithoutMyRecipesInput {
 }
 
 input UserCreateWithoutMyTagsInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myTasks: ActivityTaskCreateManyWithoutAssigneeInput
@@ -2737,10 +2737,10 @@ input UserCreateWithoutMyTagsInput {
 }
 
 input UserCreateWithoutMyTasksInput {
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
   myActivities: ActivityCreateManyWithoutCreatorInput
   myRecipes: RecipeCreateManyWithoutCreatorInput
@@ -2765,14 +2765,14 @@ type UserEdge {
 enum UserOrderByInput {
   id_ASC
   id_DESC
+  name_ASC
+  name_DESC
+  password_ASC
+  password_DESC
   wxId_ASC
   wxId_DESC
   email_ASC
   email_DESC
-  password_ASC
-  password_DESC
-  name_ASC
-  name_DESC
   avatar_ASC
   avatar_DESC
   updatedAt_ASC
@@ -2783,10 +2783,10 @@ enum UserOrderByInput {
 
 type UserPreviousValues {
   id: ID!
+  name: String!
+  password: String!
   wxId: String
   email: String
-  password: String!
-  name: String!
   avatar: String
 }
 
@@ -2826,10 +2826,10 @@ input UserSubscriptionWhereInput {
 }
 
 input UserUpdateDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2839,10 +2839,10 @@ input UserUpdateDataInput {
 }
 
 input UserUpdateInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2906,10 +2906,10 @@ input UserUpdateOneWithoutMyTasksInput {
 }
 
 input UserUpdateWithoutAttendedActivitiesDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2918,10 +2918,10 @@ input UserUpdateWithoutAttendedActivitiesDataInput {
 }
 
 input UserUpdateWithoutMyActivitiesDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
@@ -2930,10 +2930,10 @@ input UserUpdateWithoutMyActivitiesDataInput {
 }
 
 input UserUpdateWithoutMyRecipesDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2942,10 +2942,10 @@ input UserUpdateWithoutMyRecipesDataInput {
 }
 
 input UserUpdateWithoutMyTagsDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myTasks: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -2954,10 +2954,10 @@ input UserUpdateWithoutMyTagsDataInput {
 }
 
 input UserUpdateWithoutMyTasksDataInput {
+  name: String
+  password: String
   wxId: String
   email: String
-  password: String
-  name: String
   avatar: String
   myActivities: ActivityUpdateManyWithoutCreatorInput
   myRecipes: RecipeUpdateManyWithoutCreatorInput
@@ -3063,6 +3063,112 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   id_not_ends_with: ID
+  name: String
+  """
+  All values that are not equal to given value.
+  """
+  name_not: String
+  """
+  All values that are contained in given list.
+  """
+  name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  name_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  name_lte: String
+  """
+  All values greater than the given value.
+  """
+  name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  name_gte: String
+  """
+  All values containing the given string.
+  """
+  name_contains: String
+  """
+  All values not containing the given string.
+  """
+  name_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  name_not_ends_with: String
+  password: String
+  """
+  All values that are not equal to given value.
+  """
+  password_not: String
+  """
+  All values that are contained in given list.
+  """
+  password_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
+  password_not_in: [String!]
+  """
+  All values less than the given value.
+  """
+  password_lt: String
+  """
+  All values less than or equal the given value.
+  """
+  password_lte: String
+  """
+  All values greater than the given value.
+  """
+  password_gt: String
+  """
+  All values greater than or equal the given value.
+  """
+  password_gte: String
+  """
+  All values containing the given string.
+  """
+  password_contains: String
+  """
+  All values not containing the given string.
+  """
+  password_not_contains: String
+  """
+  All values starting with the given string.
+  """
+  password_starts_with: String
+  """
+  All values not starting with the given string.
+  """
+  password_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
+  password_ends_with: String
+  """
+  All values not ending with the given string.
+  """
+  password_not_ends_with: String
   wxId: String
   """
   All values that are not equal to given value.
@@ -3169,112 +3275,6 @@ input UserWhereInput {
   All values not ending with the given string.
   """
   email_not_ends_with: String
-  password: String
-  """
-  All values that are not equal to given value.
-  """
-  password_not: String
-  """
-  All values that are contained in given list.
-  """
-  password_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  password_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  password_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  password_lte: String
-  """
-  All values greater than the given value.
-  """
-  password_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  password_gte: String
-  """
-  All values containing the given string.
-  """
-  password_contains: String
-  """
-  All values not containing the given string.
-  """
-  password_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  password_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  password_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  password_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  password_not_ends_with: String
-  name: String
-  """
-  All values that are not equal to given value.
-  """
-  name_not: String
-  """
-  All values that are contained in given list.
-  """
-  name_in: [String!]
-  """
-  All values that are not contained in given list.
-  """
-  name_not_in: [String!]
-  """
-  All values less than the given value.
-  """
-  name_lt: String
-  """
-  All values less than or equal the given value.
-  """
-  name_lte: String
-  """
-  All values greater than the given value.
-  """
-  name_gt: String
-  """
-  All values greater than or equal the given value.
-  """
-  name_gte: String
-  """
-  All values containing the given string.
-  """
-  name_contains: String
-  """
-  All values not containing the given string.
-  """
-  name_not_contains: String
-  """
-  All values starting with the given string.
-  """
-  name_starts_with: String
-  """
-  All values not starting with the given string.
-  """
-  name_not_starts_with: String
-  """
-  All values ending with the given string.
-  """
-  name_ends_with: String
-  """
-  All values not ending with the given string.
-  """
-  name_not_ends_with: String
   avatar: String
   """
   All values that are not equal to given value.
@@ -3494,14 +3494,14 @@ export type ActivityType =
 export type UserOrderByInput = 
   'id_ASC' |
   'id_DESC' |
+  'name_ASC' |
+  'name_DESC' |
+  'password_ASC' |
+  'password_DESC' |
   'wxId_ASC' |
   'wxId_DESC' |
   'email_ASC' |
   'email_DESC' |
-  'password_ASC' |
-  'password_DESC' |
-  'name_ASC' |
-  'name_DESC' |
   'avatar_ASC' |
   'avatar_DESC' |
   'updatedAt_ASC' |
@@ -3866,10 +3866,10 @@ export interface UserSubscriptionWhereInput {
 }
 
 export interface UserCreateWithoutMyRecipesInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -3975,10 +3975,10 @@ export interface UserUpsertNestedInput {
 }
 
 export interface UserCreateInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -4071,10 +4071,10 @@ export interface ActivityTaskUpsertWithWhereUniqueWithoutActivityInput {
 }
 
 export interface UserUpdateWithoutMyTagsDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -4234,10 +4234,10 @@ export interface ActivityTaskCreateManyWithoutAssigneeInput {
 }
 
 export interface UserUpdateWithoutAttendedActivitiesDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -4334,10 +4334,10 @@ export interface UserCreateOneWithoutMyTasksInput {
 }
 
 export interface UserUpdateWithoutMyActivitiesDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
   myRecipes?: RecipeUpdateManyWithoutCreatorInput
@@ -4426,10 +4426,10 @@ export interface TagUpdateWithWhereUniqueWithoutRecipesInput {
 }
 
 export interface UserUpdateInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -4504,10 +4504,10 @@ export interface ActivityUpdateWithoutRecipesDataInput {
 }
 
 export interface UserCreateWithoutMyTagsInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -4525,10 +4525,10 @@ export interface ActivityTaskUpdateManyWithoutActivityInput {
 }
 
 export interface UserCreateWithoutAttendedActivitiesInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
@@ -4594,10 +4594,10 @@ export interface ActivityCreateWithoutRecipesInput {
 }
 
 export interface UserUpdateWithoutMyTasksDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myRecipes?: RecipeUpdateManyWithoutCreatorInput
@@ -4606,10 +4606,10 @@ export interface UserUpdateWithoutMyTasksDataInput {
 }
 
 export interface UserCreateWithoutMyTasksInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myActivities?: ActivityCreateManyWithoutCreatorInput
   myRecipes?: RecipeCreateManyWithoutCreatorInput
@@ -4643,6 +4643,34 @@ export interface UserWhereInput {
   id_not_starts_with?: ID_Input
   id_ends_with?: ID_Input
   id_not_ends_with?: ID_Input
+  name?: String
+  name_not?: String
+  name_in?: String[] | String
+  name_not_in?: String[] | String
+  name_lt?: String
+  name_lte?: String
+  name_gt?: String
+  name_gte?: String
+  name_contains?: String
+  name_not_contains?: String
+  name_starts_with?: String
+  name_not_starts_with?: String
+  name_ends_with?: String
+  name_not_ends_with?: String
+  password?: String
+  password_not?: String
+  password_in?: String[] | String
+  password_not_in?: String[] | String
+  password_lt?: String
+  password_lte?: String
+  password_gt?: String
+  password_gte?: String
+  password_contains?: String
+  password_not_contains?: String
+  password_starts_with?: String
+  password_not_starts_with?: String
+  password_ends_with?: String
+  password_not_ends_with?: String
   wxId?: String
   wxId_not?: String
   wxId_in?: String[] | String
@@ -4671,34 +4699,6 @@ export interface UserWhereInput {
   email_not_starts_with?: String
   email_ends_with?: String
   email_not_ends_with?: String
-  password?: String
-  password_not?: String
-  password_in?: String[] | String
-  password_not_in?: String[] | String
-  password_lt?: String
-  password_lte?: String
-  password_gt?: String
-  password_gte?: String
-  password_contains?: String
-  password_not_contains?: String
-  password_starts_with?: String
-  password_not_starts_with?: String
-  password_ends_with?: String
-  password_not_ends_with?: String
-  name?: String
-  name_not?: String
-  name_in?: String[] | String
-  name_not_in?: String[] | String
-  name_lt?: String
-  name_lte?: String
-  name_gt?: String
-  name_gte?: String
-  name_contains?: String
-  name_not_contains?: String
-  name_starts_with?: String
-  name_not_starts_with?: String
-  name_ends_with?: String
-  name_not_ends_with?: String
   avatar?: String
   avatar_not?: String
   avatar_in?: String[] | String
@@ -4747,10 +4747,10 @@ export interface TagUpdateWithoutCreatorDataInput {
 }
 
 export interface UserUpdateDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -4820,10 +4820,10 @@ export interface TagCreateWithoutRecipesInput {
 }
 
 export interface UserUpdateWithoutMyRecipesDataInput {
+  name?: String
+  password?: String
   wxId?: String
   email?: String
-  password?: String
-  name?: String
   avatar?: String
   myActivities?: ActivityUpdateManyWithoutCreatorInput
   myTasks?: ActivityTaskUpdateManyWithoutAssigneeInput
@@ -4994,10 +4994,10 @@ export interface ActivityTaskCreateWithoutActivityInput {
 }
 
 export interface UserCreateWithoutMyActivitiesInput {
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
   myTasks?: ActivityTaskCreateManyWithoutAssigneeInput
   myRecipes?: RecipeCreateManyWithoutCreatorInput
@@ -5240,10 +5240,10 @@ export interface UserConnection {
 
 export interface UserPreviousValues {
   id: ID_Output
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
   avatar?: String
 }
 
@@ -5253,16 +5253,16 @@ export interface AggregateTag {
 
 export interface User extends Node {
   id: ID_Output
+  name: String
+  password: String
   wxId?: String
   email?: String
-  password: String
-  name: String
+  avatar?: String
   myActivities?: Activity[]
   myTasks?: ActivityTask[]
   myRecipes?: Recipe[]
   myTags?: Tag[]
   attendedActivities?: Activity[]
-  avatar?: String
 }
 
 export interface ActivityPreviousValues {

@@ -12,6 +12,8 @@ async function signup(parent, args, ctx: Context, info?) {
     data: { ...args, password },
   })
 
+  // TODO 增加一些示例数据
+
   return {
     token: jwt.sign({ userId: user.id }, process.env.APP_SECRET),
     user,
@@ -31,6 +33,8 @@ async function wxSignup(parent, { userInput: { id, name, avatar } }, ctx: Contex
       password
     }
   })
+
+  // TODO 增加一些示例数据
 
   return {
     token: jwt.sign({ userId: user.id }, process.env.APP_SECRET),
