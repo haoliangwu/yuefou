@@ -32,10 +32,6 @@ type User {
 }
 
 # app config
-type AppConfig {
-  env: String!
-}
-
 type CosConfig {
   bucket: String!
   region: String!
@@ -43,6 +39,6 @@ type CosConfig {
 }
 
 type AppConfig {
-  cos: CosConfig!,
-  env: AppConfig!
+  env: String!,
+  cos: CosConfig!
 }
