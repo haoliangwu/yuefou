@@ -14,6 +14,9 @@
     "prod:restart": "pm2 restart ecosystem.config.js"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.1",
+    "@types/node": "^10.0.2",
+    "@types/ramda": "^0.25.24",
     "apollo-cache-control": "^0.1.0",
     "apollo-engine": "^1.0.4",
     "bcryptjs": "2.4.3",
@@ -27,9 +30,6 @@
     "tslint": "^5.9.1"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.1",
-    "@types/node": "^10.0.2",
-    "@types/ramda": "^0.25.24",
     "dotenv-cli": "1.4.0",
     "graphql-cli": "2.15.8",
     "nodemon": "1.17.1",
