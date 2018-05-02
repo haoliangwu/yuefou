@@ -33,7 +33,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/bcryptjs@2.4.1":
+"@types/bcryptjs@^2.4.1":
   version "2.4.1"
   resolved "http://registry.npm.taobao.org/@types/bcryptjs/download/@types/bcryptjs-2.4.1.tgz#7fb63922b5b106edacdcfe084cd38850f78aacfc"
 
@@ -139,13 +139,13 @@
   version "9.6.1"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-9.6.1.tgz#e2d374ef15b315b48e7efc308fa1a7cd51faa06c"
 
-"@types/node@^9.6.2":
-  version "9.6.2"
-  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-9.6.2.tgz#e49ac1adb458835e95ca6487bc20f916b37aff23"
+"@types/node@^10.0.2":
+  version "10.0.2"
+  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-10.0.2.tgz#180046ebbc37de8b64777765c2486ebecb59448e"
 
-"@types/ramda@^0.25.20":
-  version "0.25.21"
-  resolved "http://registry.npm.taobao.org/@types/ramda/download/@types/ramda-0.25.21.tgz#3399ac49ea99253c7c308916960b65058a1d63c4"
+"@types/ramda@^0.25.24":
+  version "0.25.24"
+  resolved "http://registry.npm.taobao.org/@types/ramda/download/@types/ramda-0.25.24.tgz#2f64ce2100271163247f93fa7b4b052db40ce155"
 
 "@types/restify@^5.0.7":
   version "5.0.7"
