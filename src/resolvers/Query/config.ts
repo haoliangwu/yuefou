@@ -6,6 +6,9 @@ import { GraphQLResolveInfo } from 'graphql';
 */
 function config(parent, args, ctx: Context, info?: GraphQLResolveInfo) {
   return {
+    app: {
+      env: process.env.NODE_ENV
+    },
     cos: {
       bucket: process.env.COS_BUCKET,
       region: process.env.COS_REGION,
