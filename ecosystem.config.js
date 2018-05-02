@@ -1,5 +1,15 @@
 require('dotenv').config({ path: './.env' })
 
+const isProdEnv = process.env.NODE_ENV === 'production'
+
+const suffixProd = str => {
+  if(isProdEnv) {
+    return str + '(prod)'
+  } else {
+    return str
+  }
+}
+
 module.exports = {
 
   /**
@@ -9,11 +19,11 @@ module.exports = {
 
   apps: [
     {
-      name: 'yuefou-graphql-server',
+      name: suffixProd('yuefou-graphql-server'),
       script: 'dist/index.js'
     },
     {
-      name: 'yuefou-graphql-engine-server',
+      name: suffixProd('yuefou-graphql-engine-server'),
       script: 'dist/engine.js'
     }
   ],
