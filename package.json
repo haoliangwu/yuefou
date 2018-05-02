@@ -22,13 +22,14 @@
     "apollo-engine": "^1.0.4",
     "bcryptjs": "2.4.3",
     "cos-nodejs-sdk-v5": "^2.3.8",
+    "dotenv": "^5.0.1",
     "graphql-yoga": "1.5.0",
     "jsonwebtoken": "8.2.0",
     "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.2",
     "node-uuid": "^1.4.8",
     "prisma-binding": "1.5.16",
     "ramda": "^0.25.0",
+    "rimraf": "^2.6.2",
     "tslint": "^5.9.1"
   },
   "devDependencies": {
